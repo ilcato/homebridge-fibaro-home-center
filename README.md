@@ -1,0 +1,1 @@
+# homebridge-fibaro-hc3
