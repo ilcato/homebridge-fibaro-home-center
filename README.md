@@ -1,1 +1,3 @@
 # homebridge-fibaro-hc3
+
+Work in progress ...
