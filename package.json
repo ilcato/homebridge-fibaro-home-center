@@ -1,0 +1,39 @@
+{
+  "name": "homebridge-fibaro-hc3",
+  "version": "0.0.1",
+  "description": "Homebridge plugin for Fibaro Home Center 3 ",
+  "note": "peerDependencies is hardcoded to peerDepdendencies in homebridge!!!",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepare": "tsc",
+    "start": "echo \"Error: configure and run homebridge to start\" && exit 1"
+  },
+  "engines": {
+    "node": ">12.0.0",
+    "homebridge": ">=0.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ilcato/homebridge-fibaro-hc3.git"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "Fibaro",
+    "Home Center",
+    "homekit",
+    "z-wave",
+    "Siri"
+  ],
+  "dependencies": {
+    "request": "^2.88.1",
+    "typescript": "^3.8.2"
+  },
+  "devDependencies": {},
+  "author": "ilcato",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/ilcato/homebridge-fibaro-hc3/issues"
+  },
+  "homepage": "https://github.com/ilcato/homebridge-fibaro-hc3"
+}
