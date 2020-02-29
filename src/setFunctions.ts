@@ -157,20 +157,19 @@ export class SetFunctions {
 			}
 		}
 	}
-	setTargetTemperature(value, callback, context, characteristic, service, IDs) {
+	async setTargetTemperature(value, callback, context, characteristic, service, IDs) {
 		if (Math.abs(value - characteristic.value) >= 0.5) {
 			value = parseFloat((Math.round(value / 0.5) * 0.5).toFixed(1));
 			var currentOpMode;
 			if (service.operatingModeId) {	// Operating mode is availble on Home Center
 				// need to force the operating mode to the current one because of a Fibaro API bug (setting temperature through the API change the mode to HEAT)
-				this.platform.fibaroClient.getDeviceProperties(IDs[0])
-					.then((properties) => {
-						currentOpMode = properties.mode;
-						this.command("setThermostatSetpoint", [currentOpMode, value], service, IDs);
-					})
-					.catch((err) => {
-						this.platform.log("There was a problem getting value from: ", `${IDs[0]} - Err: ${err}`);
-					});
+				try {
+					const properties = await this.platform.fibaroClient.getDeviceProperties(IDs[0]);
+					currentOpMode = properties.mode;
+					this.command("setThermostatSetpoint", [currentOpMode, value], service, IDs);
+				} catch (e) {
+					this.platform.log("There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
+				}
 			} else {
 				this.command("setTargetLevel", [value], service, IDs);
 				this.command("setTime", [parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000)], service, IDs);
@@ -260,46 +259,41 @@ export class SetFunctions {
 	}
 
 
-	command(c, value, service, IDs) {
-		this.platform.fibaroClient.executeDeviceAction(IDs[0], c, value)
-			.then((response) => {
-				this.platform.log("Command: ", c + ((value != undefined) ? ", value: " + value : "") + ", to: " + IDs[0]);
-			})
-			.catch((err, response) => {
-				this.platform.log("There was a problem sending command ", c + " to " + IDs[0]);
-			});
+	async command(c, value, service, IDs) {
+		try {
+			await this.platform.fibaroClient.executeDeviceAction(IDs[0], c, value);
+			this.platform.log("Command: ", c + ((value != undefined) ? ", value: " + value : "") + ", to: " + IDs[0]);
+		} catch (e) {
+			this.platform.log("There was a problem sending command ", c + " to " + IDs[0]);
+		}
 	}
 
-	scene(sceneID) {
-		this.platform.fibaroClient.executeScene(sceneID)
-			.then((response) => {
-				this.platform.log("Executed scene: ", sceneID);
-			})
-			.catch((err, response) => {
-				this.platform.log("There was a problem executing scene: ", sceneID);
-			});
+	async scene(sceneID) {
+		try {
+			await this.platform.fibaroClient.executeScene(sceneID);
+
+		} catch (e) {
+			this.platform.log("There was a problem executing scene: ", sceneID);
+		}
 	}
 
-	setGlobalVariable(variableID, value) {
-		this.platform.fibaroClient.setGlobalVariable(variableID, value)
-			.then((response) => {
-				this.platform.log("Setting variable: ", `${variableID} to ${value}`);
-			})
-			.catch((err, response) => {
-				this.platform.log("There was a problem setting variable: ", `${variableID} to ${value}`);
-			});
+	async setGlobalVariable(variableID, value) {
+		try {
+			await this.platform.fibaroClient.setGlobalVariable(variableID, value);
+		} catch (e) {
+			this.platform.log("There was a problem setting variable: ", `${variableID} to ${value}`);
+		}
 	}
-	checkLockCurrentState(IDs, value) {
-		this.platform.fibaroClient.getDeviceProperties(IDs[0])
-			.then((properties) => {
-				var currentValue = (properties.value == "true") ? this.hapCharacteristic.LockCurrentState.SECURED : this.hapCharacteristic.LockCurrentState.UNSECURED;
-				if (currentValue != value) {
-					this.platform.log("There was a problem setting value to Lock: ", `${IDs[0]}`);
-				}
-			})
-			.catch((err) => {
-				this.platform.log("There was a problem getting value from: ", `${IDs[0]} - Err: ${err}`);
-			});
+	async checkLockCurrentState(IDs, value) {
+		try {
+			const properties = this.platform.fibaroClient.getDeviceProperties(IDs[0]);
+			var currentValue = (properties.value == "true") ? this.hapCharacteristic.LockCurrentState.SECURED : this.hapCharacteristic.LockCurrentState.UNSECURED;
+			if (currentValue != value) {
+				this.platform.log("There was a problem setting value to Lock: ", `${IDs[0]}`);
+			}
+		} catch (e) {
+			this.platform.log("There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
+		}
 	}
 
 	/***

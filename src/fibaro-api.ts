@@ -28,7 +28,7 @@ export class FibaroClient {
 
 	constructor(host, username, password) {
 		this.host = host;
-		this.auth = "Basic " + new Buffer(username + ":" + password).toString("base64");
+		this.auth = "Basic " + new Buffer.from(username + ":" + password).toString("base64");
 		this.headers = {
 			"Authorization": this.auth
 		}

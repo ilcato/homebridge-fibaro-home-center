@@ -34,42 +34,42 @@ export class Poller {
 		this.hapCharacteristic = hapCharacteristic;
 	}
 
-	poll() {
+	async poll() {
 		if (this.pollingUpdateRunning) {
 			return;
 		}
 		this.pollingUpdateRunning = true;
 
-		this.platform.fibaroClient.refreshStates(this.lastPoll)
-			.then((updates) => {
-				if (updates.last != undefined)
-					this.lastPoll = updates.last;
-				if (updates.changes != undefined) {
-					updates.changes.map((change) => {
-						if ((change.value != undefined) || (change.value2 != undefined)) {
-							this.manageValue(change);
-						} else if (change["ui.startStopActivitySwitch.value"] != undefined) {
-							change.value = change["ui.startStopActivitySwitch.value"];
-							this.manageValue(change);
-						} else if (change.color != undefined) {
-							this.manageColor(change);
-						}
-					});
-				}
-				if (updates.events != undefined) {
-					updates.events.map((s) => {
-						if (s.data.property == "mode") {
-							this.manageOperatingMode(s);
-						}
-					});
-				}
-			})
-			.catch((err) => {
-				this.platform.log("Error fetching updates: ", err);
-				if (err == 400) {
-					this.lastPoll = 0;
-				}
-			});
+		try {
+			const updates = await this.platform.fibaroClient.refreshStates(this.lastPoll);
+			if (updates.last != undefined)
+				this.lastPoll = updates.last;
+			if (updates.changes != undefined) {
+				updates.changes.map((change) => {
+					if ((change.value != undefined) || (change.value2 != undefined)) {
+						this.manageValue(change);
+					} else if (change["ui.startStopActivitySwitch.value"] != undefined) {
+						change.value = change["ui.startStopActivitySwitch.value"];
+						this.manageValue(change);
+					} else if (change.color != undefined) {
+						this.manageColor(change);
+					}
+				});
+			}
+			if (updates.events != undefined) {
+				updates.events.map((s) => {
+					if (s.data.property == "mode") {
+						this.manageOperatingMode(s);
+					}
+				});
+			}
+
+		} catch (e) {
+			this.platform.log("Error fetching updates: ", e);
+			if (e == 400) {
+				this.lastPoll = 0;
+			}
+		}
 		this.pollingUpdateRunning = false;
 		setTimeout(() => { this.poll() }, this.pollerPeriod * 1000);
 	}

@@ -106,23 +106,21 @@ class FibaroHC3 {
 
 		this.getFunctions = new GetFunctions(Characteristic, this);
 	}
-	didFinishLaunching() {
+	async didFinishLaunching() {
 		this.log('didFinishLaunching.', '');
 		if (!this.fibaroClient)
 			return;
-		this.fibaroClient.getScenes()
-			.then((scenes) => {
-				this.mapSceneIDs(scenes);
-				this.setFunctions = new SetFunctions(Characteristic, this);	// There's a dependency in setFunction to Scene Mapping
-				return this.fibaroClient ? this.fibaroClient.getDevices() : {};
-			})
-			.then((devices) => {
-				this.LoadAccessories(devices);
-			})
-			.catch((err) => {
-				this.log("Error getting data from Home Center: ", err);
-				throw new Error("Startup error: get scenes or devices");
-			});
+
+		try {
+			const scenes = await this.fibaroClient.getScenes()
+			this.mapSceneIDs(scenes);
+			this.setFunctions = new SetFunctions(Characteristic, this);	// There's a dependency in setFunction to Scene Mapping
+			const devices = this.fibaroClient ? await this.fibaroClient.getDevices() : {};
+			this.LoadAccessories(devices);
+		} catch (e) {
+			this.log("Error getting data from Home Center: ", e);
+			throw e;
+		}
 	}
 	configureAccessory(accessory) {
 		for (let s = 0; s < accessory.services.length; s++) {
@@ -249,25 +247,25 @@ class FibaroHC3 {
 		// Manage all other status
 		if (!this.getFunctions) return;
 		let getFunction = this.getFunctions.getFunctionsMapping.get(characteristic.UUID);
-		setTimeout(() => {
+		setTimeout(async () => {
 			if (!this.fibaroClient) return;
-			this.fibaroClient.getDeviceProperties(IDs[0])
-				.then((properties: any) => {
-					if (getFunction.function) {
-						if (this.config.FibaroTemperatureUnit == "F") {
-							if (characteristic.displayName == 'Current Temperature') {
-								properties.value = (properties.value - 32) * 5 / 9;
-							}
+			try {
+				let properties: any;
+				properties = await this.fibaroClient.getDeviceProperties(IDs[0]);
+				if (getFunction.function) {
+					if (this.config.FibaroTemperatureUnit == "F") {
+						if (characteristic.displayName == 'Current Temperature') {
+							properties.value = (properties.value - 32) * 5 / 9;
 						}
-						getFunction.function.call(this.getFunctions, callback, characteristic, service, IDs, properties);
 					}
-					else
-						callback(`No get function defined for: ${characteristic.displayName}`, null);
-				})
-				.catch((err) => {
-					this.log("There was a problem getting value from: ", `${IDs[0]} - Err: ${err}`);
-					callback(err, null);
-				});
+					getFunction.function.call(this.getFunctions, callback, characteristic, service, IDs, properties);
+				}
+				else
+					callback(`No get function defined for: ${characteristic.displayName}`, null);
+			} catch (e) {
+				this.log("There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
+				callback(e, null);
+			}
 		}, getFunction.delay * 1000);
 	}
 

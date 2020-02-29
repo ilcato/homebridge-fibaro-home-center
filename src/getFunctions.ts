@@ -83,19 +83,18 @@ export class GetFunctions {
 		}
 	}
 	// Float getter
-	getFloat(callback, characteristic, service, IDs, properties) {
+	async getFloat(callback, characteristic, service, IDs, properties) {
 		let r = parseFloat(properties.value);
 
 		if (service.floatServiceId) {
-			this.platform.fibaroClient.getDeviceProperties(service.floatServiceId)
-				.then((properties) => {
-					r = parseFloat(properties.value);
-					this.returnValue(r, callback, characteristic);
-				})
-				.catch((err) => {
-					console.log("There was a problem getting value from: ", `${service.floatServiceId} - Err: ${err}`);
-					callback(err, null);
-				});
+			try {
+				const properties = await this.platform.fibaroClient.getDeviceProperties(service.floatServiceId);
+				r = parseFloat(properties.value);
+				this.returnValue(r, callback, characteristic);
+			} catch (e) {
+				console.log("There was a problem getting value from: ", `${service.floatServiceId} - Err: ${e}`);
+				callback(e, null);
+			}
 		} else {
 			this.returnValue(r, callback, characteristic);
 		}
@@ -157,7 +156,8 @@ export class GetFunctions {
 		this.returnValue(v === true ? this.hapCharacteristic.SmokeDetected.SMOKE_DETECTED : this.hapCharacteristic.SmokeDetected.SMOKE_NOT_DETECTED, callback, characteristic);
 	}
 	getCarbonMonoxideDetected(callback, characteristic, service, IDs, properties) {
-		this.returnValue(properties.value == "true" ? this.hapCharacteristic.CarbonMonoxideDetected.CO_LEVELS_ABNORMAL : this.hapCharacteristic.CarbonMonoxideDetected.CO_LEVELS_NORMAL, callback, characteristic);
+		const v = this.getBoolean(properties.value);
+		this.returnValue(v === true ? this.hapCharacteristic.CarbonMonoxideDetected.CO_LEVELS_ABNORMAL : this.hapCharacteristic.CarbonMonoxideDetected.CO_LEVELS_NORMAL, callback, characteristic);
 	}
 	getOutletInUse(callback, characteristic, service, IDs, properties) {
 		this.returnValue(parseFloat(properties.power) > 1.0 ? true : false, callback, characteristic);
@@ -169,28 +169,27 @@ export class GetFunctions {
 		}
 		this.returnValue(properties.value == "true" ? this.hapCharacteristic.LockCurrentState.SECURED : this.hapCharacteristic.LockCurrentState.UNSECURED, callback, characteristic);
 	}
-	getCurrentHeatingCoolingState(callback, characteristic, service, IDs, properties) {
+	async getCurrentHeatingCoolingState(callback, characteristic, service, IDs, properties) {
 		if (service.operatingModeId) {	// Operating mode is availble on Home Center
-			this.platform.fibaroClient.getDeviceProperties(service.operatingModeId)
-				.then((properties) => {
-					switch (properties.mode) {
-						case "0": // OFF
-							this.returnValue(this.hapCharacteristic.CurrentHeatingCoolingState.OFF, callback, characteristic);
-							break;
-						case "1": // HEAT
-							this.returnValue(this.hapCharacteristic.CurrentHeatingCoolingState.HEAT, callback, characteristic);
-							break;
-						case "2": // COOL
-							this.returnValue(this.hapCharacteristic.CurrentHeatingCoolingState.COOL, callback, characteristic);
-							break;
-						default:
-							break;
-					}
-				})
-				.catch((err) => {
-					this.platform.log("There was a problem getting value from: ", `${service.operatingModeId} - Err: ${err}`);
-					callback(err, null);
-				});
+			try {
+				const properties = await this.platform.fibaroClient.getDeviceProperties(service.operatingModeId);
+				switch (properties.mode) {
+					case "0": // OFF
+						this.returnValue(this.hapCharacteristic.CurrentHeatingCoolingState.OFF, callback, characteristic);
+						break;
+					case "1": // HEAT
+						this.returnValue(this.hapCharacteristic.CurrentHeatingCoolingState.HEAT, callback, characteristic);
+						break;
+					case "2": // COOL
+						this.returnValue(this.hapCharacteristic.CurrentHeatingCoolingState.COOL, callback, characteristic);
+						break;
+					default:
+						break;
+				}
+			} catch (e) {
+				this.platform.log("There was a problem getting value from: ", `${service.operatingModeId} - Err: ${e}`);
+				callback(e, null);
+			}
 		} else {
 			if (this.platform.config.enablecoolingstatemanagemnt == "on") { // Simulated operating mode
 				let t = parseFloat(properties.value);
@@ -203,31 +202,30 @@ export class GetFunctions {
 			}
 		}
 	}
-	getTargetHeatingCoolingState(callback, characteristic, service, IDs, properties) {
+	async getTargetHeatingCoolingState(callback, characteristic, service, IDs, properties) {
 		if (service.operatingModeId) {	// Operating mode is availble on Home Center
-			this.platform.fibaroClient.getDeviceProperties(service.operatingModeId)
-				.then((properties) => {
-					switch (properties.mode) {
-						case "0": // OFF
-							this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.OFF, callback, characteristic);
-							break;
-						case "1": // HEAT
-							this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.HEAT, callback, characteristic);
-							break;
-						case "2": // COOL
-							this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.COOL, callback, characteristic);
-							break;
-						case "10": // AUTO
-							this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.AUTO, callback, characteristic);
-							break;
-						default:
-							break;
-					}
-				})
-				.catch((err) => {
-					this.platform.log("There was a problem getting value from: ", `${service.operatingModeId} - Err: ${err}`);
-					callback(err, null);
-				});
+			try {
+				const properties = await this.platform.fibaroClient.getDeviceProperties(service.operatingModeId);
+				switch (properties.mode) {
+					case "0": // OFF
+						this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.OFF, callback, characteristic);
+						break;
+					case "1": // HEAT
+						this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.HEAT, callback, characteristic);
+						break;
+					case "2": // COOL
+						this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.COOL, callback, characteristic);
+						break;
+					case "10": // AUTO
+						this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.AUTO, callback, characteristic);
+						break;
+					default:
+						break;
+				}
+			} catch (e) {
+				this.platform.log("There was a problem getting value from: ", `${service.operatingModeId} - Err: ${e}`);
+				callback(e, null);
+			}
 		} else {
 			if (this.platform.config.enablecoolingstatemanagemnt == "on") {
 				let t = parseFloat(properties.targetLevel);
@@ -320,5 +318,5 @@ export class GetFunctions {
 				return false;
 		}
 	}
-	}
+}
 
