@@ -22,6 +22,7 @@ export const stdTemp = 21;
 export class SetFunctions {
 	hapCharacteristic: any;
 	setFunctionsMapping: Map<string, any>;
+	getTargetSecuritySystemSceneMapping: Map<number, any>;
 
 	platform: any;
 
@@ -39,8 +40,17 @@ export class SetFunctions {
 			[(new hapCharacteristic.TargetTemperature()).UUID, this.setTargetTemperature],
 			[(new hapCharacteristic.TargetDoorState()).UUID, this.setTargetDoorState],
 			[(new hapCharacteristic.Hue()).UUID, this.setHue],
-			[(new hapCharacteristic.Saturation()).UUID, this.setSaturation]
+			[(new hapCharacteristic.Saturation()).UUID, this.setSaturation],
+			[(new hapCharacteristic.SecuritySystemTargetState()).UUID, this.setSecuritySystemTargetState],
 		]);
+
+		this.getTargetSecuritySystemSceneMapping = new Map([
+			[this.hapCharacteristic.SecuritySystemTargetState.AWAY_ARM, 	this.platform.securitySystemScenes.SetAwayArmed],
+			[this.hapCharacteristic.SecuritySystemTargetState.DISARM, 		this.platform.securitySystemScenes.SetDisarmed],
+			[this.hapCharacteristic.SecuritySystemTargetState.NIGHT_ARM, 	this.platform.securitySystemScenes.SetNightArmed],
+			[this.hapCharacteristic.SecuritySystemTargetState.STAY_ARM, 	this.platform.securitySystemScenes.SetStayArmed]
+		]);
+
 	}
 
 
@@ -188,6 +198,14 @@ export class SetFunctions {
 	setSaturation(value, callback, context, characteristic, service, IDs) {
 		let rgb = this.updateHomeCenterColorFromHomeKit(null, value, null, service);
 		this.syncColorCharacteristics(rgb, service, IDs);
+	}
+	setSecuritySystemTargetState(value, callback, context, characteristic, service, IDs) {
+		let sceneID = this.getTargetSecuritySystemSceneMapping.get(value);
+		if (value == this.hapCharacteristic.SecuritySystemTargetState.DISARM)
+			value = this.hapCharacteristic.SecuritySystemCurrentState.DISARMED;
+		if (sceneID == undefined)
+			return;
+		this.scene(sceneID);
 	}
 
 	updateHomeCenterColorFromHomeKit(h, s, v, service) {

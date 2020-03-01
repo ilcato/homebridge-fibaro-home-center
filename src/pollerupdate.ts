@@ -72,7 +72,16 @@ export class Poller {
 					this.platform.getFunctions.getBool(null, this.searchCharacteristic(globalVariables[i]), null, null, switchStatus);
 				}
 			}
-
+			// Manage Security System state
+			if (this.platform.config.securitysystem == "enabled") {
+				const securitySystemStatus = await this.platform.fibaroClient.getGlobalVariable("SecuritySystem");
+				if (this.platform.securitySystemService != undefined) {
+					let statec = this.platform.getFunctions.getCurrentSecuritySystemStateMapping.get(securitySystemStatus.value);
+					let c = this.platform.securitySystemService.getCharacteristic(this.hapCharacteristic.SecuritySystemCurrentState);
+					if (c.value != statec)
+						c.updateValue(statec);
+				}
+			}
 		} catch (e) {
 			this.platform.log("Error fetching updates: ", e);
 			if (e == 400) {

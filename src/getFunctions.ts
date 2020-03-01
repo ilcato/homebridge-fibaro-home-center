@@ -21,6 +21,8 @@ import { lowestTemp, SetFunctions } from './setFunctions'
 export class GetFunctions {
 	hapCharacteristic: any;
 	getFunctionsMapping: Map<string, any>;
+	getCurrentSecuritySystemStateMapping: Map<string, any>;
+	getTargetSecuritySystemStateMapping: Map<string, any>;
 	platform: any;
 
 	constructor(hapCharacteristic, platform) {
@@ -60,6 +62,19 @@ export class GetFunctions {
 			[(new hapCharacteristic.BatteryLevel()).UUID, { "function": this.getBatteryLevel, "delay": 0 }],
 			[(new hapCharacteristic.ChargingState()).UUID, { "function": this.getChargingState, "delay": 0 }],
 			[(new hapCharacteristic.StatusLowBattery()).UUID, { "function": this.getStatusLowBattery, "delay": 0 }]
+		]);
+		this.getCurrentSecuritySystemStateMapping = new Map([
+			["AwayArmed", 	this.hapCharacteristic.SecuritySystemCurrentState.AWAY_ARM],
+			["Disarmed", 	this.hapCharacteristic.SecuritySystemCurrentState.DISARMED],
+			["NightArmed", 	this.hapCharacteristic.SecuritySystemCurrentState.NIGHT_ARM],
+			["StayArmed", 	this.hapCharacteristic.SecuritySystemCurrentState.STAY_ARM],
+			["AlarmTriggered", this.hapCharacteristic.SecuritySystemCurrentState.ALARM_TRIGGERED]
+		]);
+		this.getTargetSecuritySystemStateMapping = new Map([
+			["AwayArmed", 	this.hapCharacteristic.SecuritySystemTargetState.AWAY_ARM],
+			["Disarmed", 	this.hapCharacteristic.SecuritySystemTargetState.DISARM],
+			["NightArmed", 	this.hapCharacteristic.SecuritySystemTargetState.NIGHT_ARM],
+			["StayArmed", 	this.hapCharacteristic.SecuritySystemTargetState.STAY_ARM]
 		]);
 	}
 
@@ -265,6 +280,18 @@ export class GetFunctions {
 		let r = parseFloat(properties.batteryLevel) <= 30 ? 1 : 0;
 		this.returnValue(r, callback, characteristic);
 	}
+	getSecuritySystemTargetState(callback, characteristic, service, IDs, securitySystemStatus) {
+		let r;
+		if (characteristic.UUID == (new this.hapCharacteristic.SecuritySystemCurrentState()).UUID) {
+			r = this.getCurrentSecuritySystemStateMapping.get(securitySystemStatus.value);
+		} else if (characteristic.UUID == (new this.hapCharacteristic.SecuritySystemTargetState()).UUID) {
+			r = this.getTargetSecuritySystemStateMapping.get(securitySystemStatus.value);
+		}
+		if (r == undefined)
+			r = this.hapCharacteristic.SecuritySystemTargetState.DISARMED;
+		this.returnValue(r, callback, characteristic);
+	}
+
 	updateHomeKitColorFromHomeCenter(color, service) {
 		let colors = color.split(",");
 		let r = parseInt(colors[0]);

@@ -26,6 +26,7 @@
 //						"thermostattimeout": "PUT THE NUMBER OF SECONDS FOR THE THERMOSTAT TIMEOUT, DEFAULT: 7200 (2 HOURS). PUT 0 FOR INFINITE",
 //						"enablecoolingstatemanagemnt": "PUT on TO AUTOMATICALLY MANAGE HEATING STATE FOR THERMOSTAT, off TO DISABLE IT. DEFAULT off",
 //						"switchglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A BISTABLE SWITCH",
+//						"securitysystem": "PUT enabled OR disabled IN ORDER TO MANAGE THE AVAILABILITY OF THE SECURITY SYSTEM",
 //     }
 // ],
 //
@@ -71,6 +72,7 @@ class Config {
 	thermostattimeout?: string;
 	enablecoolingstatemanagemnt?: string;
 	switchglobalvariables?: string;
+	securitysystem?: string;
 	FibaroTemperatureUnit?: string;
 	constructor() {
 		this.name = "";
@@ -87,6 +89,8 @@ class FibaroHC3 {
 	accessories: Map<string, any>;
 	updateSubscriptions: Array<Object>;
 	poller?: Poller;
+	securitySystemScenes: Object;
+	securitySystemService: Object;
 	fibaroClient?: FibaroClient;
 	setFunctions?: SetFunctions;
 	getFunctions?: GetFunctions;
@@ -97,6 +101,9 @@ class FibaroHC3 {
 
 		this.accessories = new Map();
 		this.updateSubscriptions = new Array();
+		this.securitySystemScenes = {};
+		this.securitySystemService = {};
+
 		this.config = config;
 
 		if (!config) {
@@ -112,6 +119,8 @@ class FibaroHC3 {
 			this.config.enablecoolingstatemanagemnt = defaultEnableCoolingStateManagemnt;
 		if (this.config.switchglobalvariables == undefined)
 			this.config.switchglobalvariables = "";
+		if (this.config.securitysystem == undefined || (this.config.securitysystem != "enabled" && this.config.securitysystem != "disabled"))
+			this.config.securitysystem = "disabled";
 		if (this.config.FibaroTemperatureUnit == undefined)
 			this.config.FibaroTemperatureUnit = "C";
 		this.fibaroClient = new FibaroClient(this.config.host, this.config.username, this.config.password);
@@ -184,7 +193,14 @@ class FibaroHC3 {
 				this.addAccessory(sa);
 			}
 		}
-		
+
+		// Create Security System accessory
+		if (this.config.securitysystem == "enabled") {
+			let device = { name: "FibaroSecuritySystem", roomID: 0, id: 0 };
+			let sa = ShadowAccessory.createShadowSecuritySystemAccessory(device, Accessory, Service, Characteristic, this);
+			this.addAccessory(sa);
+		}
+
 		// Remove not reviewd accessories: cached accessories no more present in Home Center
 		let accessories = this.accessories.values() // Iterator for accessories, key is the uniqueseed
 		for (let a of accessories) {
@@ -210,6 +226,10 @@ class FibaroHC3 {
 			a.context.uniqueSeed = uniqueSeed;
 			this.accessories.set(uniqueSeed, a);
 		}
+		// Store SecuritySystem Accessory
+		if (this.config.securitysystem == "enabled" && shadowAccessory.isSecuritySystem) {
+			this.securitySystemService = a.getService(Service.SecuritySystem);
+		}
 		shadowAccessory.setAccessory(a);
 		// init accessory
 		shadowAccessory.initAccessory();
@@ -230,27 +250,39 @@ class FibaroHC3 {
 
 	bindCharacteristicEvents(characteristic, service) {
 		let IDs = service.subtype.split("-"); // IDs[0] is always device ID; for virtual device IDs[1] is the button ID
-		var propertyChanged = "value"; // subscribe to the changes of this property
-		if (service.HSBValue != undefined)
-			propertyChanged = "color";
-		if (service.operatingModeId != undefined) {
-			if (characteristic.UUID == (new Characteristic.CurrentHeatingCoolingState()).UUID || characteristic.UUID == (new Characteristic.TargetHeatingCoolingState()).UUID) {
-				propertyChanged = "mode";
-			}
-		}
-		if (service.UUID == (Service.WindowCovering.UUID) && (characteristic.UUID == (new Characteristic.CurrentHorizontalTiltAngle).UUID)) {
-			propertyChanged = "value2";
-		}
-		if (service.UUID == (Service.WindowCovering.UUID) && (characteristic.UUID == (new Characteristic.TargetHorizontalTiltAngle).UUID)) {
-			propertyChanged = "value2";
-		}
-		this.subscribeUpdate(service, characteristic, propertyChanged);
+		service.isVirtual = IDs[1] != "" ? true : false;
+		service.isSecuritySystem = IDs[0] == "0" ? true : false;
+		service.isGlobalVariableSwitch = IDs[0] == "G" ? true : false;
+		service.isHarmonyDevice = (IDs.length >= 4 && IDs[4] == "HP") ? true : false;
+		service.isLockSwitch = (IDs.length >= 4 && IDs[4] == "LOCK") ? true : false;
 
+		if (!service.isVirtual) {
+			var propertyChanged = "value"; // subscribe to the changes of this property
+			if (service.HSBValue != undefined)
+				propertyChanged = "color";
+			if (service.operatingModeId != undefined) {
+				if (characteristic.UUID == (new Characteristic.CurrentHeatingCoolingState()).UUID || characteristic.UUID == (new Characteristic.TargetHeatingCoolingState()).UUID) {
+					propertyChanged = "mode";
+				}
+			}
+			if (service.UUID == (Service.WindowCovering.UUID) && (characteristic.UUID == (new Characteristic.CurrentHorizontalTiltAngle).UUID)) {
+				propertyChanged = "value2";
+			}
+			if (service.UUID == (Service.WindowCovering.UUID) && (characteristic.UUID == (new Characteristic.TargetHorizontalTiltAngle).UUID)) {
+				propertyChanged = "value2";
+			}
+			this.subscribeUpdate(service, characteristic, propertyChanged);
+		}
 		characteristic.on('set', (value, callback, context) => {
 			this.setCharacteristicValue(value, callback, context, characteristic, service, IDs);
 		});
 		characteristic.on('get', (callback) => {
-			this.getCharacteristicValue(callback, characteristic, service, IDs);
+			if (service.isVirtual && !service.isGlobalVariableSwitch) {
+				// a push button is normally off
+				callback(undefined, false);
+			} else {
+				this.getCharacteristicValue(callback, characteristic, service, IDs);
+			}
 		});
 	}
 
@@ -267,8 +299,26 @@ class FibaroHC3 {
 		callback();
 	}
 
-	getCharacteristicValue(callback, characteristic, service, IDs) {
+	async getCharacteristicValue(callback, characteristic, service, IDs) {
 		this.log("Getting value from device: ", `${IDs[0]}  parameter: ${characteristic.displayName}`);
+		try {
+			if (!this.fibaroClient) return;
+			// Manage security system status
+			if (service.isSecuritySystem) {
+				const securitySystemStatus = await this.fibaroClient.getGlobalVariable("SecuritySystem");
+				if (this.getFunctions)
+					this.getFunctions.getSecuritySystemTargetState(callback, characteristic, service, IDs, securitySystemStatus);
+			}
+			// Manage global variable switches
+			if (service.isGlobalVariableSwitch) {
+				const switchStatus = await this.fibaroClient.getGlobalVariable(IDs[1]);
+				if (this.getFunctions)
+					this.getFunctions.getBool(callback, characteristic, service, IDs, switchStatus);
+			}
+		} catch (e) {
+			this.log("There was a problem getting value from Global Variabls", ` - Err: ${e}`);
+			callback(e, null);
+		}
 		// Manage all other status
 		if (!this.getFunctions) return;
 		let getFunction = this.getFunctions.getFunctionsMapping.get(characteristic.UUID);
@@ -300,6 +350,11 @@ class FibaroHC3 {
 	}
 
 	mapSceneIDs(scenes) {
+		if (this.config.securitysystem == "enabled") {
+			scenes.map((s) => {
+				this.securitySystemScenes[s.name] = s.id;
+			});
+		}
 	}
 
 	findSiblingDevices(device, devices) {

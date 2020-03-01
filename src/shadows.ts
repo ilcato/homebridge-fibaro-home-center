@@ -40,6 +40,7 @@ export class ShadowAccessory {
 	hapCharacteristic: any;
 	platform: any;
 	device: any;
+	isSecuritySystem: boolean;
 
 	constructor(device: any, services: ShadowService[], hapAccessory: any, hapService: any, hapCharacteristic: any, platform, isSecurritySystem?: boolean) {
 		this.name = device.name;
@@ -51,6 +52,7 @@ export class ShadowAccessory {
 		this.hapCharacteristic = hapCharacteristic;
 		this.platform = platform;
 		this.device = { id: device.id, name: device.name, type: device.type, properties: device.properties };
+		this.isSecuritySystem = isSecurritySystem ? isSecurritySystem : false;
 
 		for (let i = 0; i < services.length; i++) {
 			if (services[i].controlService.subtype == undefined)
@@ -271,6 +273,11 @@ export class ShadowAccessory {
 	static createShadowGlobalVariableSwitchAccessory(device, hapAccessory, hapService, hapCharacteristic, platform) {
 		let service = new ShadowService(new hapService.Switch(device.name), [hapCharacteristic.On]);
 		service.controlService.subtype = `G-${device.name}-`;
+  		return new ShadowAccessory(device, [service], hapAccessory, hapService, hapCharacteristic, platform, true);
+	}  	
+	static createShadowSecuritySystemAccessory(device, hapAccessory, hapService, hapCharacteristic, platform) {
+		let service = new ShadowService(new hapService.SecuritySystem("FibaroSecuritySystem"), [hapCharacteristic.SecuritySystemCurrentState, hapCharacteristic.SecuritySystemTargetState]);
+		service.controlService.subtype = "0--";
   		return new ShadowAccessory(device, [service], hapAccessory, hapService, hapCharacteristic, platform, true);
 	}  	
 }
