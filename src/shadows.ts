@@ -257,6 +257,11 @@ export class ShadowAccessory {
 				service.controlService.subtype = device.id + "--RGB";
 				ss = [service];
 				break;
+			case "com.fibaro.logitechHarmonyActivity":
+				controlService = new hapService.Switch(device.name);
+				controlService.subtype = device.id + "----" + "HP"; 					// HP: Harmony Plugin		
+				ss = [new ShadowService(controlService, [hapCharacteristic.On])];
+				break;
 			default:
 				break
 		}
@@ -273,11 +278,11 @@ export class ShadowAccessory {
 	static createShadowGlobalVariableSwitchAccessory(device, hapAccessory, hapService, hapCharacteristic, platform) {
 		let service = new ShadowService(new hapService.Switch(device.name), [hapCharacteristic.On]);
 		service.controlService.subtype = `G-${device.name}-`;
-  		return new ShadowAccessory(device, [service], hapAccessory, hapService, hapCharacteristic, platform, true);
-	}  	
+		return new ShadowAccessory(device, [service], hapAccessory, hapService, hapCharacteristic, platform, true);
+	}
 	static createShadowSecuritySystemAccessory(device, hapAccessory, hapService, hapCharacteristic, platform) {
 		let service = new ShadowService(new hapService.SecuritySystem("FibaroSecuritySystem"), [hapCharacteristic.SecuritySystemCurrentState, hapCharacteristic.SecuritySystemTargetState]);
 		service.controlService.subtype = "0--";
-  		return new ShadowAccessory(device, [service], hapAccessory, hapService, hapCharacteristic, platform, true);
-	}  	
+		return new ShadowAccessory(device, [service], hapAccessory, hapService, hapCharacteristic, platform, true);
+	}
 }
