@@ -24,7 +24,8 @@
 //            "password": "PUT PASSWORD OF YOUR HC3 HERE",
 //            "pollerperiod": "PUT 0 FOR DISABLING POLLING, 1 - 100 INTERVAL IN SECONDS. 5 SECONDS IS THE DEFAULT",
 //						"thermostattimeout": "PUT THE NUMBER OF SECONDS FOR THE THERMOSTAT TIMEOUT, DEFAULT: 7200 (2 HOURS). PUT 0 FOR INFINITE",
-//						"enablecoolingstatemanagemnt": "PUT on TO AUTOMATICALLY MANAGE HEATING STATE FOR THERMOSTAT, off TO DISABLE IT. DEFAULT off"
+//						"enablecoolingstatemanagemnt": "PUT on TO AUTOMATICALLY MANAGE HEATING STATE FOR THERMOSTAT, off TO DISABLE IT. DEFAULT off",
+//						"switchglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A BISTABLE SWITCH",
 //     }
 // ],
 //
@@ -69,6 +70,7 @@ class Config {
 	pollerperiod?: string;
 	thermostattimeout?: string;
 	enablecoolingstatemanagemnt?: string;
+	switchglobalvariables?: string;
 	FibaroTemperatureUnit?: string;
 	constructor() {
 		this.name = "";
@@ -108,6 +110,8 @@ class FibaroHC3 {
 			this.config.thermostattimeout = timeOffset.toString();
 		if (this.config.enablecoolingstatemanagemnt == undefined)
 			this.config.enablecoolingstatemanagemnt = defaultEnableCoolingStateManagemnt;
+		if (this.config.switchglobalvariables == undefined)
+			this.config.switchglobalvariables = "";
 		if (this.config.FibaroTemperatureUnit == undefined)
 			this.config.FibaroTemperatureUnit = "C";
 		this.fibaroClient = new FibaroClient(this.config.host, this.config.username, this.config.password);
@@ -171,6 +175,16 @@ class FibaroHC3 {
 			}
 		});
 
+		// Create Global Variable Switches
+		if (this.config.switchglobalvariables && this.config.switchglobalvariables != "") {
+			let globalVariables = this.config.switchglobalvariables.split(',');
+			for (let i = 0; i < globalVariables.length; i++) {
+				let device = { name: globalVariables[i], roomID: 0, id: 0 };
+				let sa = ShadowAccessory.createShadowGlobalVariableSwitchAccessory(device, Accessory, Service, Characteristic, this);
+				this.addAccessory(sa);
+			}
+		}
+		
 		// Remove not reviewd accessories: cached accessories no more present in Home Center
 		let accessories = this.accessories.values() // Iterator for accessories, key is the uniqueseed
 		for (let a of accessories) {

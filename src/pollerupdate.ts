@@ -63,6 +63,15 @@ export class Poller {
 					}
 				});
 			}
+			// Manage global variable switches
+			if (this.platform.config.switchglobalvariables != "") {
+				const globalVariables = this.platform.config.switchglobalvariables.split(',');
+				for (let i = 0; i < globalVariables.length; i++) {
+					const switchStatus = await this.platform.fibaroClient.getGlobalVariable(globalVariables[i]);
+					this.platform.fibaroClient.getGlobalVariable(globalVariables[i])
+					this.platform.getFunctions.getBool(null, this.searchCharacteristic(globalVariables[i]), null, null, switchStatus);
+				}
+			}
 
 		} catch (e) {
 			this.platform.log("Error fetching updates: ", e);
