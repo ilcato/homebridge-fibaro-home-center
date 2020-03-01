@@ -296,7 +296,6 @@ class FibaroHC3 {
 					setFunction.call(this.setFunctions, value, callback, context, characteristic, service, IDs);
 			}
 		}
-		callback();
 	}
 
 	async getCharacteristicValue(callback, characteristic, service, IDs) {
@@ -308,12 +307,14 @@ class FibaroHC3 {
 				const securitySystemStatus = await this.fibaroClient.getGlobalVariable("SecuritySystem");
 				if (this.getFunctions)
 					this.getFunctions.getSecuritySystemTargetState(callback, characteristic, service, IDs, securitySystemStatus);
+				return;
 			}
 			// Manage global variable switches
 			if (service.isGlobalVariableSwitch) {
 				const switchStatus = await this.fibaroClient.getGlobalVariable(IDs[1]);
 				if (this.getFunctions)
 					this.getFunctions.getBool(callback, characteristic, service, IDs, switchStatus);
+				return;
 			}
 		} catch (e) {
 			this.log("There was a problem getting value from Global Variabls", ` - Err: ${e}`);

@@ -120,8 +120,8 @@ export class FibaroClient {
 	}
 	executeScene(ID) {
 		let p = new Promise((resolve, reject) => {
-			let url = "http://" + this.host + "/api/scenes/" + ID + "/action/start";
-			let body = null;
+			let url = "http://" + this.host + "/api/scenes/" + ID + "/execute";
+			let body = "{}";
 			let method = "post";
 			request({
 				url: url,
@@ -129,7 +129,7 @@ export class FibaroClient {
 				method: method,
 				headers: this.headers
 			}, function (err, response) {
-				if (!err && (response.statusCode == 200 || response.statusCode == 202))
+				if (!err && (response.statusCode == 200 || response.statusCode == 204))
 					resolve(response);
 				else
 					reject(err);
