@@ -18,6 +18,13 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 0.0.2
++ Added support for thermostattimeout
++ Added support for enablecoolingstatemanagemnt
++ Added support for global variable based switches
++ Added support for Harmony devices
++ Added support for Security system
+
 Version 0.0.1
 + Initial version.
 + Support only for basic devices
