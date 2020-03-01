@@ -22,7 +22,9 @@
 //            "host": "PUT IP ADDRESS OF YOUR HC3 HERE",
 //            "username": "PUT USERNAME OF YOUR HC3 HERE",
 //            "password": "PUT PASSWORD OF YOUR HC3 HERE",
-//            "pollerperiod": "PUT 0 FOR DISABLING POLLING, 1 - 100 INTERVAL IN SECONDS. 5 SECONDS IS THE DEFAULT"
+//            "pollerperiod": "PUT 0 FOR DISABLING POLLING, 1 - 100 INTERVAL IN SECONDS. 5 SECONDS IS THE DEFAULT",
+//						"thermostattimeout": "PUT THE NUMBER OF SECONDS FOR THE THERMOSTAT TIMEOUT, DEFAULT: 7200 (2 HOURS). PUT 0 FOR INFINITE",
+//						"enablecoolingstatemanagemnt": "PUT on TO AUTOMATICALLY MANAGE HEATING STATE FOR THERMOSTAT, off TO DISABLE IT. DEFAULT off"
 //     }
 // ],
 //
@@ -42,6 +44,9 @@ import { GetFunctions } from './getFunctions'
 import { Poller } from './pollerupdate'
 
 const defaultPollerPeriod = 5;
+const timeOffset = 2 * 3600;
+const defaultEnableCoolingStateManagemnt = "off";
+
 
 let Accessory,
 	Service,
@@ -62,6 +67,8 @@ class Config {
 	username: string;
 	password: string;
 	pollerperiod?: string;
+	thermostattimeout?: string;
+	enablecoolingstatemanagemnt?: string;
 	FibaroTemperatureUnit?: string;
 	constructor() {
 		this.name = "";
@@ -97,6 +104,10 @@ class FibaroHC3 {
 		let pollerPeriod = this.config.pollerperiod ? parseInt(this.config.pollerperiod) : defaultPollerPeriod;
 		if (isNaN(pollerPeriod) || pollerPeriod < 0 || pollerPeriod > 100)
 			pollerPeriod = defaultPollerPeriod;
+		if (this.config.thermostattimeout == undefined)
+			this.config.thermostattimeout = timeOffset.toString();
+		if (this.config.enablecoolingstatemanagemnt == undefined)
+			this.config.enablecoolingstatemanagemnt = defaultEnableCoolingStateManagemnt;
 		if (this.config.FibaroTemperatureUnit == undefined)
 			this.config.FibaroTemperatureUnit = "C";
 		this.fibaroClient = new FibaroClient(this.config.host, this.config.username, this.config.password);
