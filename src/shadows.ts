@@ -231,21 +231,21 @@ export class ShadowAccessory {
 			case "com.fibaro.FGT001":
 			case "com.fibaro.thermostatDanfoss":
 			case "com.fibaro.com.fibaro.thermostatHorstmann":
-				controlService = new hapService.Thermostat(device.name);
-				controlCharacteristics = [hapCharacteristic.CurrentTemperature, hapCharacteristic.TargetTemperature, hapCharacteristic.CurrentHeatingCoolingState, hapCharacteristic.TargetHeatingCoolingState, hapCharacteristic.TemperatureDisplayUnits];
-				// Check the presence of an associated operating mode device
-				let m = siblings.get("com.fibaro.operatingMode");
-				if (m) {
-					controlService.operatingModeId = m.id;
-					controlService.subtype = device.id + "---" + m.id;
-				}
-				// Check if there's a temperature Sensor and use it instead of the provided float value
-				let t = siblings.get("com.fibaro.temperatureSensor");
-				if (t) {
-					controlService.floatServiceId = t.id;
-					controlService.subtype = (controlService.subtype || device.id + "----") + t.id;
-				}
-				ss = [new ShadowService(controlService, controlCharacteristics)];
+				// controlService = new hapService.Thermostat(device.name);
+				// controlCharacteristics = [hapCharacteristic.CurrentTemperature, hapCharacteristic.TargetTemperature, hapCharacteristic.CurrentHeatingCoolingState, hapCharacteristic.TargetHeatingCoolingState, hapCharacteristic.TemperatureDisplayUnits];
+				// // Check the presence of an associated operating mode device
+				// let m = siblings.get("com.fibaro.operatingMode");
+				// if (m) {
+				// 	controlService.operatingModeId = m.id;
+				// 	controlService.subtype = device.id + "---" + m.id;
+				// }
+				// // Check if there's a temperature Sensor and use it instead of the provided float value
+				// let t = siblings.get("com.fibaro.temperatureSensor");
+				// if (t) {
+				// 	controlService.floatServiceId = t.id;
+				// 	controlService.subtype = (controlService.subtype || device.id + "----") + t.id;
+				// }
+				// ss = [new ShadowService(controlService, controlCharacteristics)];
 				break;
 			case "com.fibaro.FGRGBW441M":
 			case "com.fibaro.colorController":

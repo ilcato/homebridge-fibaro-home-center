@@ -190,8 +190,8 @@ export class SetFunctions {
 					this.platform.log("There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
 				}
 			} else {
-				this.command("setTargetLevel", [value], service, IDs, null);
-				this.command("setTime", [parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000)], service, IDs, callback);
+				this.command("setHeatingThermostatSetpoint", [value], service, IDs, null);
+				this.command("setInterval", [parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000)], service, IDs, callback);
 			}
 		} else {
 			value = characteristic.value;

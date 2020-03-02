@@ -38,7 +38,7 @@ export class GetFunctions {
 			[(new hapCharacteristic.CurrentHorizontalTiltAngle()).UUID, { "function": this.getCurrentTiltAngle, "delay": 0 }],
 			[(new hapCharacteristic.TargetHorizontalTiltAngle()).UUID, { "function": this.getCurrentTiltAngle, "delay": 0 }],
 			[(new hapCharacteristic.MotionDetected()).UUID, { "function": this.getBool, "delay": 0 }],
-			[(new hapCharacteristic.CurrentTemperature()).UUID, { "function": this.getFloat, "delay": 0 }],
+			[(new hapCharacteristic.CurrentTemperature()).UUID, { "function": this.getCurrentTemperature, "delay": 0 }],
 			[(new hapCharacteristic.TargetTemperature()).UUID, { "function": this.getTargetTemperature, "delay": 0 }],
 			[(new hapCharacteristic.CurrentRelativeHumidity()).UUID, { "function": this.getFloat, "delay": 0 }],
 			[(new hapCharacteristic.ContactSensorState()).UUID, { "function": this.getContactSensorState, "delay": 0 }],
@@ -98,21 +98,9 @@ export class GetFunctions {
 		}
 	}
 	// Float getter
-	async getFloat(callback, characteristic, service, IDs, properties) {
-		let r = parseFloat(properties.value);
-
-		if (service.floatServiceId) {
-			try {
-				const properties = await this.platform.fibaroClient.getDeviceProperties(service.floatServiceId);
-				r = parseFloat(properties.value);
-				this.returnValue(r, callback, characteristic);
-			} catch (e) {
-				console.log("There was a problem getting value from: ", `${service.floatServiceId} - Err: ${e}`);
-				callback(e, null);
-			}
-		} else {
-			this.returnValue(r, callback, characteristic);
-		}
+	getFloat(callback, characteristic, service, IDs, properties) {
+		const r = parseFloat(properties.value);
+		this.returnValue(r, callback, characteristic);
 	}
 	getBrightness(callback, characteristic, service, IDs, properties) {
 		let r;
@@ -154,9 +142,23 @@ export class GetFunctions {
 		let angle = SetFunctions.scale(value2, 0, 100, characteristic.props.minValue, characteristic.props.maxValue);
 		this.returnValue(angle, callback, characteristic);
 	}
-
+	async getCurrentTemperature(callback, characteristic, service, IDs, properties) {
+		if (service.floatServiceId) {
+			try {
+				const properties = await this.platform.fibaroClient.getDeviceProperties(service.floatServiceId);
+				const r = parseFloat(properties.value);
+				this.returnValue(r, callback, characteristic);
+			} catch (e) {
+				console.log("There was a problem getting value from: ", `${service.floatServiceId} - Err: ${e}`);
+				callback(e, null);
+			}
+		} else {
+			const r = parseFloat(properties.heatingThermostatSetpoint);
+			this.returnValue(r, callback, characteristic);
+		}
+	}
 	getTargetTemperature(callback, characteristic, service, IDs, properties) {
-		this.returnValue(parseFloat(properties.targetLevel), callback, characteristic);
+		this.returnValue(parseFloat(properties.heatingThermostatSetpoint), callback, characteristic);
 	}
 	getContactSensorState(callback, characteristic, service, IDs, properties) {
 		const v = this.getBoolean(properties.value);
