@@ -91,8 +91,12 @@ export class FibaroClient {
 			}, function (err, response, json) {
 				if (!err && response.statusCode == 200)
 					resolve(json.properties);
-				else
-					reject(err);
+				else {
+					if (err)
+						reject(err);
+					else
+						reject(response.statusCode);
+				}
 			});
 		});
 		return p;

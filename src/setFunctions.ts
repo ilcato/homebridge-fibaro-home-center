@@ -70,17 +70,26 @@ export class SetFunctions {
 			//				this.command("changeActivityState", null, service, IDs, callback);	// bug in Fibaro plugin: need to call 2 times
 			//			}, 10000);
 		} else {
-//			if (characteristic.value == true && value == 0 || characteristic.value == false && value == 1)
-				this.command(value == 0 ? "turnOff" : "turnOn", null, service, IDs, callback);
+			//			if (characteristic.value == true && value == 0 || characteristic.value == false && value == 1)
+			this.command(value == 0 ? "turnOff" : "turnOn", null, service, IDs, callback);
 		}
 	}
-	setBrightness(value, callback, context, characteristic, service, IDs) {
+	async setBrightness(value, callback, context, characteristic, service, IDs) {
 		if (service.HSBValue != null) {
 			;
 			let rgb = this.updateHomeCenterColorFromHomeKit(null, null, value, service);
 			this.syncColorCharacteristics(rgb, service, IDs, callback);
 		} else {
-			this.command("setValue", [value], service, IDs, callback);
+			try {
+				const properties = await this.platform.fibaroClient.getDeviceProperties(IDs[0]);
+				if (properties.state)
+					this.command("setValue", [value], service, IDs, callback);
+				else {
+					callback();
+				}
+			} catch (e) {
+				console.log("There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
+			}
 		}
 	}
 	setTargetPosition(value, callback, context, characteristic, service, IDs) {
