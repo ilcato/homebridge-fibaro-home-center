@@ -18,12 +18,15 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 0.0.4
++ Removed thermostats devices: waiting for API documentation
+
 Version 0.0.3
 + Fix security system
 + Fix Brightness control
 
 Version 0.0.2
-+ Added support for thermostattimeout
++ Added support for thermostat
 + Added support for enablecoolingstatemanagemnt
 + Added support for global variable based switches
 + Added support for Harmony devices
