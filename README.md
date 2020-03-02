@@ -18,6 +18,10 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 0.0.3
++ Fix security system
++ Fix Brightness control
+
 Version 0.0.2
 + Added support for thermostattimeout
 + Added support for enablecoolingstatemanagemnt
