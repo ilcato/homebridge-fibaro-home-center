@@ -18,6 +18,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 0.0.5
++ Immediate action execution, no default delay
+
 Version 0.0.4
 + Removed thermostats devices: waiting for API documentation
 
