@@ -18,6 +18,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 0.0.6
++ Fixed temperature sensor read
+
 Version 0.0.5
 + Immediate action execution, no default delay
 

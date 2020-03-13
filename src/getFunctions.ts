@@ -153,7 +153,7 @@ export class GetFunctions {
 				callback(e, null);
 			}
 		} else {
-			const r = parseFloat(properties.heatingThermostatSetpoint);
+			const r = parseFloat(properties.value);
 			this.returnValue(r, callback, characteristic);
 		}
 	}
