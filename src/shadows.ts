@@ -79,7 +79,7 @@ export class ShadowAccessory {
 					break;
 				}
 			}
-			if (!found) {
+			if (!found && this.accessory.services[t].UUID !== "0000003E-0000-1000-8000-0026BB765291") { // Accessory Information must be present
 				this.accessory.removeService(this.accessory.services[t]);
 			}
 		}
