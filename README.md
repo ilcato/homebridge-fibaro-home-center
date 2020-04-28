@@ -18,6 +18,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 0.0.7
++ Fixed compatibility with homebridge 1.*
+
 Version 0.0.6
 + Fixed temperature sensor read
 
