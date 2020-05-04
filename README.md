@@ -18,6 +18,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 0.0.9
++ Yet another fix to venetian blind device issue
+
 Version 0.0.8
 + Fix to venetian blind device issue
 
