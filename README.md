@@ -18,6 +18,10 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 1.0.0
++ Production release
++ Support Plugin Settings GUI
+
 Version 0.0.9
 + Yet another fix to venetian blind device issue
 

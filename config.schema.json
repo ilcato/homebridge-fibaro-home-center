@@ -1,0 +1,69 @@
+{
+  "pluginAlias": "Fibaro Home Center 3",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "Homebridge plugin for Fibaro Home Center 3.",
+  "footerDisplay": "For additonal information see [wiki](https://github.com/ilcato/homebridge-fibaro-hc3/wiki).",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "description": "Plugin name as displayed in the homebridge log.",
+        "title": "Name",
+        "type": "string",
+        "required": true,
+        "default": "FibaroHC3"
+      },
+      "host": {
+        "description": "IP address (or hostname) of the Fibaro Home Center 3 machine.",
+        "title": "Host",
+        "type": "string",
+        "required": true
+      },
+      "username": {
+        "description": "Username for accessing Fibaro Home Center 3 machine.",
+        "title": "Username",
+        "type": "string",
+        "required": true
+      },
+      "password": {
+        "description": "Password for accessing Fibaro Home Center 3 machine.",
+        "title": "Password",
+        "type": "string",
+        "required": true
+      },
+      "pollerperiod": {
+        "description": "Polling interval for querying Fibaro Home Center 3 machine (0: disabled).",
+        "title": "Poller period",
+        "type": "integer",
+        "required": false,
+        "placeholder": 2,
+        "minimum": 0
+      },
+      "switchglobalvariables": {
+        "description": "A comma separeted list of Fibaro Home Center 3 global variables acting like a bistable switch.",
+        "title": "Global variables switches",
+        "type": "string",
+        "required": false
+      },
+      "securitysystem": {
+        "description": "Enable or disable the Security system, see wiki for detail.",
+        "title": "Security system",
+        "type": "string",
+        "oneOf": [
+          {
+            "title": "Enabled",
+            "enum": ["enabled"]
+          },
+          {
+            "title": "Disabled",
+            "enum": ["disabled"]
+          }
+        ],
+        "default": "disabled"
+      }
+    }
+  },
+  "form": null,
+  "display": null
+}
