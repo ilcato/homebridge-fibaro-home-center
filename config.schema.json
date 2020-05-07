@@ -1,5 +1,5 @@
 {
-  "pluginAlias": "Fibaro Home Center 3",
+  "pluginAlias": "FibaroHC3",
   "pluginType": "platform",
   "singular": true,
   "headerDisplay": "Homebridge plugin for Fibaro Home Center 3.",
