@@ -18,6 +18,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 1.0.3
++ Fixed log management
+
 Version 1.0.2
 + Fixed module dependencies
 

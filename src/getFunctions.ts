@@ -149,7 +149,7 @@ export class GetFunctions {
 				const r = parseFloat(properties.value);
 				this.returnValue(r, callback, characteristic);
 			} catch (e) {
-				console.log("There was a problem getting value from: ", `${service.floatServiceId} - Err: ${e}`);
+				this.platform.log("There was a problem getting value from: ", `${service.floatServiceId} - Err: ${e}`);
 				callback(e, null);
 			}
 		} else {

@@ -88,7 +88,7 @@ export class SetFunctions {
 					callback();
 				}
 			} catch (e) {
-				console.log("There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
+				this.platform.log("There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
 			}
 		}
 	}
