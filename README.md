@@ -18,6 +18,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 1.0.2
++ Fixed module dependencies
+
 Version 1.0.1
 + Fixed configuration for Plugin Settings GUI
 

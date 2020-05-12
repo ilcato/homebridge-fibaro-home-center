@@ -26,10 +26,11 @@
     "Siri"
   ],
   "dependencies": {
-    "request": "^2.88.1",
+    "request": "^2.88.1"
+  },
+  "devDependencies": {
     "typescript": "^3.8.2"
   },
-  "devDependencies": {},
   "author": "ilcato",
   "license": "Apache-2.0",
   "bugs": {
