@@ -25,6 +25,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 1.0.4
++ Added support for new color controller: com.fibaro.FGRGBW442 and com.fibaro.FGRGBW442CC
+
 Version 1.0.3
 + Fixed log management
 
