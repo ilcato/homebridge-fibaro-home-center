@@ -199,9 +199,7 @@ export class ShadowAccessory {
 				ss = [new ShadowService(new hapService.HumiditySensor(device.name), [hapCharacteristic.CurrentRelativeHumidity])];
 				break;
 			case "com.fibaro.doorSensor":
-				this.log('TEST1', '');
 			case "com.fibaro.FGDW002":
-				this.log('TEST2', '');	
 			case "com.fibaro.windowSensor":
 			case "com.fibaro.satelZone":
 				ss = [new ShadowService(new hapService.ContactSensor(device.name), [hapCharacteristic.ContactSensorState])];
