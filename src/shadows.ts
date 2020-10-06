@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 // Fibaro Home Center 3 Platform plugin for HomeBridge
+//TESt
 
 'use strict'
 
