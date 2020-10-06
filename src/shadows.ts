@@ -1,11 +1,11 @@
 //    Copyright 2020 ilcato
-// 
+//
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
 //    You may obtain a copy of the License at
-// 
+//
 //        http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 //    Unless required by applicable law or agreed to in writing, software
 //    distributed under the License is distributed on an "AS IS" BASIS,
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -199,6 +199,7 @@ export class ShadowAccessory {
 				ss = [new ShadowService(new hapService.HumiditySensor(device.name), [hapCharacteristic.CurrentRelativeHumidity])];
 				break;
 			case "com.fibaro.doorSensor":
+			case "com.fibaro.FGDW002":
 			case "com.fibaro.windowSensor":
 			case "com.fibaro.satelZone":
 				ss = [new ShadowService(new hapService.ContactSensor(device.name), [hapCharacteristic.ContactSensorState])];
@@ -261,7 +262,7 @@ export class ShadowAccessory {
 				break;
 			case "com.fibaro.logitechHarmonyActivity":
 				controlService = new hapService.Switch(device.name);
-				controlService.subtype = device.id + "----" + "HP"; 					// HP: Harmony Plugin		
+				controlService.subtype = device.id + "----" + "HP"; 					// HP: Harmony Plugin
 				ss = [new ShadowService(controlService, [hapCharacteristic.On])];
 				break;
 			default:
