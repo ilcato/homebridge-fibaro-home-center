@@ -140,7 +140,8 @@ class FibaroHC3 {
 			this.mapSceneIDs(scenes);
 			this.setFunctions = new SetFunctions(Characteristic, this);	// There's a dependency in setFunction to Scene Mapping
 			const devices = this.fibaroClient ? await this.fibaroClient.getDevices() : {};
-			this.LoadAccessories(devices);
+                        const rooms = this.fibaroClient ? await this.fibaroClient.getRooms() : {};
+			this.LoadAccessories(devices, rooms);
 		} catch (e) {
 			this.log("Error getting data from Home Center: ", e);
 			throw e;
@@ -175,12 +176,13 @@ class FibaroHC3 {
 		this.accessories.set(accessory.context.uniqueSeed, accessory);
 		accessory.reachable = true;
 	}
-	LoadAccessories(devices) {
+	LoadAccessories(devices, rooms) {
 		this.log('Loading accessories', '');
 		devices.map((s, i, a) => {
 			if (s.visible == true && s.name.charAt(0) != "_") {
 				let siblings = this.findSiblingDevices(s, a);
-				this.addAccessory(ShadowAccessory.createShadowAccessory(s, siblings, Accessory, Service, Characteristic, this));
+                                let room = rooms.find(r => r.id === s.roomID);
+				this.addAccessory(ShadowAccessory.createShadowAccessory(s, siblings, room, Accessory, Service, Characteristic, this));
 			}
 		});
 
