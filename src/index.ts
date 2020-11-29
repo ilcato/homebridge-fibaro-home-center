@@ -74,6 +74,7 @@ class Config {
 	switchglobalvariables?: string;
 	securitysystem?: string;
 	FibaroTemperatureUnit?: string;
+	addRoomNameToDeviceName?: string;
 	constructor() {
 		this.name = "";
 		this.host = "";
@@ -123,6 +124,8 @@ class FibaroHC3 {
 			this.config.securitysystem = "disabled";
 		if (this.config.FibaroTemperatureUnit == undefined)
 			this.config.FibaroTemperatureUnit = "C";
+		if (this.config.addRoomNameToDeviceName == undefined)
+			this.config.addRoomNameToDeviceName = "disabled";
 		this.fibaroClient = new FibaroClient(this.config.host, this.config.username, this.config.password);
 		if (pollerPeriod != 0)
 			this.poller = new Poller(this, pollerPeriod, Service, Characteristic);
@@ -140,7 +143,8 @@ class FibaroHC3 {
 			this.mapSceneIDs(scenes);
 			this.setFunctions = new SetFunctions(Characteristic, this);	// There's a dependency in setFunction to Scene Mapping
 			const devices = this.fibaroClient ? await this.fibaroClient.getDevices() : {};
-			this.LoadAccessories(devices);
+			const rooms = this.config.addRoomNameToDeviceName == "enabled" ? (this.fibaroClient ? await this.fibaroClient.getRooms() : {}) : null;
+			this.LoadAccessories(devices, rooms);
 		} catch (e) {
 			this.log("Error getting data from Home Center: ", e);
 			throw e;
@@ -175,12 +179,14 @@ class FibaroHC3 {
 		this.accessories.set(accessory.context.uniqueSeed, accessory);
 		accessory.reachable = true;
 	}
-	LoadAccessories(devices) {
+	LoadAccessories(devices, rooms) {
 		this.log('Loading accessories', '');
 		devices.map((s, i, a) => {
 			if (s.visible == true && s.name.charAt(0) != "_") {
 				let siblings = this.findSiblingDevices(s, a);
-				this.addAccessory(ShadowAccessory.createShadowAccessory(s, siblings, Accessory, Service, Characteristic, this));
+				this.addAccessory(ShadowAccessory.createShadowAccessory(s, siblings,
+					rooms != null ? rooms.find(r => r.id === s.roomID) : null,
+					Accessory, Service, Characteristic, this));
 			}
 		});
 
