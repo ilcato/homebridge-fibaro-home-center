@@ -20,11 +20,17 @@ Remember to configure the plugin in config.json in your home directory inside th
 + "username": "PUT USERNAME OF YOUR HC3 HERE"
 + "password": "PUT PASSWORD OF YOUR HC3 HERE"
 + "pollerperiod": "PUT 0 FOR DISABLING POLLING, 1 - 100 INTERVAL IN SECONDS. 2 SECONDS IS THE DEFAULT"
++ "switchglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A BISTABLE SWITCH"
++ "securitysystem": "PUT enabled OR disabled IN ORDER TO MANAGE THE AVAILABILITY OF THE SECURITY SYSTEM"
++ "addRoomNameToDeviceName" : "PUT enabled OR disabled IN ORDER TO ADD THE ROOM NAME TO DEVIVE NAME. DEFAULT disabled"
 
 Look for a sample config in [config.json example](https://github.com/ilcato/homebridge-Fibaro-hc3/blob/master/config.json)
 
 
 # Release notes
+Version 1.0.6
++ Added new config parameter for adding room name to  the device name
+
 Version 1.0.5
 + Added support for com.fibaro.FGDW002
 
