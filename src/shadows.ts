@@ -123,7 +123,7 @@ export class ShadowAccessory {
 	static createShadowAccessory(device, siblings, room, hapAccessory, hapService, hapCharacteristic, platform) {
 		let ss;
 		let controlService, controlCharacteristics;
-		let deviceName =  device.name + " - " + room.name;
+		let deviceName = device.name + room != null ? " - " + room.name : "";
 
 		switch (device.type) {
 			case "com.fibaro.multilevelSwitch":
