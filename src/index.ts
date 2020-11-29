@@ -184,9 +184,12 @@ class FibaroHC3 {
 		devices.map((s, i, a) => {
 			if (s.visible == true && s.name.charAt(0) != "_") {
 				let siblings = this.findSiblingDevices(s, a);
-				this.addAccessory(ShadowAccessory.createShadowAccessory(s, siblings,
-					rooms != null ? rooms.find(r => r.id === s.roomID) : null,
-					Accessory, Service, Characteristic, this));
+				if (rooms != null) {
+					// patch device name
+					let room = rooms.find(r => r.id === s.roomID);
+					s.name = s.name + " - " + (room != null ? room.name : "no-room");
+				}
+				this.addAccessory(ShadowAccessory.createShadowAccessory(s, siblings, Accessory, Service, Characteristic, this));
 			}
 		});
 
