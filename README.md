@@ -28,8 +28,11 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 1.0.7
++ Fix room name inn device name management
+
 Version 1.0.6
-+ Added new config parameter for adding room name to  the device name
++ Added new config parameter for adding room name to the device name
 
 Version 1.0.5
 + Added support for com.fibaro.FGDW002
