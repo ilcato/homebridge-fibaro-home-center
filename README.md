@@ -28,6 +28,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 1.0.8
++ Fix lock state error
+
 Version 1.0.7
 + Fix room name inn device name management
 
