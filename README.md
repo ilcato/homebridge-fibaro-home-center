@@ -28,7 +28,7 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
-Version 1.0.8
+Version 1.0.9
 + Fix lock state error
 
 Version 1.0.7
