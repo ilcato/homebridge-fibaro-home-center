@@ -39,16 +39,25 @@ export class FibaroClient {
 		this.headers = {
 			"Authorization": this.auth
 		};
-		let configPath = process.env.UIX_CONFIG_PATH
-		if (configPath) {
-			configPath = configPath.substring(0, configPath.lastIndexOf("/config.json"))
-		} else {
-			configPath = path.resolve(os.homedir(), '.homebridge');
-		}
+		let configPath = '/homebridge';
 		try {
 			this.ca = fs.readFileSync(configPath + '/ca.cer');
 		} catch (e) {
-			log("Cannot find ca.cer file in config folder. If you are using url config you MUST copy the ca.cer file from Home Center in config folder.");
+			if (e.code === 'ENOENT') {
+				let configPath = process.env.UIX_CONFIG_PATH
+				if (configPath) {
+					configPath = configPath.substring(0, configPath.lastIndexOf("/config.json"))
+				} else {
+					configPath = path.resolve(os.homedir(), '.homebridge');
+				}
+				try {
+					this.ca = fs.readFileSync(configPath + '/ca.cer');
+				} catch (e) {
+					log("Error reading ca.cer: ", e);
+				}
+			} else {
+				log("Error reading ca.cer: ", e);
+			}
 		}
 		if (this.url && !this.ca) {
 			log("Put a valid ca.cer file in config.json folder.");
@@ -70,7 +79,7 @@ export class FibaroClient {
 			.get(url)
 			.set('Authorization', this.auth)
 			.set('accept', 'json')
-			.ca(this.ca);		
+			.ca(this.ca);
 	}
 	genericPost(service, body) {
 		const url = this.composeURL(service);
@@ -78,8 +87,8 @@ export class FibaroClient {
 			.post(url)
 			.send(body)
 			.set('Authorization', this.auth)
-			.set('accept', 'json')		
-			.ca(this.ca);		
+			.set('accept', 'json')
+			.ca(this.ca);
 	}
 	genericPut(service, body) {
 		const url = this.composeURL(service);

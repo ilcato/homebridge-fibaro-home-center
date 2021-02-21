@@ -29,6 +29,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 1.1.2
++ Added support fo https for homebridge running in docker containers
+
 Version 1.1.1
 + Fix ca.cer location finding for homebridge UX
 
