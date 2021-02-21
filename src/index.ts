@@ -171,8 +171,7 @@ class FibaroHC3 {
 			}
 			for (let i = 0; i < service.characteristics.length; i++) {
 				let characteristic = service.characteristics[i];
-				if (characteristic.props.needsBinding)
-					this.bindCharacteristicEvents(characteristic, service);
+				this.bindCharacteristicEvents(characteristic, service);
 			}
 		}
 		this.log("Configured Accessory: ", accessory.displayName);
@@ -258,6 +257,7 @@ class FibaroHC3 {
 	}
 
 	bindCharacteristicEvents(characteristic, service) {
+		if (service.subtype == undefined) return;
 		let IDs = service.subtype.split("-"); // IDs[0] is always device ID; for virtual device IDs[1] is the button ID
 		service.isVirtual = IDs[1] != "" ? true : false;
 		service.isSecuritySystem = IDs[0] == "0" ? true : false;
@@ -313,9 +313,13 @@ class FibaroHC3 {
 			if (!this.fibaroClient) return;
 			// Manage security system status
 			if (service.isSecuritySystem) {
+				if (characteristic.UUID == (new Characteristic.Name()).UUID) {
+					callback(undefined, characteristic.value);
+					return;
+				}
 				const securitySystemStatus = await this.fibaroClient.getGlobalVariable("SecuritySystem");
 				if (this.getFunctions)
-					this.getFunctions.getSecuritySystemTargetState(callback, characteristic, service, IDs, securitySystemStatus);
+					this.getFunctions.getSecuritySystemState(callback, characteristic, service, IDs, securitySystemStatus);
 				return;
 			}
 			// Manage global variable switches
@@ -326,12 +330,17 @@ class FibaroHC3 {
 				return;
 			}
 		} catch (e) {
-			this.log("There was a problem getting value from Global Variabls", ` - Err: ${e}`);
+			this.log("There was a problem getting value from Global Variables", ` - Err: ${e}`);
 			callback(e, null);
+			return;
 		}
 		// Manage all other status
 		if (!this.getFunctions) return;
 		let getFunction = this.getFunctions.getFunctionsMapping.get(characteristic.UUID);
+		if (!getFunction) {
+			callback(undefined, characteristic.value);
+			return;
+		}
 		setTimeout(async () => {
 			if (!this.fibaroClient) return;
 			try {

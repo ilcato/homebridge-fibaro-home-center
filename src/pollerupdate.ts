@@ -105,7 +105,7 @@ export class Poller {
 				let changePropertyValue = change[property];
 				this.platform.log(`Updating ${property} for device: `, `${subscription.id}  parameter: ${subscription.characteristic.displayName}, ${property}: ${changePropertyValue}`);
 				let getFunction = this.platform.getFunctions.getFunctionsMapping.get(subscription.characteristic.UUID);
-				if (getFunction.function)
+				if (getFunction && getFunction.function)
 					getFunction.function.call(this.platform.getFunctions, null, subscription.characteristic, subscription.service, null, change);
 			}
 		}
