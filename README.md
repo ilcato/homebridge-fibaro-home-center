@@ -29,6 +29,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 1.1.1
++ Fix ca.cer location finding for homebridge UX
+
 Version 1.1.0
 + Support for https connection to Home Center 3
   + Put ca.cer file in the same folder as config.json and use url parameter to point to Home Center via https
