@@ -45,10 +45,10 @@ export class SetFunctions {
 		]);
 
 		this.getTargetSecuritySystemSceneMapping = new Map([
-			[this.hapCharacteristic.SecuritySystemTargetState.AWAY_ARM, this.platform.securitySystemScenes.SetAwayArmed],
-			[this.hapCharacteristic.SecuritySystemTargetState.DISARM, this.platform.securitySystemScenes.SetDisarmed],
-			[this.hapCharacteristic.SecuritySystemTargetState.NIGHT_ARM, this.platform.securitySystemScenes.SetNightArmed],
-			[this.hapCharacteristic.SecuritySystemTargetState.STAY_ARM, this.platform.securitySystemScenes.SetStayArmed]
+			[this.hapCharacteristic.SecuritySystemTargetState.AWAY_ARM, this.platform.scenes.SetAwayArmed],
+			[this.hapCharacteristic.SecuritySystemTargetState.DISARM, this.platform.scenes.SetDisarmed],
+			[this.hapCharacteristic.SecuritySystemTargetState.NIGHT_ARM, this.platform.scenes.SetNightArmed],
+			[this.hapCharacteristic.SecuritySystemTargetState.STAY_ARM, this.platform.scenes.SetStayArmed]
 		]);
 
 	}
@@ -81,7 +81,7 @@ export class SetFunctions {
 			this.syncColorCharacteristics(rgb, service, IDs, callback);
 		} else {
 			try {
-				const properties = await this.platform.fibaroClient.getDeviceProperties(IDs[0]);
+				const properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
 				if (properties.state)
 					this.command("setValue", [value], service, IDs, callback);
 				else {
@@ -183,7 +183,7 @@ export class SetFunctions {
 			if (service.operatingModeId) {	// Operating mode is availble on Home Center
 				// need to force the operating mode to the current one because of a Fibaro API bug (setting temperature through the API change the mode to HEAT)
 				try {
-					const properties = await this.platform.fibaroClient.getDeviceProperties(IDs[0]);
+					const properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
 					currentOpMode = properties.mode;
 					this.command("setThermostatSetpoint", [currentOpMode, value], service, IDs, callback);
 				} catch (e) {
@@ -318,7 +318,7 @@ export class SetFunctions {
 	}
 	async checkLockCurrentState(IDs, value) {
 		try {
-			const properties = this.platform.fibaroClient.getDeviceProperties(IDs[0]);
+			const properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
 			var currentValue = (properties.value == "true") ? this.hapCharacteristic.LockCurrentState.SECURED : this.hapCharacteristic.LockCurrentState.UNSECURED;
 			if (currentValue != value) {
 				this.platform.log("There was a problem setting value to Lock: ", `${IDs[0]}`);

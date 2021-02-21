@@ -26,9 +26,10 @@
     "Siri"
   ],
   "dependencies": {
-    "request": "^2.88.1"
+    "superagent": "^6.1.0"
   },
   "devDependencies": {
+    "@types/node": "^14.14.31",
     "typescript": "^3.8.2"
   },
   "author": "ilcato",

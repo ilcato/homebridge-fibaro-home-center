@@ -19,6 +19,7 @@
 //     {
 //            "platform": "FibaroHC3",
 //            "name": "FibaroHC3",
+//            "url": "PUT URL OF YOUR HC3 HERE",
 //            "host": "PUT IP ADDRESS OF YOUR HC3 HERE",
 //            "username": "PUT USERNAME OF YOUR HC3 HERE",
 //            "password": "PUT PASSWORD OF YOUR HC3 HERE",
@@ -65,6 +66,7 @@ export = function (homebridge) {
 
 class Config {
 	name: string;
+	url: string;
 	host: string;
 	username: string;
 	password: string;
@@ -77,6 +79,7 @@ class Config {
 	addRoomNameToDeviceName?: string;
 	constructor() {
 		this.name = "";
+		this.url = "";
 		this.host = "";
 		this.username = "";
 		this.password = "";
@@ -90,7 +93,7 @@ class FibaroHC3 {
 	accessories: Map<string, any>;
 	updateSubscriptions: Array<Object>;
 	poller?: Poller;
-	securitySystemScenes: Object;
+	scenes: Object;
 	securitySystemService: Object;
 	fibaroClient?: FibaroClient;
 	setFunctions?: SetFunctions;
@@ -102,7 +105,7 @@ class FibaroHC3 {
 
 		this.accessories = new Map();
 		this.updateSubscriptions = new Array();
-		this.securitySystemScenes = {};
+		this.scenes = {};
 		this.securitySystemService = {};
 
 		this.config = config;
@@ -126,7 +129,11 @@ class FibaroHC3 {
 			this.config.FibaroTemperatureUnit = "C";
 		if (this.config.addRoomNameToDeviceName == undefined)
 			this.config.addRoomNameToDeviceName = "disabled";
-		this.fibaroClient = new FibaroClient(this.config.host, this.config.username, this.config.password);
+		this.fibaroClient = new FibaroClient(this.config.url, this.config.host, this.config.username, this.config.password, this.log);
+		if (this.fibaroClient.status == false) {
+			this.log('Cannot connect to Fibaro Home Center', 'Check credentials, url/host or ca.cer file');
+			return;
+		}
 		if (pollerPeriod != 0)
 			this.poller = new Poller(this, pollerPeriod, Service, Characteristic);
 		this.api.on('didFinishLaunching', this.didFinishLaunching.bind(this));
@@ -139,11 +146,16 @@ class FibaroHC3 {
 			return;
 
 		try {
-			const scenes = await this.fibaroClient.getScenes()
-			this.mapSceneIDs(scenes);
+			const scenes = (await this.fibaroClient.getScenes()).body;
+			scenes.map((s) => {
+				this.scenes[s.name] = s.id;
+			});
 			this.setFunctions = new SetFunctions(Characteristic, this);	// There's a dependency in setFunction to Scene Mapping
-			const devices = this.fibaroClient ? await this.fibaroClient.getDevices() : {};
-			const rooms = this.config.addRoomNameToDeviceName == "enabled" ? (this.fibaroClient ? await this.fibaroClient.getRooms() : {}) : null;
+			const devices = this.fibaroClient ? (await this.fibaroClient.getDevices()).body : {};
+			let rooms = null
+			if (this.config.addRoomNameToDeviceName == "enabled" && this.fibaroClient) {
+				rooms = (await this.fibaroClient.getRooms()).body
+			}
 			this.LoadAccessories(devices, rooms);
 		} catch (e) {
 			this.log("Error getting data from Home Center: ", e);
@@ -317,14 +329,14 @@ class FibaroHC3 {
 			if (!this.fibaroClient) return;
 			// Manage security system status
 			if (service.isSecuritySystem) {
-				const securitySystemStatus = await this.fibaroClient.getGlobalVariable("SecuritySystem");
+				const securitySystemStatus = (await this.fibaroClient.getGlobalVariable("SecuritySystem")).body;
 				if (this.getFunctions)
 					this.getFunctions.getSecuritySystemState(callback, characteristic, service, IDs, securitySystemStatus);
 				return;
 			}
 			// Manage global variable switches
 			if (service.isGlobalVariableSwitch) {
-				const switchStatus = await this.fibaroClient.getGlobalVariable(IDs[1]);
+				const switchStatus = (await this.fibaroClient.getGlobalVariable(IDs[1])).body;
 				if (this.getFunctions)
 					this.getFunctions.getBool(callback, characteristic, service, IDs, switchStatus);
 				return;
@@ -345,7 +357,7 @@ class FibaroHC3 {
 			if (!this.fibaroClient) return;
 			try {
 				let properties: any;
-				properties = await this.fibaroClient.getDeviceProperties(IDs[0]);
+				properties = (await this.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
 				if (getFunction.function) {
 					if (this.config.FibaroTemperatureUnit == "F") {
 						if (characteristic.displayName == 'Current Temperature') {
@@ -366,14 +378,6 @@ class FibaroHC3 {
 	subscribeUpdate(service, characteristic, propertyChanged) {
 		var IDs = service.subtype.split("-"); 							// IDs[0] is always device ID; for virtual device IDs[1] is the button ID
 		this.updateSubscriptions.push({ 'id': IDs[0], 'service': service, 'characteristic': characteristic, "property": propertyChanged });
-	}
-
-	mapSceneIDs(scenes) {
-		if (this.config.securitysystem == "enabled") {
-			scenes.map((s) => {
-				this.securitySystemScenes[s.name] = s.id;
-			});
-		}
 	}
 
 	findSiblingDevices(device, devices) {
