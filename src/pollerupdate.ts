@@ -41,7 +41,7 @@ export class Poller {
 		this.pollingUpdateRunning = true;
 
 		try {
-			const updates = await this.platform.fibaroClient.refreshStates(this.lastPoll);
+			const updates = (await this.platform.fibaroClient.refreshStates(this.lastPoll)).body;
 			if (updates.last != undefined)
 				this.lastPoll = updates.last;
 			if (updates.changes != undefined) {
@@ -67,14 +67,14 @@ export class Poller {
 			if (this.platform.config.switchglobalvariables != "") {
 				const globalVariables = this.platform.config.switchglobalvariables.split(',');
 				for (let i = 0; i < globalVariables.length; i++) {
-					const switchStatus = await this.platform.fibaroClient.getGlobalVariable(globalVariables[i]);
+					const switchStatus = (await this.platform.fibaroClient.getGlobalVariable(globalVariables[i])).body;
 					this.platform.fibaroClient.getGlobalVariable(globalVariables[i])
 					this.platform.getFunctions.getBool(null, this.searchCharacteristic(globalVariables[i]), null, null, switchStatus);
 				}
 			}
 			// Manage Security System state
 			if (this.platform.config.securitysystem == "enabled") {
-				const securitySystemStatus = await this.platform.fibaroClient.getGlobalVariable("SecuritySystem");
+				const securitySystemStatus = (await this.platform.fibaroClient.getGlobalVariable("SecuritySystem")).body;
 				if (this.platform.securitySystemService != undefined) {
 					let statec = this.platform.getFunctions.getCurrentSecuritySystemStateMapping.get(securitySystemStatus.value);
 					let c = this.platform.securitySystemService.getCharacteristic(this.hapCharacteristic.SecuritySystemCurrentState);

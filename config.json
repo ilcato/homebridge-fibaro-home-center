@@ -12,7 +12,8 @@
             {
             "platform": "FibaroHC3",
             "name": "FibaroHC3",
-            "host": "PUT IP ADDRESS OF YOUR HC3 HERE",
+            "host": "PUT IP ADDRESS OF YOUR HC3 HERE. IF URL IS PRESENT THIS PARAMETER IS IGNORED",
+            "url": "PUT URL OF YOUR HC3 HERE CONTAINING PROTOCOL AND NAME, E.G.: https://hc3-00000XXX.local",
             "username": "PUT USERNAME OF YOUR HC3 HERE",
             "password": "PUT PASSWORD OF YOUR HC3 HERE",
             "pollerperiod": "PUT 0 FOR DISABLING POLLING, 1 - 100 INTERVAL IN SECONDS. 2 SECONDS IS THE DEFAULT",

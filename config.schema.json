@@ -14,11 +14,17 @@
         "required": true,
         "default": "FibaroHC3"
       },
+      "url": {
+        "description": "URL of the Fibaro Home Center 3 machine. Must contain protocol and host name, e.g: https://hc3-00000XXX.local",
+        "title": "Url",
+        "type": "string",
+        "required": false
+      },
       "host": {
-        "description": "IP address (or hostname) of the Fibaro Home Center 3 machine.",
+        "description": "IP address (or hostname) of the Fibaro Home Center 3 machine. Ignored if Url is present",
         "title": "Host",
         "type": "string",
-        "required": true
+        "required": false
       },
       "username": {
         "description": "Username for accessing Fibaro Home Center 3 machine.",

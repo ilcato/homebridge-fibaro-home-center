@@ -16,7 +16,8 @@ The plugin is published through [NPM](https://www.npmjs.com/package/homebridge-f
     
 # Configuration
 Remember to configure the plugin in config.json in your home directory inside the .homebridge directory. Configuration parameters:
-+ "host": "PUT IP ADDRESS OF YOUR HC3 HERE"
++ "url": "PUT URL OF YOUR HC3 HERE CONTAINING PROTOCOL AND NAME, E.G.: https://hc3-00000XXX.local, ca.cer file in the same folder as config.json"
++ "host": "PUT IP ADDRESS OF YOUR HC3 HERE. IF URL PARAMETER IS PRESENT THIS PARAMETER IS IGNORED"
 + "username": "PUT USERNAME OF YOUR HC3 HERE"
 + "password": "PUT PASSWORD OF YOUR HC3 HERE"
 + "pollerperiod": "PUT 0 FOR DISABLING POLLING, 1 - 100 INTERVAL IN SECONDS. 2 SECONDS IS THE DEFAULT"
@@ -28,6 +29,11 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 1.1.0
++ Support for https connection to Home Center 3
+  + Put ca.cer file in the same folder as config.json and use url parameter to point to Home Center via https
++ Removed deprecated library
+
 Version 1.0.12
 + Fix globalVariable error after homebridge 1.3
 

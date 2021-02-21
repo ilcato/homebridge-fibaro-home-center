@@ -147,7 +147,7 @@ export class GetFunctions {
 	async getCurrentTemperature(callback, characteristic, service, IDs, properties) {
 		if (service.floatServiceId) {
 			try {
-				const properties = await this.platform.fibaroClient.getDeviceProperties(service.floatServiceId);
+				const properties = (await this.platform.fibaroClient.getDeviceProperties(service.floatServiceId)).body.properties;
 				const r = parseFloat(properties.value);
 				this.returnValue(r, callback, characteristic);
 			} catch (e) {
@@ -192,7 +192,7 @@ export class GetFunctions {
 	async getCurrentHeatingCoolingState(callback, characteristic, service, IDs, properties) {
 		if (service.operatingModeId) {	// Operating mode is availble on Home Center
 			try {
-				const properties = await this.platform.fibaroClient.getDeviceProperties(service.operatingModeId);
+				const properties = (await this.platform.fibaroClient.getDeviceProperties(service.operatingModeId)).body.properties;
 				switch (properties.mode) {
 					case "0": // OFF
 						this.returnValue(this.hapCharacteristic.CurrentHeatingCoolingState.OFF, callback, characteristic);
@@ -225,7 +225,7 @@ export class GetFunctions {
 	async getTargetHeatingCoolingState(callback, characteristic, service, IDs, properties) {
 		if (service.operatingModeId) {	// Operating mode is availble on Home Center
 			try {
-				const properties = await this.platform.fibaroClient.getDeviceProperties(service.operatingModeId);
+				const properties = (await this.platform.fibaroClient.getDeviceProperties(service.operatingModeId)).body.properties;
 				switch (properties.mode) {
 					case "0": // OFF
 						this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.OFF, callback, characteristic);
