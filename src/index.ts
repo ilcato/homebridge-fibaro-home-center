@@ -286,6 +286,10 @@ class FibaroHC3 {
 			this.setCharacteristicValue(value, callback, context, characteristic, service, IDs);
 		});
 		characteristic.on('get', (callback) => {
+			if (characteristic.UUID == (new Characteristic.Name()).UUID) {
+				callback(undefined, characteristic.value);
+				return;
+			}
 			if (service.isVirtual && !service.isGlobalVariableSwitch) {
 				// a push button is normally off
 				callback(undefined, false);
@@ -313,10 +317,6 @@ class FibaroHC3 {
 			if (!this.fibaroClient) return;
 			// Manage security system status
 			if (service.isSecuritySystem) {
-				if (characteristic.UUID == (new Characteristic.Name()).UUID) {
-					callback(undefined, characteristic.value);
-					return;
-				}
 				const securitySystemStatus = await this.fibaroClient.getGlobalVariable("SecuritySystem");
 				if (this.getFunctions)
 					this.getFunctions.getSecuritySystemState(callback, characteristic, service, IDs, securitySystemStatus);
