@@ -64,17 +64,17 @@ export class GetFunctions {
 			[(new hapCharacteristic.StatusLowBattery()).UUID, { "function": this.getStatusLowBattery, "delay": 0 }]
 		]);
 		this.getCurrentSecuritySystemStateMapping = new Map([
-			["AwayArmed", 	this.hapCharacteristic.SecuritySystemCurrentState.AWAY_ARM],
-			["Disarmed", 	this.hapCharacteristic.SecuritySystemCurrentState.DISARMED],
-			["NightArmed", 	this.hapCharacteristic.SecuritySystemCurrentState.NIGHT_ARM],
-			["StayArmed", 	this.hapCharacteristic.SecuritySystemCurrentState.STAY_ARM],
+			["AwayArmed", this.hapCharacteristic.SecuritySystemCurrentState.AWAY_ARM],
+			["Disarmed", this.hapCharacteristic.SecuritySystemCurrentState.DISARMED],
+			["NightArmed", this.hapCharacteristic.SecuritySystemCurrentState.NIGHT_ARM],
+			["StayArmed", this.hapCharacteristic.SecuritySystemCurrentState.STAY_ARM],
 			["AlarmTriggered", this.hapCharacteristic.SecuritySystemCurrentState.ALARM_TRIGGERED]
 		]);
 		this.getTargetSecuritySystemStateMapping = new Map([
-			["AwayArmed", 	this.hapCharacteristic.SecuritySystemTargetState.AWAY_ARM],
-			["Disarmed", 	this.hapCharacteristic.SecuritySystemTargetState.DISARM],
-			["NightArmed", 	this.hapCharacteristic.SecuritySystemTargetState.NIGHT_ARM],
-			["StayArmed", 	this.hapCharacteristic.SecuritySystemTargetState.STAY_ARM]
+			["AwayArmed", this.hapCharacteristic.SecuritySystemTargetState.AWAY_ARM],
+			["Disarmed", this.hapCharacteristic.SecuritySystemTargetState.DISARM],
+			["NightArmed", this.hapCharacteristic.SecuritySystemTargetState.NIGHT_ARM],
+			["StayArmed", this.hapCharacteristic.SecuritySystemTargetState.STAY_ARM]
 		]);
 	}
 
@@ -88,26 +88,7 @@ export class GetFunctions {
 	getBool(callback, characteristic, service, IDs, properties) {
 		let v = properties.value;
 		if (v !== undefined) {
-			switch (typeof v) {
-				case 'boolean':
-					break;
-				case 'string':
-					if (v === "true" || v === "false") {
-						v = (v === "true") ? true : false;
-					} else if (v === "1" || v === "0") {
-						v = (v === "1") ? true : false;
-					} else {
-						callback(new Error('Unknown property value string type.'), null);
-						return;	
-					}
-					break;
-				case 'number':
-					v = (v === 1) ? true : false;
-					break;
-				default:
-					callback(new Error('Unknown property value type.'), null);
-					return;
-			}
+			v = this.getBoolean(v);
 		} else {
 			v = properties["ui.startStopActivitySwitch.value"];
 			if (v == undefined) v = false;
@@ -116,6 +97,10 @@ export class GetFunctions {
 	}
 	// Float getter
 	getFloat(callback, characteristic, service, IDs, properties) {
+		if (isNaN(properties.value)) {
+			callback(new Error('Value is not a number.'), null);
+			return;
+		}
 		const r = parseFloat(properties.value);
 		this.returnValue(r, callback, characteristic);
 	}
@@ -125,6 +110,10 @@ export class GetFunctions {
 			let hsv = this.updateHomeKitColorFromHomeCenter(properties.color, service);
 			r = Math.round(hsv.v);
 		} else {
+			if (isNaN(properties.value)) {
+				callback(new Error('Brightness value is not a number.'), null);
+				return;
+			}
 			r = parseFloat(properties.value);
 			if (r == 99)
 				r = 100;
@@ -164,17 +153,33 @@ export class GetFunctions {
 			try {
 				const properties = (await this.platform.fibaroClient.getDeviceProperties(service.floatServiceId)).body.properties;
 				const r = parseFloat(properties.value);
+				if (isNaN(properties.value)) {
+					this.platform.log('Temperature is not a number.', '');
+					callback(new Error('Temperature is not a number.'), null);
+					return;
+				}
 				this.returnValue(r, callback, characteristic);
 			} catch (e) {
 				this.platform.log("There was a problem getting value from: ", `${service.floatServiceId} - Err: ${e}`);
 				callback(e, null);
+				return;
 			}
 		} else {
+			if (isNaN(properties.value)) {
+				this.platform.log('Temperature is not a number.', '');
+				callback(new Error('Temperature is not a number.'), null);
+				return;
+			}
 			const r = parseFloat(properties.value);
 			this.returnValue(r, callback, characteristic);
 		}
 	}
 	getTargetTemperature(callback, characteristic, service, IDs, properties) {
+		if (isNaN(properties.heatingThermostatSetpoint)) {
+			this.platform.log('heatingThermostatSetpoint is not a number.', '');
+			callback(new Error('heatingThermostatSetpoint is not a number.'), null);
+			return;
+		}
 		this.returnValue(parseFloat(properties.heatingThermostatSetpoint), callback, characteristic);
 	}
 	getContactSensorState(callback, characteristic, service, IDs, properties) {
@@ -194,6 +199,11 @@ export class GetFunctions {
 		this.returnValue(v === true ? this.hapCharacteristic.CarbonMonoxideDetected.CO_LEVELS_ABNORMAL : this.hapCharacteristic.CarbonMonoxideDetected.CO_LEVELS_NORMAL, callback, characteristic);
 	}
 	getOutletInUse(callback, characteristic, service, IDs, properties) {
+		if (isNaN(properties.power)) {
+			this.platform.log('power is not a number.', '');
+			callback(new Error('power is not a number.'), null);
+			return;
+		}
 		this.returnValue(parseFloat(properties.power) > 1.0 ? true : false, callback, characteristic);
 	}
 	getLockCurrentState(callback, characteristic, service, IDs, properties) {
@@ -227,6 +237,11 @@ export class GetFunctions {
 			}
 		} else {
 			if (this.platform.config.enablecoolingstatemanagemnt == "on") { // Simulated operating mode
+				if (isNaN(properties.value)) {
+					this.platform.log('temperature is not a number.', '');
+					callback(new Error('temperature is not a number.'), null);
+					return;
+				}		
 				let t = parseFloat(properties.value);
 				if (t <= lowestTemp)
 					this.returnValue(this.hapCharacteristic.CurrentHeatingCoolingState.OFF, callback, characteristic);
@@ -263,6 +278,11 @@ export class GetFunctions {
 			}
 		} else {
 			if (this.platform.config.enablecoolingstatemanagemnt == "on") {
+				if (isNaN(properties.targetLevel)) {
+					this.platform.log('targetLevel is not a number.', '');
+					callback(new Error('targetLevel is not a number.'), null);
+					return;
+				}		
 				let t = parseFloat(properties.targetLevel);
 				if (t <= lowestTemp)
 					this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.OFF, callback, characteristic);
