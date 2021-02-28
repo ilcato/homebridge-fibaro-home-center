@@ -88,10 +88,25 @@ export class GetFunctions {
 	getBool(callback, characteristic, service, IDs, properties) {
 		let v = properties.value;
 		if (v !== undefined) {
-			if (typeof v !== "boolean") {
-				v = (v == "true" || v == "false") ?
-				((v == "false") ? false : true) :
-				((parseInt(v) == 0) ? false : true);
+			switch (typeof v) {
+				case 'boolean':
+					break;
+				case 'string':
+					if (v === "true" || v === "false") {
+						v = (v === "true") ? true : false;
+					} else if (v === "1" || v === "0") {
+						v = (v === "1") ? true : false;
+					} else {
+						callback(new Error('Unknown property value string type.'), null);
+						return;	
+					}
+					break;
+				case 'number':
+					v = (v === 1) ? true : false;
+					break;
+				default:
+					callback(new Error('Unknown property value type.'), null);
+					return;
 			}
 		} else {
 			v = properties["ui.startStopActivitySwitch.value"];
@@ -292,7 +307,7 @@ export class GetFunctions {
 		} else if (characteristic.UUID == (new this.hapCharacteristic.SecuritySystemTargetState()).UUID) {
 			r = this.getTargetSecuritySystemStateMapping.get(securitySystemStatus.value);
 		}
-		if (r == undefined)
+		if (r === undefined)
 			r = this.hapCharacteristic.SecuritySystemTargetState.DISARMED;
 		this.returnValue(r, callback, characteristic);
 	}

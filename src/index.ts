@@ -326,12 +326,18 @@ class FibaroHC3 {
 	async getCharacteristicValue(callback, characteristic, service, IDs) {
 		this.log("Getting value from device: ", `${IDs[0]}  parameter: ${characteristic.displayName}`);
 		try {
-			if (!this.fibaroClient) return;
+			if (!this.fibaroClient) {
+				callback(new Error("No Fibaro client available."), null);
+				return;
+			}
 			// Manage security system status
 			if (service.isSecuritySystem) {
 				const securitySystemStatus = (await this.fibaroClient.getGlobalVariable("SecuritySystem")).body;
 				if (this.getFunctions)
 					this.getFunctions.getSecuritySystemState(callback, characteristic, service, IDs, securitySystemStatus);
+				else {
+					callback(new Error("No getFunctions available."), null);
+				}
 				return;
 			}
 			// Manage global variable switches
@@ -339,6 +345,9 @@ class FibaroHC3 {
 				const switchStatus = (await this.fibaroClient.getGlobalVariable(IDs[1])).body;
 				if (this.getFunctions)
 					this.getFunctions.getBool(callback, characteristic, service, IDs, switchStatus);
+				else {
+					callback(new Error("No getFunctions available."), null);
+				}
 				return;
 			}
 		} catch (e) {
@@ -347,14 +356,21 @@ class FibaroHC3 {
 			return;
 		}
 		// Manage all other status
-		if (!this.getFunctions) return;
+		if (!this.getFunctions) {
+			callback(new Error("No getFunctions available."), null);
+			return;
+		}
+
 		let getFunction = this.getFunctions.getFunctionsMapping.get(characteristic.UUID);
 		if (!getFunction) {
-			callback(undefined, characteristic.value);
+			callback(new Error("No getFunction available."), null);
 			return;
 		}
 		setTimeout(async () => {
-			if (!this.fibaroClient) return;
+			if (!this.fibaroClient) {
+				callback(new Error("No Fibaro client available."), null);
+				return;
+			}
 			try {
 				let properties: any;
 				properties = (await this.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
@@ -367,12 +383,12 @@ class FibaroHC3 {
 					getFunction.function.call(this.getFunctions, callback, characteristic, service, IDs, properties);
 				}
 				else
-					callback(`No get function defined for: ${characteristic.displayName}`, null);
+					callback(new Error(`No get function defined for: ${characteristic.displayName}`), null);
 			} catch (e) {
-				this.log("There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
+				this.log("G1 - There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
 				callback(e, null);
 			}
-		}, getFunction.delay * 1000);
+		}, getFunction.delay * 100);
 	}
 
 	subscribeUpdate(service, characteristic, propertyChanged) {

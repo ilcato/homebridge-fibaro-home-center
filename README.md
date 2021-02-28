@@ -29,6 +29,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 1.1.3
++ Reduce number of homebridge slowness warnings 
+
 Version 1.1.2
 + Added support fo https for homebridge running in docker containers
 
