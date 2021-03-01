@@ -29,6 +29,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 1.1.4
++ Fix device update error 
+
 Version 1.1.3
 + Reduce number of homebridge slowness warnings 
 

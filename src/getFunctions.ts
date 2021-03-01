@@ -98,7 +98,8 @@ export class GetFunctions {
 	// Float getter
 	getFloat(callback, characteristic, service, IDs, properties) {
 		if (isNaN(properties.value)) {
-			callback(new Error('Value is not a number.'), null);
+			if (callback)
+				callback(new Error('Value is not a number.'), null);
 			return;
 		}
 		const r = parseFloat(properties.value);
@@ -111,7 +112,8 @@ export class GetFunctions {
 			r = Math.round(hsv.v);
 		} else {
 			if (isNaN(properties.value)) {
-				callback(new Error('Brightness value is not a number.'), null);
+				if (callback)
+					callback(new Error('Brightness value is not a number.'), null);
 				return;
 			}
 			r = parseFloat(properties.value);
@@ -167,7 +169,8 @@ export class GetFunctions {
 		} else {
 			if (isNaN(properties.value)) {
 				this.platform.log('Temperature is not a number.', '');
-				callback(new Error('Temperature is not a number.'), null);
+				if (callback)
+					callback(new Error('Temperature is not a number.'), null);
 				return;
 			}
 			const r = parseFloat(properties.value);
@@ -177,7 +180,8 @@ export class GetFunctions {
 	getTargetTemperature(callback, characteristic, service, IDs, properties) {
 		if (isNaN(properties.heatingThermostatSetpoint)) {
 			this.platform.log('heatingThermostatSetpoint is not a number.', '');
-			callback(new Error('heatingThermostatSetpoint is not a number.'), null);
+			if (callback)
+				callback(new Error('heatingThermostatSetpoint is not a number.'), null);
 			return;
 		}
 		this.returnValue(parseFloat(properties.heatingThermostatSetpoint), callback, characteristic);
@@ -201,7 +205,8 @@ export class GetFunctions {
 	getOutletInUse(callback, characteristic, service, IDs, properties) {
 		if (isNaN(properties.power)) {
 			this.platform.log('power is not a number.', '');
-			callback(new Error('power is not a number.'), null);
+			if (callback)
+				callback(new Error('power is not a number.'), null);
 			return;
 		}
 		this.returnValue(parseFloat(properties.power) > 1.0 ? true : false, callback, characteristic);
@@ -233,13 +238,16 @@ export class GetFunctions {
 				}
 			} catch (e) {
 				this.platform.log("There was a problem getting value from: ", `${service.operatingModeId} - Err: ${e}`);
-				callback(e, null);
+				if (callback)
+					callback(e, null);
+				return;
 			}
 		} else {
 			if (this.platform.config.enablecoolingstatemanagemnt == "on") { // Simulated operating mode
 				if (isNaN(properties.value)) {
 					this.platform.log('temperature is not a number.', '');
-					callback(new Error('temperature is not a number.'), null);
+					if (callback)
+						callback(new Error('temperature is not a number.'), null);
 					return;
 				}		
 				let t = parseFloat(properties.value);
@@ -274,13 +282,15 @@ export class GetFunctions {
 				}
 			} catch (e) {
 				this.platform.log("There was a problem getting value from: ", `${service.operatingModeId} - Err: ${e}`);
-				callback(e, null);
+				if (callback)
+					callback(e, null);
 			}
 		} else {
 			if (this.platform.config.enablecoolingstatemanagemnt == "on") {
 				if (isNaN(properties.targetLevel)) {
 					this.platform.log('targetLevel is not a number.', '');
-					callback(new Error('targetLevel is not a number.'), null);
+					if (callback)
+						callback(new Error('targetLevel is not a number.'), null);
 					return;
 				}		
 				let t = parseFloat(properties.targetLevel);
@@ -309,6 +319,12 @@ export class GetFunctions {
 		this.returnValue(0, callback, characteristic);
 	}
 	getBatteryLevel(callback, characteristic, service, IDs, properties) {
+		if (isNaN(properties.batteryLevel)) {
+			this.platform.log('batteryLevel is not a number.', '');
+			if (callback)
+				callback(new Error('batteryLevel is not a number.'), null);
+			return;
+		}		
 		let r = parseFloat(properties.batteryLevel);
 		this.returnValue(r, callback, characteristic);
 	}
@@ -317,6 +333,12 @@ export class GetFunctions {
 		this.returnValue(r, callback, characteristic);
 	}
 	getStatusLowBattery(callback, characteristic, service, IDs, properties) {
+		if (isNaN(properties.batteryLevel)) {
+			this.platform.log('batteryLevel is not a number.', '');
+			if (callback)
+				callback(new Error('batteryLevel is not a number.'), null);
+			return;
+		}		
 		let r = parseFloat(properties.batteryLevel) <= 30 ? 1 : 0;
 		this.returnValue(r, callback, characteristic);
 	}
