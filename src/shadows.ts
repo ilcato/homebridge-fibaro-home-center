@@ -197,6 +197,7 @@ export class ShadowAccessory {
 			case "com.fibaro.humiditySensor":
 				ss = [new ShadowService(new hapService.HumiditySensor(device.name), [hapCharacteristic.CurrentRelativeHumidity])];
 				break;
+			case "com.fibaro.binarySensor":
 			case "com.fibaro.doorSensor":
 			case "com.fibaro.FGDW002":
 			case "com.fibaro.windowSensor":
