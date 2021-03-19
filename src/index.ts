@@ -53,12 +53,16 @@ const defaultEnableCoolingStateManagemnt = "off";
 
 let Accessory,
 	Service,
+	HapStatusError,
+	HAPStatus,
 	Characteristic,
 	UUIDGen;
 
 export = function (homebridge) {
 	Accessory = homebridge.platformAccessory
 	Service = homebridge.hap.Service
+	HapStatusError = homebridge.hap.HapStatusError
+	HAPStatus = homebridge.hap.HAPStatus;
 	Characteristic = homebridge.hap.Characteristic
 	UUIDGen = homebridge.hap.uuid
 	homebridge.registerPlatform(pluginName, platformName, FibaroHC3, true)
@@ -183,7 +187,7 @@ class FibaroHC3 {
 			}
 			for (let i = 0; i < service.characteristics.length; i++) {
 				let characteristic = service.characteristics[i];
-				this.bindCharacteristicEvents(characteristic, service);
+				this.bindCharacteristicEvents(characteristic, service, accessory);
 			}
 		}
 		this.log("Configured Accessory: ", accessory.displayName);
@@ -268,7 +272,7 @@ class FibaroHC3 {
 		this.accessories.delete(accessory.context.uniqueSeed);
 	}
 
-	bindCharacteristicEvents(characteristic, service) {
+	bindCharacteristicEvents(characteristic, service, accessory) {
 		if (service.subtype == undefined) return;
 		let IDs = service.subtype.split("-"); // IDs[0] is always device ID; for virtual device IDs[1] is the button ID
 		service.isVirtual = IDs[1] != "" ? true : false;
@@ -306,7 +310,7 @@ class FibaroHC3 {
 				// a push button is normally off
 				callback(undefined, false);
 			} else {
-				this.getCharacteristicValue(callback, characteristic, service, IDs);
+				this.getCharacteristicValue(callback, characteristic, service, accessory, IDs);
 			}
 		});
 	}
@@ -323,72 +327,74 @@ class FibaroHC3 {
 		}
 	}
 
-	async getCharacteristicValue(callback, characteristic, service, IDs) {
+	async getCharacteristicValue(callback, characteristic, service, accessory, IDs) {
 		this.log("Getting value from device: ", `${IDs[0]}  parameter: ${characteristic.displayName}`);
 		try {
 			if (!this.fibaroClient) {
-				callback(new Error("No Fibaro client available."), null);
+				this.log("Error:", "no Fibaro client available.");
+				callback(undefined, characteristic.value);
 				return;
 			}
 			// Manage security system status
 			if (service.isSecuritySystem) {
 				const securitySystemStatus = (await this.fibaroClient.getGlobalVariable("SecuritySystem")).body;
 				if (this.getFunctions)
-					this.getFunctions.getSecuritySystemState(callback, characteristic, service, IDs, securitySystemStatus);
-				else {
-					callback(new Error("No getFunctions available."), null);
-				}
+					this.getFunctions.getSecuritySystemState(null, characteristic, service, IDs, securitySystemStatus);
+				callback(undefined, characteristic.value);
 				return;
 			}
 			// Manage global variable switches
 			if (service.isGlobalVariableSwitch) {
 				const switchStatus = (await this.fibaroClient.getGlobalVariable(IDs[1])).body;
 				if (this.getFunctions)
-					this.getFunctions.getBool(callback, characteristic, service, IDs, switchStatus);
-				else {
-					callback(new Error("No getFunctions available."), null);
-				}
+					this.getFunctions.getBool(null, characteristic, service, IDs, switchStatus);
+				callback(undefined, characteristic.value);
 				return;
 			}
 		} catch (e) {
 			this.log("There was a problem getting value from Global Variables", ` - Err: ${e}`);
-			callback(e, null);
+			callback(undefined, characteristic.value);
 			return;
 		}
 		// Manage all other status
 		if (!this.getFunctions) {
-			callback(new Error("No getFunctions available."), null);
+			callback(undefined, characteristic.value);
 			return;
 		}
 
 		let getFunction = this.getFunctions.getFunctionsMapping.get(characteristic.UUID);
-		if (!getFunction) {
-			callback(new Error("No getFunction available."), null);
-			return;
-		}
-		setTimeout(async () => {
-			if (!this.fibaroClient) {
-				callback(new Error("No Fibaro client available."), null);
-				return;
-			}
-			try {
-				let properties: any;
-				properties = (await this.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
-				if (getFunction.function) {
-					if (this.config.FibaroTemperatureUnit == "F") {
-						if (characteristic.displayName == 'Current Temperature') {
-							properties.value = (properties.value - 32) * 5 / 9;
+		if (getFunction) {
+			setTimeout(async () => {
+				if (!this.fibaroClient) return;
+				try {
+					let properties: any;
+					properties = (await this.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
+					if (getFunction.function) {
+						if (this.config.FibaroTemperatureUnit == "F") {
+							if (characteristic.displayName == 'Current Temperature') {
+								properties.value = (properties.value - 32) * 5 / 9;
+							}
 						}
+						if (properties.hasOwnProperty('dead') && properties.dead == 'true') {
+							service.dead = true;
+							this.log("Device dead: ", `${IDs[0]}  parameter: ${characteristic.displayName}`);
+						} else {
+							service.dead = false;
+							getFunction.function.call(this.getFunctions, null, characteristic, service, IDs, properties);
+						}
+					} else {
+						this.log("No get function defined for: ", `${characteristic.displayName}`);
 					}
-					getFunction.function.call(this.getFunctions, callback, characteristic, service, IDs, properties);
+				} catch (e) {
+					this.log("G1 - There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
 				}
-				else
-					callback(new Error(`No get function defined for: ${characteristic.displayName}`), null);
-			} catch (e) {
-				this.log("G1 - There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
-				callback(e, null);
-			}
-		}, getFunction.delay * 100);
+			}, getFunction.delay * 100);
+		}
+		if (service.dead) {
+			callback(new HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
+		} else {
+			callback(undefined, characteristic.value);
+		}
 	}
 
 	subscribeUpdate(service, characteristic, propertyChanged) {

@@ -326,6 +326,7 @@ export class GetFunctions {
 			return;
 		}		
 		let r = parseFloat(properties.batteryLevel);
+		if (r>100) r = 0;
 		this.returnValue(r, callback, characteristic);
 	}
 	getChargingState(callback, characteristic, service, IDs, properties) {
