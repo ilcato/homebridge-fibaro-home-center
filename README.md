@@ -29,6 +29,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 1.1.6
++ Fix dimmer status
+
 Version 1.1.5
 + Fix slowness warning
 

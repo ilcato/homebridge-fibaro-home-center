@@ -249,7 +249,7 @@ export class GetFunctions {
 					if (callback)
 						callback(new Error('temperature is not a number.'), null);
 					return;
-				}		
+				}
 				let t = parseFloat(properties.value);
 				if (t <= lowestTemp)
 					this.returnValue(this.hapCharacteristic.CurrentHeatingCoolingState.OFF, callback, characteristic);
@@ -292,7 +292,7 @@ export class GetFunctions {
 					if (callback)
 						callback(new Error('targetLevel is not a number.'), null);
 					return;
-				}		
+				}
 				let t = parseFloat(properties.targetLevel);
 				if (t <= lowestTemp)
 					this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.OFF, callback, characteristic);
@@ -324,9 +324,9 @@ export class GetFunctions {
 			if (callback)
 				callback(new Error('batteryLevel is not a number.'), null);
 			return;
-		}		
+		}
 		let r = parseFloat(properties.batteryLevel);
-		if (r>100) r = 0;
+		if (r > 100) r = 0;
 		this.returnValue(r, callback, characteristic);
 	}
 	getChargingState(callback, characteristic, service, IDs, properties) {
@@ -339,7 +339,7 @@ export class GetFunctions {
 			if (callback)
 				callback(new Error('batteryLevel is not a number.'), null);
 			return;
-		}		
+		}
 		let r = parseFloat(properties.batteryLevel) <= 30 ? 1 : 0;
 		this.returnValue(r, callback, characteristic);
 	}
@@ -396,11 +396,21 @@ export class GetFunctions {
 		};
 	}
 	getBoolean(value) {
+		if (typeof value === "number") {
+			if (value === 0) return false;
+			else return true;
+		}
+		if (typeof value === "string") {
+			const vNum = parseInt(value);
+			if (!isNaN(vNum)) {
+				if (vNum === 0) return false;
+				else return true;
+			}
+		}
+
 		switch (value) {
 			case true:
 			case "true":
-			case 1:
-			case "1":
 			case "on":
 			case "yes":
 				return true;
