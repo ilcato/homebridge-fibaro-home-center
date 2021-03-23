@@ -171,13 +171,6 @@ class FibaroHC3 {
 			let service = accessory.services[s];
 			if (service.subtype != undefined) {
 				let subtypeParams = service.subtype.split("-"); // DEVICE_ID-VIRTUAL_BUTTON_ID-RGB_MARKER-OPERATING_MODE_ID-FLOAT_SVC_ID
-				if (subtypeParams.length >= 3 && subtypeParams[2] == "RGB") {
-					// For RGB devices add specific attributes for managing it
-					service.HSBValue = { hue: 0, saturation: 0, brightness: 0 };
-					service.RGBValue = { red: 0, green: 0, blue: 0 };
-					service.countColorCharacteristics = 2;
-					service.timeoutIdColorCharacteristics = 0;
-				}
 				if (subtypeParams.length >= 4) {
 					service.operatingModeId = subtypeParams[3];
 				}
@@ -283,17 +276,17 @@ class FibaroHC3 {
 
 		if (!service.isVirtual) {
 			var propertyChanged = "value"; // subscribe to the changes of this property
-			if (service.HSBValue != undefined)
+			if (characteristic.UUID === (new Characteristic.Hue).UUID || characteristic.UUID === (new Characteristic.Saturation).UUID )
 				propertyChanged = "color";
 			if (service.operatingModeId != undefined) {
-				if (characteristic.UUID == (new Characteristic.CurrentHeatingCoolingState()).UUID || characteristic.UUID == (new Characteristic.TargetHeatingCoolingState()).UUID) {
+				if (characteristic.UUID === (new Characteristic.CurrentHeatingCoolingState()).UUID || characteristic.UUID === (new Characteristic.TargetHeatingCoolingState()).UUID) {
 					propertyChanged = "mode";
 				}
 			}
-			if (service.UUID == (Service.WindowCovering.UUID) && (characteristic.UUID == (new Characteristic.CurrentHorizontalTiltAngle).UUID)) {
+			if (service.UUID === (Service.WindowCovering.UUID) && (characteristic.UUID === (new Characteristic.CurrentHorizontalTiltAngle).UUID)) {
 				propertyChanged = "value2";
 			}
-			if (service.UUID == (Service.WindowCovering.UUID) && (characteristic.UUID == (new Characteristic.TargetHorizontalTiltAngle).UUID)) {
+			if (service.UUID === (Service.WindowCovering.UUID) && (characteristic.UUID === (new Characteristic.TargetHorizontalTiltAngle).UUID)) {
 				propertyChanged = "value2";
 			}
 			this.subscribeUpdate(service, characteristic, propertyChanged);
