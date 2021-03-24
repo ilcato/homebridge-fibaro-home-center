@@ -54,62 +54,60 @@ export class SetFunctions {
 	}
 
 
-	setOn(value, callback, context, characteristic, service, IDs) {
+	setOn(value, context, characteristic, service, IDs) {
 		if (service.isVirtual && !service.isGlobalVariableSwitch) {
 			// It's a virtual device so the command is pressButton and not turnOn or Off
-			this.command("pressButton", [IDs[1]], service, IDs, callback);
+			this.command("pressButton", [IDs[1]], service, IDs);
 			// In order to behave like a push button reset the status to off
 			setTimeout(() => {
 				characteristic.setValue(0, undefined, 'fromSetValue');
 			}, 100);
 		} else if (service.isGlobalVariableSwitch) {
-			this.setGlobalVariable(IDs[1], value == true ? "true" : "false", callback);
+			this.setGlobalVariable(IDs[1], value == true ? "true" : "false");
 		} else if (service.isHarmonyDevice) {
-			this.command("changeActivityState", null, service, IDs, callback);
+			this.command("changeActivityState", null, service, IDs);
 			//			setTimeout(() => {
 			//				this.command("changeActivityState", null, service, IDs, callback);	// bug in Fibaro plugin: need to call 2 times
 			//			}, 10000);
 		} else {
 			//			if (characteristic.value == true && value == 0 || characteristic.value == false && value == 1)
-			this.command(value == 0 ? "turnOff" : "turnOn", null, service, IDs, callback);
+			this.command(value == 0 ? "turnOff" : "turnOn", null, service, IDs);
 		}
 	}
-	async setBrightness(value, callback, context, characteristic, service, IDs) {
-		if (service.HSBValue != null) {
-			;
-			let rgb = this.updateHomeCenterColorFromHomeKit(null, null, value, service);
-			this.syncColorCharacteristics(rgb, service, IDs, callback);
-		} else {
-			try {
-				const properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
-				if (properties.state)
-					this.command("setValue", [value], service, IDs, callback);
-				else {
-					callback();
-				}
-			} catch (e) {
-				this.platform.log("There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
-			}
-		}
+	async setBrightness(value, context, characteristic, service, IDs) {
+		//		if (service.characteristics.length > 3) {
+		//			this.updateHomeCenterColorFromHomeKit(null, null, value, service, IDs, callback);
+		//		} else {
+		//			try {
+		//				const properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
+		//				if (properties.state)
+		this.command("setValue", [value], service, IDs);
+		//				else {
+		//					callback();
+		//				}
+		//			} catch (e) {
+		//				this.platform.log("There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
+		//			}
+		//		}
 	}
-	setTargetPosition(value, callback, context, characteristic, service, IDs) {
-		this.command("setValue", [value], service, IDs, callback);
+	setTargetPosition(value, context, characteristic, service, IDs) {
+		this.command("setValue", [value], service, IDs);
 	}
-	setTargetTiltAngle(angle, callback, context, characteristic, service, IDs) {
+	setTargetTiltAngle(angle, context, characteristic, service, IDs) {
 		let value2 = SetFunctions.scale(angle, characteristic.props.minValue, characteristic.props.maxValue, 0, 100);
-		this.command("setValue2", [value2], service, IDs, callback);
+		this.command("setValue2", [value2], service, IDs);
 	}
-	setLockTargetState(value, callback, context, characteristic, service, IDs) {
+	setLockTargetState(value, context, characteristic, service, IDs) {
 		if (service.isLockSwitch) {
 			var action = (value == this.hapCharacteristic.LockTargetState.UNSECURED) ? "turnOn" : "turnOff";
-			this.command(action, null, service, IDs, callback);
+			this.command(action, null, service, IDs);
 			let lockCurrentStateCharacteristic = service.getCharacteristic(this.hapCharacteristic.LockCurrentState);
 			lockCurrentStateCharacteristic.updateValue(value, undefined, 'fromSetValue');
 			return;
 		}
 
 		var action = (value == this.hapCharacteristic.LockTargetState.UNSECURED) ? "unsecure" : "secure";
-		this.command(action, [0], service, IDs, callback);
+		this.command(action, [0], service, IDs);
 		setTimeout(() => {
 			let lockCurrentStateCharacteristic = service.getCharacteristic(this.hapCharacteristic.LockCurrentState);
 			lockCurrentStateCharacteristic.updateValue(value, undefined, 'fromSetValue');
@@ -122,9 +120,9 @@ export class SetFunctions {
 			}, timeout);
 		}
 	}
-	setTargetDoorState(value, callback, context, characteristic, service, IDs) {
+	setTargetDoorState(value, context, characteristic, service, IDs) {
 		var action = value == 1 ? "close" : "open";
-		this.command(action, [0], service, IDs, callback);
+		this.command(action, [0], service, IDs);
 		setTimeout(() => {
 			characteristic.setValue(value, undefined, 'fromSetValue');
 			// set also current state
@@ -132,7 +130,7 @@ export class SetFunctions {
 			currentDoorStateCharacteristic.setValue(value, undefined, 'fromSetValue');
 		}, 100);
 	}
-	setTargetHeatingCoolingState(value, callback, context, characteristic, service, IDs) {
+	setTargetHeatingCoolingState(value, context, characteristic, service, IDs) {
 		if (service.operatingModeId) {	// Operating mode is availble on Home Center
 			var v;
 			switch (value) {
@@ -152,9 +150,9 @@ export class SetFunctions {
 					return;
 			}
 			if (v != "0") { // set subset mode on the temperature controller ...
-				this.command("setSetpointMode", [v], service, IDs, null);
+				this.command("setSetpointMode", [v], service, IDs);
 			}
-			this.command("setMode", [v], service, [service.operatingModeId], callback);	// ... and full mode on mode controller	
+			this.command("setMode", [v], service, [service.operatingModeId]);	// ... and full mode on mode controller	
 		} else {
 			if (this.platform.config.enablecoolingstatemanagemnt == "on") {
 				let temp = 0;
@@ -164,8 +162,8 @@ export class SetFunctions {
 					temp = stdTemp;
 					value = this.hapCharacteristic.TargetHeatingCoolingState.HEAT; // force the target state to HEAT because we are not managing other staes beside OFF and HEAT
 				}
-				this.command("setTargetLevel", [temp], service, IDs, null);
-				this.command("setTime", [0 + Math.trunc((new Date()).getTime() / 1000)], service, IDs, callback);
+				this.command("setTargetLevel", [temp], service, IDs);
+				this.command("setTime", [0 + Math.trunc((new Date()).getTime() / 1000)], service, IDs);
 
 				setTimeout(() => {
 					characteristic.setValue(value, undefined, 'fromSetValue');
@@ -176,7 +174,7 @@ export class SetFunctions {
 			}
 		}
 	}
-	async setTargetTemperature(value, callback, context, characteristic, service, IDs) {
+	async setTargetTemperature(value, context, characteristic, service, IDs) {
 		if (Math.abs(value - characteristic.value) >= 0.5) {
 			value = parseFloat((Math.round(value / 0.5) * 0.5).toFixed(1));
 			var currentOpMode;
@@ -185,52 +183,51 @@ export class SetFunctions {
 				try {
 					const properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
 					currentOpMode = properties.mode;
-					this.command("setThermostatSetpoint", [currentOpMode, value], service, IDs, callback);
+					this.command("setThermostatSetpoint", [currentOpMode, value], service, IDs);
 				} catch (e) {
 					this.platform.log("There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
 				}
 			} else {
-				this.command("setHeatingThermostatSetpoint", [value], service, IDs, null);
-				this.command("setInterval", [parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000)], service, IDs, callback);
+				this.command("setHeatingThermostatSetpoint", [value], service, IDs);
+				this.command("setInterval", [parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000)], service, IDs);
 			}
 		} else {
 			value = characteristic.value;
 		}
 		setTimeout(() => {
-			characteristic.setValue(value, undefined, 'fromSetValue');
+			characteristic.setValue(value, undefined, '	');
 		}, 100);
 	}
-	setHue(value, callback, context, characteristic, service, IDs) {
-		let rgb = this.updateHomeCenterColorFromHomeKit(value, null, null, service);
-		this.syncColorCharacteristics(rgb, service, IDs, callback);
+	setHue(value, context, characteristic, service, IDs) {
+		this.updateHomeCenterColorFromHomeKit(value, null, service, IDs);
 	}
-	setSaturation(value, callback, context, characteristic, service, IDs) {
-		let rgb = this.updateHomeCenterColorFromHomeKit(null, value, null, service);
-		this.syncColorCharacteristics(rgb, service, IDs, callback);
+	setSaturation(value, context, characteristic, service, IDs) {
+		this.updateHomeCenterColorFromHomeKit(null, value, service, IDs);
 	}
-	setSecuritySystemTargetState(value, callback, context, characteristic, service, IDs) {
+	setSecuritySystemTargetState(value, context, characteristic, service, IDs) {
 		let sceneID = this.getTargetSecuritySystemSceneMapping.get(value);
 		if (value == this.hapCharacteristic.SecuritySystemTargetState.DISARM)
 			value = this.hapCharacteristic.SecuritySystemCurrentState.DISARMED;
 		if (sceneID == undefined)
 			return;
-		this.scene(sceneID, callback);
+		this.scene(sceneID);
 	}
 
-	updateHomeCenterColorFromHomeKit(h, s, v, service) {
-		if (h != null)
-			service.HSBValue.hue = h;
-		if (s != null)
-			service.HSBValue.saturation = s;
-		if (v != null)
-			service.HSBValue.brightness = v;
-		var rgb = this.HSVtoRGB(service.HSBValue.hue, service.HSBValue.saturation, service.HSBValue.brightness);
-		service.RGBValue.red = rgb.r;
-		service.RGBValue.green = rgb.g;
-		service.RGBValue.blue = rgb.b;
-		service.RGBValue.white = rgb.w;
-		return rgb;
+	updateHomeCenterColorFromHomeKit(h, s, service, IDs) {
+		if (h !== null)
+			service.h = h;
+		if (s !== null)
+			service.s = s;
+		if (service.h !== undefined && service.s !== undefined) {
+			const v = service.characteristics[2].value;
+			var rgbw = this.HSVtoRGB(service.h, service.s, v);
+			this.command("setColor", [rgbw.r, rgbw.g, rgbw.b, rgbw.w], service, IDs);
+			this.command("setValue", [v], service, IDs);
+			delete service.h;
+			delete service.s;
+		}
 	}
+
 	HSVtoRGB(hue, saturation, value) {
 		let h = hue / 360.0;
 		let s = saturation / 100.0;
@@ -257,61 +254,27 @@ export class SetFunctions {
 			w: Math.round(w * 255)
 		};
 	}
-	syncColorCharacteristics(rgb, service, IDs, callback) {
-		switch (--service.countColorCharacteristics) {
-			case 1:
-				service.timeoutIdColorCharacteristics = setTimeout(() => {
-					if (service.countColorCharacteristics < 1)
-						return;
-					this.command("setR", [rgb.r], service, IDs, null);
-					this.command("setG", [rgb.g], service, IDs, null);
-					this.command("setB", [rgb.b], service, IDs, null);
-					this.command("setW", [rgb.w], service, IDs, callback);
-					service.countColorCharacteristics = 2;
-					service.timeoutIdColorCharacteristics = 0;
-				}, 1000);
-				break;
-			case 0:
-				this.command("setR", [rgb.r], service, IDs, null);
-				this.command("setG", [rgb.g], service, IDs, null);
-				this.command("setB", [rgb.b], service, IDs, null);
-				this.command("setW", [rgb.w], service, IDs, callback);
-				service.countColorCharacteristics = 2;
-				clearTimeout(service.timeoutIdColorCharacteristics);
-				service.timeoutIdColorCharacteristics = 0;
-				break;
-			default:
-				break;
-		}
-	}
 
-
-	async command(c, value, service, IDs, callback) {
+	async command(c, value, service, IDs) {
 		try {
 			await this.platform.fibaroClient.executeDeviceAction(IDs[0], c, value);
-			if (callback)
-				callback();
 			this.platform.log("Command: ", c + ((value != undefined) ? ", value: " + value : "") + ", to: " + IDs[0]);
 		} catch (e) {
 			this.platform.log("There was a problem sending command ", c + " to " + IDs[0]);
 		}
 	}
 
-	async scene(sceneID, callback) {
+	async scene(sceneID) {
 		try {
 			await this.platform.fibaroClient.executeScene(sceneID);
-			if (callback)
-				callback();
 		} catch (e) {
 			this.platform.log("There was a problem executing scene: ", sceneID);
 		}
 	}
 
-	async setGlobalVariable(variableID, value, callback) {
+	async setGlobalVariable(variableID, value) {
 		try {
 			await this.platform.fibaroClient.setGlobalVariable(variableID, value);
-			if (callback)
-				callback();
 		} catch (e) {
 			this.platform.log("There was a problem setting variable: ", `${variableID} to ${value}`);
 		}

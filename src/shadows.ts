@@ -229,36 +229,31 @@ export class ShadowAccessory {
 			case "com.fibaro.gerda":
 				ss = [new ShadowService(new hapService.LockMechanism(device.name), [hapCharacteristic.LockCurrentState, hapCharacteristic.LockTargetState])];
 				break;
-			case "com.fibaro.setPoint":
+			//			case "com.fibaro.setPoint":
+			//			case "com.fibaro.thermostatDanfoss":
+			//			case "com.fibaro.com.fibaro.thermostatHorstmann":
 			case "com.fibaro.FGT001":
-			case "com.fibaro.thermostatDanfoss":
-			case "com.fibaro.com.fibaro.thermostatHorstmann":
-				// controlService = new hapService.Thermostat(device.name);
-				// controlCharacteristics = [hapCharacteristic.CurrentTemperature, hapCharacteristic.TargetTemperature, hapCharacteristic.CurrentHeatingCoolingState, hapCharacteristic.TargetHeatingCoolingState, hapCharacteristic.TemperatureDisplayUnits];
-				// // Check the presence of an associated operating mode device
-				// let m = siblings.get("com.fibaro.operatingMode");
-				// if (m) {
-				// 	controlService.operatingModeId = m.id;
-				// 	controlService.subtype = device.id + "---" + m.id;
-				// }
-				// // Check if there's a temperature Sensor and use it instead of the provided float value
-				// let t = siblings.get("com.fibaro.temperatureSensor");
-				// if (t) {
-				// 	controlService.floatServiceId = t.id;
-				// 	controlService.subtype = (controlService.subtype || device.id + "----") + t.id;
-				// }
-				// ss = [new ShadowService(controlService, controlCharacteristics)];
+				controlService = new hapService.Thermostat(device.name);
+				controlCharacteristics = [hapCharacteristic.CurrentTemperature, hapCharacteristic.TargetTemperature, hapCharacteristic.CurrentHeatingCoolingState, hapCharacteristic.TargetHeatingCoolingState, hapCharacteristic.TemperatureDisplayUnits];
+				// Check the presence of an associated operating mode device
+				let m = siblings.get("com.fibaro.operatingMode");
+				if (m) {
+					controlService.operatingModeId = m.id;
+					controlService.subtype = device.id + "---" + m.id;
+				}
+				// Check if there's a temperature Sensor and use it instead of the provided float value
+				let t = siblings.get("com.fibaro.temperatureSensor");
+				if (t) {
+					controlService.floatServiceId = t.id;
+					controlService.subtype = (controlService.subtype || device.id + "----") + t.id;
+				}
+				ss = [new ShadowService(controlService, controlCharacteristics)];
 				break;
 			case "com.fibaro.FGRGBW441M":
 			case "com.fibaro.colorController":
 			case "com.fibaro.FGRGBW442":
 			case "com.fibaro.FGRGBW442CC":
 				let service = { controlService: new hapService.Lightbulb(device.name), characteristics: [hapCharacteristic.On, hapCharacteristic.Brightness, hapCharacteristic.Hue, hapCharacteristic.Saturation] };
-				service.controlService.HSBValue = { hue: 0, saturation: 0, brightness: 100 };
-				service.controlService.RGBValue = { red: 0, green: 0, blue: 0, white: 0 };
-				service.controlService.countColorCharacteristics = 0;
-				service.controlService.timeoutIdColorCharacteristics = 0;
-				service.controlService.subtype = device.id + "--RGB";
 				ss = [service];
 				break;
 			case "com.fibaro.logitechHarmonyActivity":

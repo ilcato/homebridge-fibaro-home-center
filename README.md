@@ -29,6 +29,10 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 1.1.7
++ Fix color management forr lights
++ Fibaro heat controller support
+
 Version 1.1.6
 + Fix dimmer status
 
