@@ -106,20 +106,9 @@ export class GetFunctions {
 		this.returnValue(r, callback, characteristic);
 	}
 	getBrightness(callback, characteristic, service, IDs, properties) {
-		let r;
-		if (properties.color) {
-			let hsv = this.updateHomeKitColorFromHomeCenter(properties.color, service);
-			r = Math.round(hsv.v);
-		} else {
-			if (isNaN(properties.value)) {
-				if (callback)
-					callback(new Error('Brightness value is not a number.'), null);
-				return;
-			}
-			r = parseFloat(properties.value);
+			let r = parseFloat(properties.value);
 			if (r == 99)
 				r = 100;
-		}
 		this.returnValue(r, callback, characteristic);
 	}
 	getPositionState(callback, characteristic, service, IDs, properties) {
