@@ -78,14 +78,8 @@ export class GetFunctions {
 		]);
 	}
 
-	returnValue(r, callback, characteristic) {
-		if (callback)
-			callback(undefined, r);
-		else
-			characteristic.updateValue(r);
-	}
 	// Boolean getter
-	getBool(callback, characteristic, service, IDs, properties) {
+	getBool(characteristic, service, IDs, properties) {
 		let v = properties.value;
 		if (v !== undefined) {
 			v = this.getBoolean(v);
@@ -93,28 +87,26 @@ export class GetFunctions {
 			v = properties["ui.startStopActivitySwitch.value"];
 			if (v == undefined) v = false;
 		}
-		this.returnValue(v, callback, characteristic);
+		characteristic.updateValue(v);
 	}
 	// Float getter
-	getFloat(callback, characteristic, service, IDs, properties) {
+	getFloat(characteristic, service, IDs, properties) {
 		if (isNaN(properties.value)) {
-			if (callback)
-				callback(new Error('Value is not a number.'), null);
 			return;
 		}
 		const r = parseFloat(properties.value);
-		this.returnValue(r, callback, characteristic);
+		characteristic.updateValue(r);
 	}
-	getBrightness(callback, characteristic, service, IDs, properties) {
-			let r = parseFloat(properties.value);
-			if (r == 99)
-				r = 100;
-		this.returnValue(r, callback, characteristic);
+	getBrightness(characteristic, service, IDs, properties) {
+		let r = parseFloat(properties.value);
+		if (r == 99)
+			r = 100;
+		characteristic.updateValue(r);
 	}
-	getPositionState(callback, characteristic, service, IDs, properties) {
-		this.returnValue(this.hapCharacteristic.PositionState.STOPPED, callback, characteristic);
+	getPositionState(characteristic, service, IDs, properties) {
+		characteristic.updateValue(this.hapCharacteristic.PositionState.STOPPED);
 	}
-	getCurrentPosition(callback, characteristic, service, IDs, properties) {
+	getCurrentPosition(characteristic, service, IDs, properties) {
 		let r = parseInt(properties.value);
 		if (r >= characteristic.props.minValue && r <= characteristic.props.maxValue) {
 			if (r == 99)
@@ -124,9 +116,9 @@ export class GetFunctions {
 		} else {
 			r = characteristic.props.minValue;
 		}
-		this.returnValue(r, callback, characteristic);
+		characteristic.updateValue(r);
 	}
-	getCurrentTiltAngle(callback, characteristic, service, IDs, properties) {
+	getCurrentTiltAngle(characteristic, service, IDs, properties) {
 		let value2 = parseInt(properties.value2);
 		if (value2 >= 0 && value2 <= 100) {
 			if (value2 == 99)
@@ -137,211 +129,189 @@ export class GetFunctions {
 			value2 = characteristic.props.minValue;
 		}
 		let angle = SetFunctions.scale(value2, 0, 100, characteristic.props.minValue, characteristic.props.maxValue);
-		this.returnValue(angle, callback, characteristic);
+		characteristic.updateValue(angle);
 	}
-	async getCurrentTemperature(callback, characteristic, service, IDs, properties) {
+	async getCurrentTemperature(characteristic, service, IDs, properties) {
 		if (service.floatServiceId) {
 			try {
 				const properties = (await this.platform.fibaroClient.getDeviceProperties(service.floatServiceId)).body.properties;
 				const r = parseFloat(properties.value);
 				if (isNaN(properties.value)) {
 					this.platform.log('Temperature is not a number.', '');
-					callback(new Error('Temperature is not a number.'), null);
 					return;
 				}
-				this.returnValue(r, callback, characteristic);
+				characteristic.updateValue(r);
 			} catch (e) {
 				this.platform.log("There was a problem getting value from: ", `${service.floatServiceId} - Err: ${e}`);
-				callback(e, null);
 				return;
 			}
 		} else {
 			if (isNaN(properties.value)) {
 				this.platform.log('Temperature is not a number.', '');
-				if (callback)
-					callback(new Error('Temperature is not a number.'), null);
 				return;
 			}
 			const r = parseFloat(properties.value);
-			this.returnValue(r, callback, characteristic);
+			characteristic.updateValue(r);
 		}
 	}
-	getTargetTemperature(callback, characteristic, service, IDs, properties) {
+	getTargetTemperature(characteristic, service, IDs, properties) {
 		if (isNaN(properties.heatingThermostatSetpoint)) {
 			this.platform.log('heatingThermostatSetpoint is not a number.', '');
-			if (callback)
-				callback(new Error('heatingThermostatSetpoint is not a number.'), null);
 			return;
 		}
-		this.returnValue(parseFloat(properties.heatingThermostatSetpoint), callback, characteristic);
+		characteristic.updateValue(parseFloat(properties.heatingThermostatSetpoint));
 	}
-	getContactSensorState(callback, characteristic, service, IDs, properties) {
+	getContactSensorState(characteristic, service, IDs, properties) {
 		const v = this.getBoolean(properties.value);
-		this.returnValue(v === false ? this.hapCharacteristic.ContactSensorState.CONTACT_DETECTED : this.hapCharacteristic.ContactSensorState.CONTACT_NOT_DETECTED, callback, characteristic);
+		characteristic.updateValue(v === false ? this.hapCharacteristic.ContactSensorState.CONTACT_DETECTED : this.hapCharacteristic.ContactSensorState.CONTACT_NOT_DETECTED);
 	}
-	getLeakDetected(callback, characteristic, service, IDs, properties) {
+	getLeakDetected(characteristic, service, IDs, properties) {
 		const v = this.getBoolean(properties.value);
-		this.returnValue(v === true ? this.hapCharacteristic.LeakDetected.LEAK_DETECTED : this.hapCharacteristic.LeakDetected.LEAK_NOT_DETECTED, callback, characteristic);
+		characteristic.updateValue(v === true ? this.hapCharacteristic.LeakDetected.LEAK_DETECTED : this.hapCharacteristic.LeakDetected.LEAK_NOT_DETECTED);
 	}
-	getSmokeDetected(callback, characteristic, service, IDs, properties) {
+	getSmokeDetected(characteristic, service, IDs, properties) {
 		const v = this.getBoolean(properties.value);
-		this.returnValue(v === true ? this.hapCharacteristic.SmokeDetected.SMOKE_DETECTED : this.hapCharacteristic.SmokeDetected.SMOKE_NOT_DETECTED, callback, characteristic);
+		characteristic.updateValue(v === true ? this.hapCharacteristic.SmokeDetected.SMOKE_DETECTED : this.hapCharacteristic.SmokeDetected.SMOKE_NOT_DETECTED);
 	}
-	getCarbonMonoxideDetected(callback, characteristic, service, IDs, properties) {
+	getCarbonMonoxideDetected(characteristic, service, IDs, properties) {
 		const v = this.getBoolean(properties.value);
-		this.returnValue(v === true ? this.hapCharacteristic.CarbonMonoxideDetected.CO_LEVELS_ABNORMAL : this.hapCharacteristic.CarbonMonoxideDetected.CO_LEVELS_NORMAL, callback, characteristic);
+		characteristic.updateValue(v === true ? this.hapCharacteristic.CarbonMonoxideDetected.CO_LEVELS_ABNORMAL : this.hapCharacteristic.CarbonMonoxideDetected.CO_LEVELS_NORMAL);
 	}
-	getOutletInUse(callback, characteristic, service, IDs, properties) {
+	getOutletInUse(characteristic, service, IDs, properties) {
 		if (isNaN(properties.power)) {
 			this.platform.log('power is not a number.', '');
-			if (callback)
-				callback(new Error('power is not a number.'), null);
 			return;
 		}
-		this.returnValue(parseFloat(properties.power) > 1.0 ? true : false, callback, characteristic);
+		characteristic.updateValue(parseFloat(properties.power) > 1.0 ? true : false);
 	}
-	getLockCurrentState(callback, characteristic, service, IDs, properties) {
+	getLockCurrentState(characteristic, service, IDs, properties) {
 		const v = this.getBoolean(properties.value);
 		if (service.isLockSwitch) {
-			this.returnValue(v == false ? this.hapCharacteristic.LockCurrentState.SECURED : this.hapCharacteristic.LockCurrentState.UNSECURED, callback, characteristic);
+			characteristic.updateValue(v == false ? this.hapCharacteristic.LockCurrentState.SECURED : this.hapCharacteristic.LockCurrentState.UNSECURED);
 			return
 		}
-		this.returnValue(v == true ? this.hapCharacteristic.LockCurrentState.SECURED : this.hapCharacteristic.LockCurrentState.UNSECURED, callback, characteristic);
+		characteristic.updateValue(v == true ? this.hapCharacteristic.LockCurrentState.SECURED : this.hapCharacteristic.LockCurrentState.UNSECURED);
 	}
-	async getCurrentHeatingCoolingState(callback, characteristic, service, IDs, properties) {
+	async getCurrentHeatingCoolingState(characteristic, service, IDs, properties) {
 		if (service.operatingModeId) {	// Operating mode is availble on Home Center
 			try {
 				const properties = (await this.platform.fibaroClient.getDeviceProperties(service.operatingModeId)).body.properties;
 				switch (properties.mode) {
 					case "0": // OFF
-						this.returnValue(this.hapCharacteristic.CurrentHeatingCoolingState.OFF, callback, characteristic);
+						characteristic.updateValue(this.hapCharacteristic.CurrentHeatingCoolingState.OFF);
 						break;
 					case "1": // HEAT
-						this.returnValue(this.hapCharacteristic.CurrentHeatingCoolingState.HEAT, callback, characteristic);
+						characteristic.updateValue(this.hapCharacteristic.CurrentHeatingCoolingState.HEAT);
 						break;
 					case "2": // COOL
-						this.returnValue(this.hapCharacteristic.CurrentHeatingCoolingState.COOL, callback, characteristic);
+						characteristic.updateValue(this.hapCharacteristic.CurrentHeatingCoolingState.COOL);
 						break;
 					default:
 						break;
 				}
 			} catch (e) {
 				this.platform.log("There was a problem getting value from: ", `${service.operatingModeId} - Err: ${e}`);
-				if (callback)
-					callback(e, null);
 				return;
 			}
 		} else {
 			if (this.platform.config.enablecoolingstatemanagemnt == "on") { // Simulated operating mode
 				if (isNaN(properties.value)) {
 					this.platform.log('temperature is not a number.', '');
-					if (callback)
-						callback(new Error('temperature is not a number.'), null);
 					return;
 				}
 				let t = parseFloat(properties.value);
 				if (t <= lowestTemp)
-					this.returnValue(this.hapCharacteristic.CurrentHeatingCoolingState.OFF, callback, characteristic);
+					characteristic.updateValue(this.hapCharacteristic.CurrentHeatingCoolingState.OFF);
 				else
-					this.returnValue(this.hapCharacteristic.CurrentHeatingCoolingState.HEAT, callback, characteristic);
+					characteristic.updateValue(this.hapCharacteristic.CurrentHeatingCoolingState.HEAT);
 			} else { // Fake simulated mode: always heat
-				this.returnValue(this.hapCharacteristic.CurrentHeatingCoolingState.HEAT, callback, characteristic);
+				characteristic.updateValue(this.hapCharacteristic.CurrentHeatingCoolingState.HEAT);
 			}
 		}
 	}
-	async getTargetHeatingCoolingState(callback, characteristic, service, IDs, properties) {
+	async getTargetHeatingCoolingState(characteristic, service, IDs, properties) {
 		if (service.operatingModeId) {	// Operating mode is availble on Home Center
 			try {
 				const properties = (await this.platform.fibaroClient.getDeviceProperties(service.operatingModeId)).body.properties;
 				switch (properties.mode) {
 					case "0": // OFF
-						this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.OFF, callback, characteristic);
+						characteristic.updateValue(this.hapCharacteristic.TargetHeatingCoolingState.OFF);
 						break;
 					case "1": // HEAT
-						this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.HEAT, callback, characteristic);
+						characteristic.updateValue(this.hapCharacteristic.TargetHeatingCoolingState.HEAT);
 						break;
 					case "2": // COOL
-						this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.COOL, callback, characteristic);
+						characteristic.updateValue(this.hapCharacteristic.TargetHeatingCoolingState.COOL);
 						break;
 					case "10": // AUTO
-						this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.AUTO, callback, characteristic);
+						characteristic.updateValue(this.hapCharacteristic.TargetHeatingCoolingState.AUTO);
 						break;
 					default:
 						break;
 				}
 			} catch (e) {
 				this.platform.log("There was a problem getting value from: ", `${service.operatingModeId} - Err: ${e}`);
-				if (callback)
-					callback(e, null);
 			}
 		} else {
 			if (this.platform.config.enablecoolingstatemanagemnt == "on") {
 				if (isNaN(properties.targetLevel)) {
 					this.platform.log('targetLevel is not a number.', '');
-					if (callback)
-						callback(new Error('targetLevel is not a number.'), null);
 					return;
 				}
 				let t = parseFloat(properties.targetLevel);
 				if (t <= lowestTemp)
-					this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.OFF, callback, characteristic);
+					characteristic.updateValue(this.hapCharacteristic.TargetHeatingCoolingState.OFF);
 				else
-					this.returnValue(this.hapCharacteristic.TargetHeatingCoolingState.HEAT, callback, characteristic);
+					characteristic.updateValue(this.hapCharacteristic.TargetHeatingCoolingState.HEAT);
 			} else {
-				this.returnValue(this.hapCharacteristic.CurrentHeatingCoolingState.HEAT, callback, characteristic);
+				characteristic.updateValue(this.hapCharacteristic.CurrentHeatingCoolingState.HEAT);
 			}
 		}
 	}
-	getTemperatureDisplayUnits(callback, characteristic, service, IDs, properties) {
-		this.returnValue(this.hapCharacteristic.TemperatureDisplayUnits.CELSIUS, callback, characteristic);
+	getTemperatureDisplayUnits(characteristic, service, IDs, properties) {
+		characteristic.updateValue(this.hapCharacteristic.TemperatureDisplayUnits.CELSIUS);
 	}
-	getHue(callback, characteristic, service, IDs, properties) {
-		this.returnValue(Math.round(this.updateHomeKitColorFromHomeCenter(properties.color, service).h), callback, characteristic);
+	getHue(characteristic, service, IDs, properties) {
+		characteristic.updateValue(Math.round(this.updateHomeKitColorFromHomeCenter(properties.color, service).h));
 	}
-	getSaturation(callback, characteristic, service, IDs, properties) {
-		this.returnValue(Math.round(this.updateHomeKitColorFromHomeCenter(properties.color, service).s), callback, characteristic);
+	getSaturation(characteristic, service, IDs, properties) {
+		characteristic.updateValue(Math.round(this.updateHomeKitColorFromHomeCenter(properties.color, service).s));
 	}
-	getCurrentDoorState(callback, characteristic, service, IDs, properties) {
-		this.returnValue(properties.state == "Closed" ? this.hapCharacteristic.CurrentDoorState.CLOSED : this.hapCharacteristic.CurrentDoorState.OPEN, callback, characteristic);
+	getCurrentDoorState(characteristic, service, IDs, properties) {
+		characteristic.updateValue(properties.state == "Closed" ? this.hapCharacteristic.CurrentDoorState.CLOSED : this.hapCharacteristic.CurrentDoorState.OPEN);
 	}
-	getObstructionDetected(callback, characteristic, service, IDs, properties) {
-		this.returnValue(0, callback, characteristic);
+	getObstructionDetected(characteristic, service, IDs, properties) {
+		characteristic.updateValue(0);
 	}
-	getBatteryLevel(callback, characteristic, service, IDs, properties) {
+	getBatteryLevel(characteristic, service, IDs, properties) {
 		if (isNaN(properties.batteryLevel)) {
 			this.platform.log('batteryLevel is not a number.', '');
-			if (callback)
-				callback(new Error('batteryLevel is not a number.'), null);
 			return;
 		}
 		let r = parseFloat(properties.batteryLevel);
 		if (r > 100) r = 0;
-		this.returnValue(r, callback, characteristic);
+		characteristic.updateValue(r);
 	}
-	getChargingState(callback, characteristic, service, IDs, properties) {
+	getChargingState(characteristic, service, IDs, properties) {
 		let r = 0;//parseFloat(properties.batteryLevel);
-		this.returnValue(r, callback, characteristic);
+		characteristic.updateValue(r);
 	}
-	getStatusLowBattery(callback, characteristic, service, IDs, properties) {
+	getStatusLowBattery(characteristic, service, IDs, properties) {
 		if (isNaN(properties.batteryLevel)) {
 			this.platform.log('batteryLevel is not a number.', '');
-			if (callback)
-				callback(new Error('batteryLevel is not a number.'), null);
 			return;
 		}
 		let r = parseFloat(properties.batteryLevel) <= 30 ? 1 : 0;
-		this.returnValue(r, callback, characteristic);
+		characteristic.updateValue(r);
 	}
-	getSecuritySystemState(callback, characteristic, service, IDs, securitySystemStatus) {
-		let r;
+	getSecuritySystemState(characteristic, service, IDs, securitySystemStatus) {
+		let r = this.hapCharacteristic.SecuritySystemTargetState.DISARMED;
 		if (characteristic.UUID == (new this.hapCharacteristic.SecuritySystemCurrentState()).UUID) {
 			r = this.getCurrentSecuritySystemStateMapping.get(securitySystemStatus.value);
 		} else if (characteristic.UUID == (new this.hapCharacteristic.SecuritySystemTargetState()).UUID) {
 			r = this.getTargetSecuritySystemStateMapping.get(securitySystemStatus.value);
 		}
-		if (r === undefined)
-			r = this.hapCharacteristic.SecuritySystemTargetState.DISARMED;
-		this.returnValue(r, callback, characteristic);
+		characteristic.updateValue(r);
 	}
 
 	updateHomeKitColorFromHomeCenter(color, service) {
