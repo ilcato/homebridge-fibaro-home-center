@@ -77,9 +77,11 @@ export class Poller {
 				const securitySystemStatus = (await this.platform.fibaroClient.getGlobalVariable("SecuritySystem")).body;
 				if (this.platform.securitySystemService != undefined) {
 					let statec = this.platform.getFunctions.getCurrentSecuritySystemStateMapping.get(securitySystemStatus.value);
-					let c = this.platform.securitySystemService.getCharacteristic(this.hapCharacteristic.SecuritySystemCurrentState);
-					if (c.value != statec)
-						c.updateValue(statec);
+					if (statec !== undefined) {
+						let c = this.platform.securitySystemService.getCharacteristic(this.hapCharacteristic.SecuritySystemCurrentState);
+						if (c.value != statec)
+							c.updateValue(statec);
+					}
 				}
 			}
 		} catch (e) {
@@ -108,7 +110,7 @@ export class Poller {
 					this.platform.log(`Updating ${property} for device: `, `${subscription.id}  parameter: ${subscription.characteristic.displayName}, ${property}: ${changePropertyValue}`);
 					let getFunction = this.platform.getFunctions.getFunctionsMapping.get(subscription.characteristic.UUID);
 					if (getFunction && getFunction.function)
-						getFunction.function.call(this.platform.getFunctions, null, subscription.characteristic, subscription.service, null, change);
+						getFunction.function.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
 				}
 			}
 		}
@@ -138,7 +140,7 @@ export class Poller {
 				this.platform.log("Updating value for device: ", `${subscription.service.operatingModeId}  parameter: ${subscription.characteristic.displayName}, value: ${event.data.newValue}`);
 				let getFunction = this.platform.getFunctions.getFunctionsMapping.get(subscription.characteristic.UUID);
 				if (getFunction.function)
-					getFunction.function.call(this.platform.getFunctions, null, subscription.characteristic, subscription.service, null, null);
+					getFunction.function.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, null);
 			}
 		}
 	}

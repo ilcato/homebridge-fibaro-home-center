@@ -311,7 +311,8 @@ export class GetFunctions {
 		} else if (characteristic.UUID == (new this.hapCharacteristic.SecuritySystemTargetState()).UUID) {
 			r = this.getTargetSecuritySystemStateMapping.get(securitySystemStatus.value);
 		}
-		characteristic.updateValue(r);
+		if (r !== undefined)
+			characteristic.updateValue(r);
 	}
 
 	updateHomeKitColorFromHomeCenter(color, service) {

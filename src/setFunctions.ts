@@ -75,20 +75,7 @@ export class SetFunctions {
 		}
 	}
 	async setBrightness(value, context, characteristic, service, IDs) {
-		//		if (service.characteristics.length > 3) {
-		//			this.updateHomeCenterColorFromHomeKit(null, null, value, service, IDs, callback);
-		//		} else {
-		//			try {
-		//				const properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
-		//				if (properties.state)
 		this.command("setValue", [value], service, IDs);
-		//				else {
-		//					callback();
-		//				}
-		//			} catch (e) {
-		//				this.platform.log("There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
-		//			}
-		//		}
 	}
 	setTargetPosition(value, context, characteristic, service, IDs) {
 		this.command("setValue", [value], service, IDs);
@@ -195,7 +182,7 @@ export class SetFunctions {
 			value = characteristic.value;
 		}
 		setTimeout(() => {
-			characteristic.setValue(value, undefined, '	');
+			characteristic.setValue(value, undefined, 'fromSetValue');
 		}, 100);
 	}
 	setHue(value, context, characteristic, service, IDs) {
