@@ -333,7 +333,7 @@ class FibaroHC3 {
 			if (service.isSecuritySystem) {
 				const securitySystemStatus = (await this.fibaroClient.getGlobalVariable("SecuritySystem")).body;
 				if (this.getFunctions)
-					this.getFunctions.getSecuritySystemState(null, characteristic, service, IDs, securitySystemStatus);
+					this.getFunctions.getSecuritySystemState(characteristic, service, IDs, securitySystemStatus);
 				callback(undefined, characteristic.value);
 				return;
 			}
@@ -341,7 +341,7 @@ class FibaroHC3 {
 			if (service.isGlobalVariableSwitch) {
 				const switchStatus = (await this.fibaroClient.getGlobalVariable(IDs[1])).body;
 				if (this.getFunctions)
-					this.getFunctions.getBool(null, characteristic, service, IDs, switchStatus);
+					this.getFunctions.getBool(characteristic, service, IDs, switchStatus);
 				callback(undefined, characteristic.value);
 				return;
 			}
@@ -374,12 +374,13 @@ class FibaroHC3 {
 							this.log("Device dead: ", `${IDs[0]}  parameter: ${characteristic.displayName}`);
 						} else {
 							service.dead = false;
-							getFunction.function.call(this.getFunctions, null, characteristic, service, IDs, properties);
+							getFunction.function.call(this.getFunctions, characteristic, service, IDs, properties);
 						}
 					} else {
 						this.log("No get function defined for: ", `${characteristic.displayName}`);
 					}
 				} catch (e) {
+					service.dead = true;
 					this.log("G1 - There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
 				}
 			}, getFunction.delay * 100);
