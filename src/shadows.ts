@@ -56,7 +56,7 @@ export class ShadowAccessory {
 
 		for (let i = 0; i < services.length; i++) {
 			if (services[i].controlService.subtype == undefined)
-				services[i].controlService.subtype = device.id + "----"			// DEVICE_ID-VIRTUAL_BUTTON_ID-RGB_MARKER-OPERATING_MODE_ID-PLUGIN_MARKER
+				services[i].controlService.subtype = device.id + "----"	
 		}
 	}
 
@@ -153,7 +153,7 @@ export class ShadowAccessory {
 						break;
 					case 25: // Video gate open
 						controlService = new hapService.LockMechanism(device.name);
-						controlService.subtype = device.id + "----" + "LOCK";
+						controlService.subtype = device.id + "--" + "LOCK";
 						controlCharacteristics = [hapCharacteristic.LockCurrentState, hapCharacteristic.LockTargetState];
 						break;
 					default:
@@ -229,23 +229,17 @@ export class ShadowAccessory {
 			case "com.fibaro.gerda":
 				ss = [new ShadowService(new hapService.LockMechanism(device.name), [hapCharacteristic.LockCurrentState, hapCharacteristic.LockTargetState])];
 				break;
-			//			case "com.fibaro.setPoint":
-			//			case "com.fibaro.thermostatDanfoss":
-			//			case "com.fibaro.com.fibaro.thermostatHorstmann":
+			case "com.fibaro.setPoint":
+			case "com.fibaro.thermostatDanfoss":
+			case "com.fibaro.com.fibaro.thermostatHorstmann":
 			case "com.fibaro.FGT001":
 				controlService = new hapService.Thermostat(device.name);
 				controlCharacteristics = [hapCharacteristic.CurrentTemperature, hapCharacteristic.TargetTemperature, hapCharacteristic.CurrentHeatingCoolingState, hapCharacteristic.TargetHeatingCoolingState, hapCharacteristic.TemperatureDisplayUnits];
-				// Check the presence of an associated operating mode device
-				let m = siblings.get("com.fibaro.operatingMode");
-				if (m) {
-					controlService.operatingModeId = m.id;
-					controlService.subtype = device.id + "---" + m.id;
-				}
 				// Check if there's a temperature Sensor and use it instead of the provided float value
 				let t = siblings.get("com.fibaro.temperatureSensor");
 				if (t) {
 					controlService.floatServiceId = t.id;
-					controlService.subtype = (controlService.subtype || device.id + "----") + t.id;
+					controlService.subtype = (controlService.subtype || device.id + "---") + t.id;
 				}
 				ss = [new ShadowService(controlService, controlCharacteristics)];
 				break;
@@ -258,7 +252,7 @@ export class ShadowAccessory {
 				break;
 			case "com.fibaro.logitechHarmonyActivity":
 				controlService = new hapService.Switch(device.name);
-				controlService.subtype = device.id + "----" + "HP"; 					// HP: Harmony Plugin
+				controlService.subtype = device.id + "--" + "HP"; 					// HP: Harmony Plugin
 				ss = [new ShadowService(controlService, [hapCharacteristic.On])];
 				break;
 			default:
@@ -276,12 +270,12 @@ export class ShadowAccessory {
 	}
 	static createShadowGlobalVariableSwitchAccessory(device, hapAccessory, hapService, hapCharacteristic, platform) {
 		let service = new ShadowService(new hapService.Switch(device.name), [hapCharacteristic.On]);
-		service.controlService.subtype = `G-${device.name}-`;
+		service.controlService.subtype = 'G--';
 		return new ShadowAccessory(device, [service], hapAccessory, hapService, hapCharacteristic, platform, true);
 	}
 	static createShadowSecuritySystemAccessory(device, hapAccessory, hapService, hapCharacteristic, platform) {
 		let service = new ShadowService(new hapService.SecuritySystem("FibaroSecuritySystem"), [hapCharacteristic.SecuritySystemCurrentState, hapCharacteristic.SecuritySystemTargetState]);
-		service.controlService.subtype = "0--";
+		service.controlService.subtype = '0--';
 		return new ShadowAccessory(device, [service], hapAccessory, hapService, hapCharacteristic, platform, true);
 	}
 }

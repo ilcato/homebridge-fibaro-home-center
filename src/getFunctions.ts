@@ -16,7 +16,7 @@
 
 'use strict'
 
-import { lowestTemp, SetFunctions } from './setFunctions'
+import { SetFunctions } from './setFunctions'
 
 export class GetFunctions {
 	hapCharacteristic: any;
@@ -135,23 +135,25 @@ export class GetFunctions {
 		if (service.floatServiceId) {
 			try {
 				const properties = (await this.platform.fibaroClient.getDeviceProperties(service.floatServiceId)).body.properties;
-				const r = parseFloat(properties.value);
-				if (isNaN(properties.value)) {
-					this.platform.log('Temperature is not a number.', '');
+				if (!properties.value) {
+					this.platform.log('No value for Temperature.', '');
 					return;
 				}
-				characteristic.updateValue(r);
+				characteristic.updateValue(properties.value);
 			} catch (e) {
 				this.platform.log("There was a problem getting value from: ", `${service.floatServiceId} - Err: ${e}`);
 				return;
 			}
 		} else {
-			if (isNaN(properties.value)) {
-				this.platform.log('Temperature is not a number.', '');
-				return;
+			let value = properties.value;
+			if (!value) {
+				value = properties.heatingThermostatSetpoint
+				if (!value) {
+					this.platform.log('No value for Temperature.', '');
+					return;
+				}
 			}
-			const r = parseFloat(properties.value);
-			characteristic.updateValue(r);
+			characteristic.updateValue(value);
 		}
 	}
 	getTargetTemperature(characteristic, service, IDs, properties) {
@@ -159,7 +161,13 @@ export class GetFunctions {
 			this.platform.log('heatingThermostatSetpoint is not a number.', '');
 			return;
 		}
-		characteristic.updateValue(parseFloat(properties.heatingThermostatSetpoint));
+		const t = parseFloat(properties.heatingThermostatSetpoint);
+		if (t < characteristic.props.minValue)
+			return;
+		characteristic.updateValue(t);
+		setTimeout(() => {
+			characteristic.setValue(t, undefined, 'fromFibaro');
+		}, 100);
 	}
 	getContactSensorState(characteristic, service, IDs, properties) {
 		const v = this.getBoolean(properties.value);
@@ -192,80 +200,38 @@ export class GetFunctions {
 		}
 		characteristic.updateValue(v == true ? this.hapCharacteristic.LockCurrentState.SECURED : this.hapCharacteristic.LockCurrentState.UNSECURED);
 	}
-	async getCurrentHeatingCoolingState(characteristic, service, IDs, properties) {
-		if (service.operatingModeId) {	// Operating mode is availble on Home Center
-			try {
-				const properties = (await this.platform.fibaroClient.getDeviceProperties(service.operatingModeId)).body.properties;
-				switch (properties.mode) {
-					case "0": // OFF
-						characteristic.updateValue(this.hapCharacteristic.CurrentHeatingCoolingState.OFF);
-						break;
-					case "1": // HEAT
-						characteristic.updateValue(this.hapCharacteristic.CurrentHeatingCoolingState.HEAT);
-						break;
-					case "2": // COOL
-						characteristic.updateValue(this.hapCharacteristic.CurrentHeatingCoolingState.COOL);
-						break;
-					default:
-						break;
-				}
-			} catch (e) {
-				this.platform.log("There was a problem getting value from: ", `${service.operatingModeId} - Err: ${e}`);
-				return;
-			}
-		} else {
-			if (this.platform.config.enablecoolingstatemanagemnt == "on") { // Simulated operating mode
-				if (isNaN(properties.value)) {
-					this.platform.log('temperature is not a number.', '');
-					return;
-				}
-				let t = parseFloat(properties.value);
-				if (t <= lowestTemp)
-					characteristic.updateValue(this.hapCharacteristic.CurrentHeatingCoolingState.OFF);
-				else
-					characteristic.updateValue(this.hapCharacteristic.CurrentHeatingCoolingState.HEAT);
-			} else { // Fake simulated mode: always heat
+	getCurrentHeatingCoolingState(characteristic, service, IDs, properties,) {
+		switch (properties.thermostatMode) {
+			case "Off": // OFF
+				characteristic.updateValue(this.hapCharacteristic.CurrentHeatingCoolingState.OFF);
+				break;
+			case "Heat": // HEAT
 				characteristic.updateValue(this.hapCharacteristic.CurrentHeatingCoolingState.HEAT);
-			}
+				break;
+			case "Cool": // COOL
+				characteristic.updateValue(this.hapCharacteristic.CurrentHeatingCoolingState.COOL);
+				break;
+			default:
+				break;
 		}
 	}
-	async getTargetHeatingCoolingState(characteristic, service, IDs, properties) {
-		if (service.operatingModeId) {	// Operating mode is availble on Home Center
-			try {
-				const properties = (await this.platform.fibaroClient.getDeviceProperties(service.operatingModeId)).body.properties;
-				switch (properties.mode) {
-					case "0": // OFF
-						characteristic.updateValue(this.hapCharacteristic.TargetHeatingCoolingState.OFF);
-						break;
-					case "1": // HEAT
-						characteristic.updateValue(this.hapCharacteristic.TargetHeatingCoolingState.HEAT);
-						break;
-					case "2": // COOL
-						characteristic.updateValue(this.hapCharacteristic.TargetHeatingCoolingState.COOL);
-						break;
-					case "10": // AUTO
-						characteristic.updateValue(this.hapCharacteristic.TargetHeatingCoolingState.AUTO);
-						break;
-					default:
-						break;
-				}
-			} catch (e) {
-				this.platform.log("There was a problem getting value from: ", `${service.operatingModeId} - Err: ${e}`);
-			}
-		} else {
-			if (this.platform.config.enablecoolingstatemanagemnt == "on") {
-				if (isNaN(properties.targetLevel)) {
-					this.platform.log('targetLevel is not a number.', '');
-					return;
-				}
-				let t = parseFloat(properties.targetLevel);
-				if (t <= lowestTemp)
-					characteristic.updateValue(this.hapCharacteristic.TargetHeatingCoolingState.OFF);
-				else
-					characteristic.updateValue(this.hapCharacteristic.TargetHeatingCoolingState.HEAT);
-			} else {
-				characteristic.updateValue(this.hapCharacteristic.CurrentHeatingCoolingState.HEAT);
-			}
+	getTargetHeatingCoolingState(characteristic, service, IDs, properties) {
+		const m = properties.thermostatModeFuture ? properties.thermostatModeFuture : properties.thermostatMode;
+		switch (m) {
+			case "Off": // OFF
+				characteristic.updateValue(this.hapCharacteristic.TargetHeatingCoolingState.OFF);
+				break;
+			case "Heat": // HEAT
+				characteristic.updateValue(this.hapCharacteristic.TargetHeatingCoolingState.HEAT);
+				break;
+			case "Cool": // COOL
+				characteristic.updateValue(this.hapCharacteristic.TargetHeatingCoolingState.COOL);
+				break;
+			case "Auto": // AUTO
+				characteristic.updateValue(this.hapCharacteristic.TargetHeatingCoolingState.AUTO);
+				break;
+			default:
+				break;
 		}
 	}
 	getTemperatureDisplayUnits(characteristic, service, IDs, properties) {
