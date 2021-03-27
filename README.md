@@ -21,6 +21,7 @@ Remember to configure the plugin in config.json in your home directory inside th
 + "username": "PUT USERNAME OF YOUR HC3 HERE"
 + "password": "PUT PASSWORD OF YOUR HC3 HERE"
 + "pollerperiod": "PUT 0 FOR DISABLING POLLING, 1 - 100 INTERVAL IN SECONDS. 2 SECONDS IS THE DEFAULT"
++ "thermostattimeout": "PUT THE NUMBER OF SECONDS FOR THE THERMOSTAT TIMEOUT, DEFAULT: 7200 (2 HOURS)
 + "switchglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A BISTABLE SWITCH"
 + "securitysystem": "PUT enabled OR disabled IN ORDER TO MANAGE THE AVAILABILITY OF THE SECURITY SYSTEM"
 + "addRoomNameToDeviceName" : "PUT enabled OR disabled IN ORDER TO ADD THE ROOM NAME TO DEVIVE NAME. DEFAULT disabled"
@@ -29,6 +30,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 1.1.9
++ Complete thermostat support
+
 Version 1.1.8
 + Fix warning on Security System Target State
 + Fix Fibaro heat controller setting temperture

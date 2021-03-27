@@ -24,10 +24,9 @@
 //            "username": "PUT USERNAME OF YOUR HC3 HERE",
 //            "password": "PUT PASSWORD OF YOUR HC3 HERE",
 //            "pollerperiod": "PUT 0 FOR DISABLING POLLING, 1 - 100 INTERVAL IN SECONDS. 5 SECONDS IS THE DEFAULT",
-//						"thermostattimeout": "PUT THE NUMBER OF SECONDS FOR THE THERMOSTAT TIMEOUT, DEFAULT: 7200 (2 HOURS). PUT 0 FOR INFINITE",
-//						"enablecoolingstatemanagemnt": "PUT on TO AUTOMATICALLY MANAGE HEATING STATE FOR THERMOSTAT, off TO DISABLE IT. DEFAULT off",
-//						"switchglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A BISTABLE SWITCH",
-//						"securitysystem": "PUT enabled OR disabled IN ORDER TO MANAGE THE AVAILABILITY OF THE SECURITY SYSTEM",
+//  		  "thermostattimeout": "PUT THE NUMBER OF SECONDS FOR THE THERMOSTAT TIMEOUT, DEFAULT: 7200 (2 HOURS). PUT 0 FOR INFINITE",
+//			  "switchglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A BISTABLE SWITCH",
+//			  "securitysystem": "PUT enabled OR disabled IN ORDER TO MANAGE THE AVAILABILITY OF THE SECURITY SYSTEM",
 //     }
 // ],
 //
@@ -170,12 +169,10 @@ class FibaroHC3 {
 		for (let s = 0; s < accessory.services.length; s++) {
 			let service = accessory.services[s];
 			if (service.subtype != undefined) {
-				let subtypeParams = service.subtype.split("-"); // DEVICE_ID-VIRTUAL_BUTTON_ID-RGB_MARKER-OPERATING_MODE_ID-FLOAT_SVC_ID
+				let subtypeParams = service.subtype.split("-");
 				if (subtypeParams.length >= 4) {
-					service.operatingModeId = subtypeParams[3];
-				}
-				if (subtypeParams.length >= 5) {
-					service.floatServiceId = subtypeParams[4];
+					if (subtypeParams[3] !== "")
+						service.floatServiceId = subtypeParams[3];
 				}
 			}
 			for (let i = 0; i < service.characteristics.length; i++) {
@@ -267,28 +264,29 @@ class FibaroHC3 {
 
 	bindCharacteristicEvents(characteristic, service, accessory) {
 		if (service.subtype == undefined) return;
-		let IDs = service.subtype.split("-"); // IDs[0] is always device ID; for virtual device IDs[1] is the button ID
+		let IDs = service.subtype.split("-");
+		// IDs[0] is always device ID, "0" for security system and "G" for global variables switches
+		// IDs[1] is reserved for the button ID for virtual devices, otherwise is ""
+		// IDs[2] is a subdevice type "HP" for Harmony Plugin, "LOCK" for locks
+		// IDs[3] is the ID of a related device: FLOAT_SVC_ID (e.g.: a temperature sensor associated to a thermostat)
 		service.isVirtual = IDs[1] != "" ? true : false;
 		service.isSecuritySystem = IDs[0] == "0" ? true : false;
 		service.isGlobalVariableSwitch = IDs[0] == "G" ? true : false;
-		service.isHarmonyDevice = (IDs.length >= 4 && IDs[4] == "HP") ? true : false;
-		service.isLockSwitch = (IDs.length >= 4 && IDs[4] == "LOCK") ? true : false;
+		service.isHarmonyDevice = (IDs.length >= 3 && IDs[2] == "HP") ? true : false;
+		service.isLockSwitch = (IDs.length >= 3 && IDs[2] == "LOCK") ? true : false;
 
 		if (!service.isVirtual) {
 			var propertyChanged = "value"; // subscribe to the changes of this property
-			if (characteristic.UUID === (new Characteristic.Hue).UUID || characteristic.UUID === (new Characteristic.Saturation).UUID )
+			if (characteristic.UUID === (new Characteristic.Hue).UUID || characteristic.UUID === (new Characteristic.Saturation).UUID)
 				propertyChanged = "color";
-			if (service.operatingModeId != undefined) {
-				if (characteristic.UUID === (new Characteristic.CurrentHeatingCoolingState()).UUID || characteristic.UUID === (new Characteristic.TargetHeatingCoolingState()).UUID) {
-					propertyChanged = "mode";
-				}
-			}
-			if (service.UUID === (Service.WindowCovering.UUID) && (characteristic.UUID === (new Characteristic.CurrentHorizontalTiltAngle).UUID)) {
+			if (characteristic.UUID === (new Characteristic.CurrentHeatingCoolingState).UUID || characteristic.UUID === (new Characteristic.TargetHeatingCoolingState).UUID)
+				propertyChanged = "mode";
+			if (characteristic.UUID === (new Characteristic.TargetTemperature).UUID)
+				propertyChanged = "targettemperature";
+			if (service.UUID === (Service.WindowCovering.UUID) && (characteristic.UUID === (new Characteristic.CurrentHorizontalTiltAngle).UUID))
 				propertyChanged = "value2";
-			}
-			if (service.UUID === (Service.WindowCovering.UUID) && (characteristic.UUID === (new Characteristic.TargetHorizontalTiltAngle).UUID)) {
+			if (service.UUID === (Service.WindowCovering.UUID) && (characteristic.UUID === (new Characteristic.TargetHorizontalTiltAngle).UUID)) 
 				propertyChanged = "value2";
-			}
 			this.subscribeUpdate(service, characteristic, propertyChanged);
 		}
 		characteristic.on('set', (value, callback, context) => {
@@ -393,7 +391,7 @@ class FibaroHC3 {
 	}
 
 	subscribeUpdate(service, characteristic, propertyChanged) {
-		var IDs = service.subtype.split("-"); 							// IDs[0] is always device ID; for virtual device IDs[1] is the button ID
+		var IDs = service.subtype.split("-");
 		this.updateSubscriptions.push({ 'id': IDs[0], 'service': service, 'characteristic': characteristic, "property": propertyChanged });
 	}
 

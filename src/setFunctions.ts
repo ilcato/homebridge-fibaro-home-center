@@ -118,72 +118,36 @@ export class SetFunctions {
 		}, 100);
 	}
 	setTargetHeatingCoolingState(value, context, characteristic, service, IDs) {
-		if (service.operatingModeId) {	// Operating mode is availble on Home Center
-			var v;
-			switch (value) {
-				case this.hapCharacteristic.TargetHeatingCoolingState.OFF:
-					v = "0";
-					break;
-				case this.hapCharacteristic.TargetHeatingCoolingState.HEAT:
-					v = "1";
-					break;
-				case this.hapCharacteristic.TargetHeatingCoolingState.COOL:
-					v = "2";
-					break;
-				case this.hapCharacteristic.TargetHeatingCoolingState.AUTO:
-					v = "10";
-					break;
-				default:
-					return;
-			}
-			if (v != "0") { // set subset mode on the temperature controller ...
-				this.command("setSetpointMode", [v], service, IDs);
-			}
-			this.command("setMode", [v], service, [service.operatingModeId]);	// ... and full mode on mode controller	
-		} else {
-			if (this.platform.config.enablecoolingstatemanagemnt == "on") {
-				let temp = 0;
-				if (value == this.hapCharacteristic.TargetHeatingCoolingState.OFF) {
-					temp = lowestTemp;
-				} else {
-					temp = stdTemp;
-					value = this.hapCharacteristic.TargetHeatingCoolingState.HEAT; // force the target state to HEAT because we are not managing other staes beside OFF and HEAT
-				}
-				this.command("setTargetLevel", [temp], service, IDs);
-				this.command("setTime", [0 + Math.trunc((new Date()).getTime() / 1000)], service, IDs);
-
-				setTimeout(() => {
-					characteristic.setValue(value, undefined, 'fromSetValue');
-					// set also current state
-					let currentHeatingCoolingStateCharacteristic = service.getCharacteristic(this.hapCharacteristic.CurrentHeatingCoolingState);
-					currentHeatingCoolingStateCharacteristic.setValue(value, undefined, 'fromSetValue');
-				}, 100);
-			}
+		let v = "";
+		switch (value) {
+			case this.hapCharacteristic.TargetHeatingCoolingState.OFF:
+				v = "Off";
+				break;
+			case this.hapCharacteristic.TargetHeatingCoolingState.HEAT:
+				v = "Heat";
+				break;
+			//			case this.hapCharacteristic.TargetHeatingCoolingState.COOL:
+			//				v = "Cool";
+			//				break;
+			//			case this.hapCharacteristic.TargetHeatingCoolingState.AUTO:
+			//				v = "Auto";
+			//				break;
+			default:
+				return;
 		}
+		this.command("setThermostatMode", [v], service, IDs);	// ... and full mode on mode controller	
 	}
 	async setTargetTemperature(value, context, characteristic, service, IDs) {
-		if (Math.abs(value - characteristic.value) >= 0.5) {
-			value = parseFloat((Math.round(value / 0.5) * 0.5).toFixed(1));
-			var currentOpMode;
-			if (service.operatingModeId) {	// Operating mode is availble on Home Center
-				// need to force the operating mode to the current one because of a Fibaro API bug (setting temperature through the API change the mode to HEAT)
-				try {
-					const properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
-					currentOpMode = properties.mode;
-					this.command("setThermostatSetpoint", [currentOpMode, value], service, IDs);
-				} catch (e) {
-					this.platform.log("There was a problem getting value from: ", `${IDs[0]} - Err: ${e}`);
-				}
-			} else {
-				this.command("setHeatingThermostatSetpoint", [value], service, IDs);
-				this.command("setInterval", [parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000)], service, IDs);
-			}
-		} else {
-			value = characteristic.value;
-		}
-		setTimeout(() => {
-			characteristic.setValue(value, undefined, 'fromSetValue');
-		}, 100);
+//		if (Math.abs(value - characteristic.value) >= 0.5) {
+//			value = parseFloat((Math.round(value / 0.5) * 0.5).toFixed(1));
+			this.command("setHeatingThermostatSetpoint", [value], service, IDs);
+			this.command("setInterval", [parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000)], service, IDs);
+//		} else {
+//			value = characteristic.value;
+//		}
+//		setTimeout(() => {
+//			characteristic.setValue(value, undefined, 'fromSetValue');
+//		}, 100);
 	}
 	setHue(value, context, characteristic, service, IDs) {
 		this.updateHomeCenterColorFromHomeKit(value, null, service, IDs);

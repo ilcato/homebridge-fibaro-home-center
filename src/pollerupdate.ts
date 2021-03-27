@@ -53,13 +53,10 @@ export class Poller {
 						this.manageValue(change);
 					} else if (change.color != undefined) {
 						this.manageColor(change);
-					}
-				});
-			}
-			if (updates.events != undefined) {
-				updates.events.map((s) => {
-					if (s.data.property == "mode") {
-						this.manageOperatingMode(s);
+					} else if (change.thermostatMode != undefined) {
+						this.manageOperatingMode(change);
+					} else if (change.heatingThermostatSetpoint != undefined) {
+						this.manageHeatingThermostatSetpoint(change);
 					}
 				});
 			}
@@ -133,17 +130,30 @@ export class Poller {
 		}
 	}
 
-	manageOperatingMode(event) {
+	manageOperatingMode(change) {
 		for (let i = 0; i < this.platform.updateSubscriptions.length; i++) {
 			let subscription = this.platform.updateSubscriptions[i];
-			if (subscription.service.operatingModeId != undefined && subscription.service.operatingModeId == event.data.id && subscription.property == "mode") {
-				this.platform.log("Updating value for device: ", `${subscription.service.operatingModeId}  parameter: ${subscription.characteristic.displayName}, value: ${event.data.newValue}`);
+			if (subscription.id == change.id && subscription.property == "mode") {
+				this.platform.log("Updating value for device: ", `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.thermostatMode}`);
 				let getFunction = this.platform.getFunctions.getFunctionsMapping.get(subscription.characteristic.UUID);
 				if (getFunction.function)
-					getFunction.function.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, null);
+					getFunction.function.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
 			}
 		}
 	}
+
+	manageHeatingThermostatSetpoint(change) {
+		for (let i = 0; i < this.platform.updateSubscriptions.length; i++) {
+			let subscription = this.platform.updateSubscriptions[i];
+			if (subscription.id == change.id && subscription.property == "targettemperature") {
+				this.platform.log("Updating value for device: ", `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.heatingThermostatSetpoint}`);
+				let getFunction = this.platform.getFunctions.getFunctionsMapping.get(subscription.characteristic.UUID);
+				if (getFunction.function)
+					getFunction.function.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
+			}
+		}
+	}
+
 
 	searchCharacteristic(globalVariablesID) {
 		let a = this.platform.accessories.get(globalVariablesID + "0");
