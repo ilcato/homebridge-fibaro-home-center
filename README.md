@@ -31,8 +31,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 # Release notes
 Version 1.1.11
++ Added support for com.fibaro.hvacSystem
 + Fix lock issue
-+ Fix CO sensor issue
++ Fix CO sensor issue 
 
 Version 1.1.10
 + Added momentary switch accessory for each scene starting with _. See the wiki page https://github.com/ilcato/homebridge-fibaro-hc3/wiki/Adding-scenes-as-momentary-switches
