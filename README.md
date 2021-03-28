@@ -30,6 +30,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 1.1.10
++ Added momentary switch accessory for each scene starting with _. See the wiki page https://github.com/ilcato/homebridge-fibaro-hc3/wiki/Adding-scenes-as-momentary-switches
+
 Version 1.1.9
 + Complete thermostat support
 
