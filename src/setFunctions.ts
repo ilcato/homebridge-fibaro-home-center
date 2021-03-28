@@ -55,9 +55,16 @@ export class SetFunctions {
 
 
 	setOn(value, context, characteristic, service, IDs) {
-		if (service.isVirtual && !service.isGlobalVariableSwitch) {
+		if (service.isVirtual) {
 			// It's a virtual device so the command is pressButton and not turnOn or Off
 			this.command("pressButton", [IDs[1]], service, IDs);
+			// In order to behave like a push button reset the status to off
+			setTimeout(() => {
+				characteristic.setValue(0, undefined, 'fromSetValue');
+			}, 100);
+		} else if (service.isScene) {
+			// It's a scene so the command is execute scene
+			this.scene(IDs[0]);
 			// In order to behave like a push button reset the status to off
 			setTimeout(() => {
 				characteristic.setValue(0, undefined, 'fromSetValue');
@@ -66,11 +73,7 @@ export class SetFunctions {
 			this.setGlobalVariable(IDs[1], value == true ? "true" : "false");
 		} else if (service.isHarmonyDevice) {
 			this.command("changeActivityState", null, service, IDs);
-			//			setTimeout(() => {
-			//				this.command("changeActivityState", null, service, IDs, callback);	// bug in Fibaro plugin: need to call 2 times
-			//			}, 10000);
 		} else {
-			//			if (characteristic.value == true && value == 0 || characteristic.value == false && value == 1)
 			this.command(value == 0 ? "turnOff" : "turnOn", null, service, IDs);
 		}
 	}
@@ -138,16 +141,8 @@ export class SetFunctions {
 		this.command("setThermostatMode", [v], service, IDs);	// ... and full mode on mode controller	
 	}
 	async setTargetTemperature(value, context, characteristic, service, IDs) {
-//		if (Math.abs(value - characteristic.value) >= 0.5) {
-//			value = parseFloat((Math.round(value / 0.5) * 0.5).toFixed(1));
-			this.command("setHeatingThermostatSetpoint", [value], service, IDs);
-			this.command("setInterval", [parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000)], service, IDs);
-//		} else {
-//			value = characteristic.value;
-//		}
-//		setTimeout(() => {
-//			characteristic.setValue(value, undefined, 'fromSetValue');
-//		}, 100);
+		this.command("setHeatingThermostatSetpoint", [value], service, IDs);
+		this.command("setInterval", [parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000)], service, IDs);
 	}
 	setHue(value, context, characteristic, service, IDs) {
 		this.updateHomeCenterColorFromHomeKit(value, null, service, IDs);

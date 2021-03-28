@@ -152,6 +152,10 @@ class FibaroHC3 {
 			const scenes = (await this.fibaroClient.getScenes()).body;
 			scenes.map((s) => {
 				this.scenes[s.name] = s.id;
+				if (s.name.startsWith('_')) {
+					let device = { name: s.name.substring(1), roomID: 0, id: s.id };
+					this.addAccessory(ShadowAccessory.createShadowSceneAccessory(device, Accessory, Service, Characteristic, this));	
+				}
 			});
 			this.setFunctions = new SetFunctions(Characteristic, this);	// There's a dependency in setFunction to Scene Mapping
 			const devices = this.fibaroClient ? (await this.fibaroClient.getDevices()).body : {};
@@ -187,7 +191,7 @@ class FibaroHC3 {
 	LoadAccessories(devices, rooms) {
 		this.log('Loading accessories', '');
 		devices.map((s, i, a) => {
-			if (s.visible == true && s.name.charAt(0) != "_") {
+			if (s.visible == true && !s.name.startsWith('_')) {
 				let siblings = this.findSiblingDevices(s, a);
 				if (rooms != null) {
 					// patch device name
@@ -203,16 +207,14 @@ class FibaroHC3 {
 			let globalVariables = this.config.switchglobalvariables.split(',');
 			for (let i = 0; i < globalVariables.length; i++) {
 				let device = { name: globalVariables[i], roomID: 0, id: 0 };
-				let sa = ShadowAccessory.createShadowGlobalVariableSwitchAccessory(device, Accessory, Service, Characteristic, this);
-				this.addAccessory(sa);
+				this.addAccessory(ShadowAccessory.createShadowGlobalVariableSwitchAccessory(device, Accessory, Service, Characteristic, this));
 			}
 		}
 
 		// Create Security System accessory
 		if (this.config.securitysystem == "enabled") {
 			let device = { name: "FibaroSecuritySystem", roomID: 0, id: 0 };
-			let sa = ShadowAccessory.createShadowSecuritySystemAccessory(device, Accessory, Service, Characteristic, this);
-			this.addAccessory(sa);
+			this.addAccessory(ShadowAccessory.createShadowSecuritySystemAccessory(device, Accessory, Service, Characteristic, this));
 		}
 
 		// Remove not reviewd accessories: cached accessories no more present in Home Center
@@ -267,15 +269,16 @@ class FibaroHC3 {
 		let IDs = service.subtype.split("-");
 		// IDs[0] is always device ID, "0" for security system and "G" for global variables switches
 		// IDs[1] is reserved for the button ID for virtual devices, otherwise is ""
-		// IDs[2] is a subdevice type "HP" for Harmony Plugin, "LOCK" for locks
+		// IDs[2] is a subdevice type "HP" for Harmony Plugin, "LOCK" for locks, "SC" for Scenes
 		// IDs[3] is the ID of a related device: FLOAT_SVC_ID (e.g.: a temperature sensor associated to a thermostat)
 		service.isVirtual = IDs[1] != "" ? true : false;
 		service.isSecuritySystem = IDs[0] == "0" ? true : false;
 		service.isGlobalVariableSwitch = IDs[0] == "G" ? true : false;
 		service.isHarmonyDevice = (IDs.length >= 3 && IDs[2] == "HP") ? true : false;
 		service.isLockSwitch = (IDs.length >= 3 && IDs[2] == "LOCK") ? true : false;
+		service.isScene = (IDs.length >= 3 && IDs[2] == "SC") ? true : false;
 
-		if (!service.isVirtual) {
+		if (!service.isVirtual && !service.isScene) {
 			var propertyChanged = "value"; // subscribe to the changes of this property
 			if (characteristic.UUID === (new Characteristic.Hue).UUID || characteristic.UUID === (new Characteristic.Saturation).UUID)
 				propertyChanged = "color";
@@ -298,7 +301,7 @@ class FibaroHC3 {
 				callback(undefined, characteristic.value);
 				return;
 			}
-			if (service.isVirtual && !service.isGlobalVariableSwitch) {
+			if (service.isVirtual || service.isScene) {
 				// a push button is normally off
 				callback(undefined, false);
 			} else {
