@@ -45,8 +45,8 @@ export class GetFunctions {
 			[(new hapCharacteristic.LeakDetected()).UUID, { "function": this.getLeakDetected, "delay": 0 }],
 			[(new hapCharacteristic.SmokeDetected()).UUID, { "function": this.getSmokeDetected, "delay": 0 }],
 			[(new hapCharacteristic.CarbonMonoxideDetected()).UUID, { "function": this.getCarbonMonoxideDetected, "delay": 0 }],
-			[(new hapCharacteristic.CarbonMonoxideLevel()).UUID, { "function": this.getFloat, "delay": 0 }],
-			[(new hapCharacteristic.CarbonMonoxidePeakLevel()).UUID, { "function": this.getFloat, "delay": 0 }],
+			[(new hapCharacteristic.CarbonMonoxideLevel()).UUID, { "function": this.getCarbonMonoxideLevel, "delay": 0 }],
+			[(new hapCharacteristic.CarbonMonoxidePeakLevel()).UUID, { "function": this.getCarbonMonoxidePeakLevel, "delay": 0 }],
 			[(new hapCharacteristic.CurrentAmbientLightLevel()).UUID, { "function": this.getFloat, "delay": 0 }],
 			[(new hapCharacteristic.OutletInUse()).UUID, { "function": this.getOutletInUse, "delay": 0 }],
 			[(new hapCharacteristic.LockCurrentState()).UUID, { "function": this.getLockCurrentState, "delay": this.platform.config.LockCurrentStateDelay }],
@@ -185,6 +185,16 @@ export class GetFunctions {
 		const v = this.getBoolean(properties.value);
 		characteristic.updateValue(v === true ? this.hapCharacteristic.CarbonMonoxideDetected.CO_LEVELS_ABNORMAL : this.hapCharacteristic.CarbonMonoxideDetected.CO_LEVELS_NORMAL);
 	}
+
+	getCarbonMonoxideLevel(characteristic, service, IDs, properties) {
+		let r = parseFloat(properties.concentration);
+		characteristic.updateValue(r);
+	}
+	getCarbonMonoxidePeakLevel(characteristic, service, IDs, properties) {
+		let r = parseFloat(properties.maxConcentration);
+		characteristic.updateValue(r);
+	}
+
 	getOutletInUse(characteristic, service, IDs, properties) {
 		if (isNaN(properties.power)) {
 			this.platform.log('power is not a number.', '');
