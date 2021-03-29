@@ -66,7 +66,7 @@ export class Poller {
 				for (let i = 0; i < globalVariables.length; i++) {
 					const switchStatus = (await this.platform.fibaroClient.getGlobalVariable(globalVariables[i])).body;
 					this.platform.fibaroClient.getGlobalVariable(globalVariables[i])
-					this.platform.getFunctions.getBool(null, this.searchCharacteristic(globalVariables[i]), null, null, switchStatus);
+					this.platform.getFunctions.getBool(this.searchCharacteristic(globalVariables[i]), null, null, switchStatus);
 				}
 			}
 			// Manage Security System state
