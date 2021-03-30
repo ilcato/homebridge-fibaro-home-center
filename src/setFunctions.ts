@@ -228,7 +228,7 @@ export class SetFunctions {
 	async checkLockCurrentState(IDs, value) {
 		try {
 			const properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
-			var currentValue = (properties.value == "true") ? this.hapCharacteristic.LockCurrentState.SECURED : this.hapCharacteristic.LockCurrentState.UNSECURED;
+			var currentValue = (properties.value == true) ? this.hapCharacteristic.LockCurrentState.SECURED : this.hapCharacteristic.LockCurrentState.UNSECURED;
 			if (currentValue != value) {
 				this.platform.log("There was a problem setting value to Lock: ", `${IDs[0]}`);
 			}

@@ -233,6 +233,7 @@ export class ShadowAccessory {
 			case "com.fibaro.thermostatDanfoss":
 			case "com.fibaro.com.fibaro.thermostatHorstmann":
 			case "com.fibaro.FGT001":
+			case "com.fibaro.hvacSystem":
 				controlService = new hapService.Thermostat(device.name);
 				controlCharacteristics = [hapCharacteristic.CurrentTemperature, hapCharacteristic.TargetTemperature, hapCharacteristic.CurrentHeatingCoolingState, hapCharacteristic.TargetHeatingCoolingState, hapCharacteristic.TemperatureDisplayUnits];
 				// Check if there's a temperature Sensor and use it instead of the provided float value
