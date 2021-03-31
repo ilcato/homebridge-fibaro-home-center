@@ -55,7 +55,7 @@ export class SetFunctions {
 
 
 	setOn(value, context, characteristic, service, IDs) {
-		if (service.isVirtual) {
+		if (service.isVirtual && !service.isGlobalVariableSwitch) {
 			// It's a virtual device so the command is pressButton and not turnOn or Off
 			this.command("pressButton", [IDs[1]], service, IDs);
 			// In order to behave like a push button reset the status to off

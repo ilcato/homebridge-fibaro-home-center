@@ -30,6 +30,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Release notes
+Version 1.1.12
++ Fix Global variables set issue
+
 Version 1.1.11
 + Added support for com.fibaro.hvacSystem
 + Fix lock issue

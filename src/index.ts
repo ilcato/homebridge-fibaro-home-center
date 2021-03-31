@@ -301,7 +301,7 @@ class FibaroHC3 {
 				callback(undefined, characteristic.value);
 				return;
 			}
-			if (service.isVirtual || service.isScene) {
+			if ((service.isVirtual && !service.isGlobalVariableSwitch) || service.isScene) {
 				// a push button is normally off
 				callback(undefined, false);
 			} else {
