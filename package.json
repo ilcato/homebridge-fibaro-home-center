@@ -37,5 +37,9 @@
   "bugs": {
     "url": "https://github.com/ilcato/homebridge-fibaro-hc3/issues"
   },
-  "homepage": "https://github.com/ilcato/homebridge-fibaro-hc3"
+  "homepage": "https://github.com/ilcato/homebridge-fibaro-hc3",
+  "funding": {
+    "type" : "buymeacoffee",
+    "url" : "https://www.buymeacoffee.com/ilcato"
+  }
 }
