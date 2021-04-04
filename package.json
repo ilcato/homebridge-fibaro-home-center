@@ -38,8 +38,14 @@
     "url": "https://github.com/ilcato/homebridge-fibaro-hc3/issues"
   },
   "homepage": "https://github.com/ilcato/homebridge-fibaro-hc3",
-  "funding": {
-    "type" : "buymeacoffee",
-    "url" : "https://www.buymeacoffee.com/ilcato"
-  }
+  "funding": [
+    {
+      "type": "paypal",
+      "url": "https://paypal.me/ilcato"
+    },
+    {
+      "type": "buymeacoffee",
+      "url": "https://www.buymeacoffee.com/ilcato"
+    }
+  ]
 }
