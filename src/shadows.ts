@@ -1,4 +1,4 @@
-//    Copyright 2020 ilcato
+//    Copyright 2021 ilcato
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-// Fibaro Home Center 3 Platform plugin for HomeBridge
+// Fibaro Home Center Platform plugin for HomeBridge
 
 'use strict'
 
@@ -177,7 +177,6 @@ export class ShadowAccessory {
 					hapCharacteristic.TargetPosition,
 					hapCharacteristic.PositionState
 				];
-				//if (device.actions.setValue2 == 1) {
 				if (parseInt(device.properties.deviceControlType) === 55) {
 					controlCharacteristics.push(
 						hapCharacteristic.CurrentHorizontalTiltAngle,
