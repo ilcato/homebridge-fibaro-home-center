@@ -268,9 +268,6 @@ export class ShadowAccessory {
 
 		return new ShadowAccessory(device, ss, hapAccessory, hapService, hapCharacteristic, platform);
 	}
-	static createShadowGlobalVariableSwitchAccessory(device, hapAccessory, hapService, hapCharacteristic, platform) {
-		let service = new ShadowService(new hapService.Switch(device.name), [hapCharacteristic.On]);
-		service.controlService.subtype = 'G-'+ device.name +'-';
 	static createShadowGlobalVariableAccessory(device, hapAccessory, hapService, hapCharacteristic, platform, type) {
 		let service;
 		if (type === 'D') {
@@ -280,7 +277,7 @@ export class ShadowAccessory {
 		} else {
 			return null;
 		}
-		service.controlService.subtype = type + '--';
+		service.controlService.subtype = type + '-'+ device.name +'-';
 		return new ShadowAccessory(device, [service], hapAccessory, hapService, hapCharacteristic, platform, true);
 	}
 	static createShadowSecuritySystemAccessory(device, hapAccessory, hapService, hapCharacteristic, platform) {

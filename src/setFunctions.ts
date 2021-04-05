@@ -55,7 +55,7 @@ export class SetFunctions {
 
 
 	setOn(value, context, characteristic, service, IDs) {
-		if (service.isVirtual && !service.isGlobalVariableSwitch) {
+		if (service.isVirtual && !service.isGlobalVariableSwitch && !service.isGlobalVariableDimmer) {
 			// It's a virtual device so the command is pressButton and not turnOn or Off
 			this.command("pressButton", [IDs[1]], service, IDs);
 			// In order to behave like a push button reset the status to off
@@ -71,6 +71,8 @@ export class SetFunctions {
 			}, 100);
 		} else if (service.isGlobalVariableSwitch) {
 			this.setGlobalVariable(IDs[1], value == true ? "true" : "false");
+		} else if (service.isGlobalVariableDimmer) {
+			this.setGlobalVariable(IDs[1], value == true ? "100" : "0");
 		} else if (service.isHarmonyDevice) {
 			this.command("changeActivityState", null, service, IDs);
 		} else {
@@ -78,7 +80,11 @@ export class SetFunctions {
 		}
 	}
 	async setBrightness(value, context, characteristic, service, IDs) {
-		this.command("setValue", [value], service, IDs);
+		if (service.isGlobalVariableDimmer) {
+			this.setGlobalVariable(IDs[1], value.toString());
+		} else {
+			this.command("setValue", [value], service, IDs);
+		}
 	}
 	setTargetPosition(value, context, characteristic, service, IDs) {
 		this.command("setValue", [value], service, IDs);

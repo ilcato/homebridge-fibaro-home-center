@@ -322,7 +322,7 @@ class FibaroHC3 {
 
 	setCharacteristicValue(value, context, characteristic, service, IDs) {
 		if (context !== 'fromFibaro' && context !== 'fromSetValue') {
-			let d = IDs[0] != "G" ? IDs[0] : IDs[1];
+			let d = (IDs[0] != "G" && IDs[0] != "D") ? IDs[0] : IDs[1];
 			this.log("Setting value to device: ", `${d}  parameter: ${characteristic.displayName}`);
 			if (this.setFunctions) {
 				let setFunction = this.setFunctions.setFunctionsMapping.get(characteristic.UUID);
@@ -360,7 +360,7 @@ class FibaroHC3 {
 			if (service.isGlobalVariableDimmer) {
 				const value = (await this.fibaroClient.getGlobalVariable(IDs[1])).body;
 				if (this.getFunctions) {
-					if (characteristic.UUID == (new Characteristic.Brighness()).UUID) {
+					if (characteristic.UUID == (new Characteristic.Brightness()).UUID) {
 						this.getFunctions.getBrightness(characteristic, service, IDs, value);
 					} else if (characteristic.UUID == (new Characteristic.On()).UUID) {
 						this.getFunctions.getBool(characteristic, service, IDs, value);
