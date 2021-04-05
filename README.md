@@ -23,6 +23,7 @@ Remember to configure the plugin in config.json in your home directory inside th
 + "pollerperiod": "PUT 0 FOR DISABLING POLLING, 1 - 100 INTERVAL IN SECONDS. 2 SECONDS IS THE DEFAULT"
 + "thermostattimeout": "PUT THE NUMBER OF SECONDS FOR THE THERMOSTAT TIMEOUT, DEFAULT: 7200 (2 HOURS)
 + "switchglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A BISTABLE SWITCH"
++ "dimmerglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A DIMMER"
 + "securitysystem": "PUT enabled OR disabled IN ORDER TO MANAGE THE AVAILABILITY OF THE SECURITY SYSTEM"
 + "addRoomNameToDeviceName" : "PUT enabled OR disabled IN ORDER TO ADD THE ROOM NAME TO DEVIVE NAME. DEFAULT disabled"
 
@@ -30,6 +31,5 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Last release note
-Version 1.1.13
-+ Fix Global variables get issue
-+ Cleanup code
+Version 1.1.14
++ Added global variable dimmers

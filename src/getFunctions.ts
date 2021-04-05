@@ -98,9 +98,18 @@ export class GetFunctions {
 		characteristic.updateValue(r);
 	}
 	getBrightness(characteristic, service, IDs, properties) {
+		if (isNaN(properties.value)) {
+			return;
+		}
 		let r = parseFloat(properties.value);
-		if (r == 99)
+		if (r > 100)
 			r = 100;
+		if (r < 0)
+			r = 0;
+		if (service != null && !service.isGlobalVariableDimmer) { // For real dimmers
+			if (r == 99)
+				r = 100;
+		}
 		characteristic.updateValue(r);
 	}
 	getPositionState(characteristic, service, IDs, properties) {

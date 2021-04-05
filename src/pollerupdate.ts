@@ -60,15 +60,10 @@ export class Poller {
 					}
 				});
 			}
-			// Manage global variable switches
-			if (this.platform.config.switchglobalvariables != "") {
-				const globalVariables = this.platform.config.switchglobalvariables.split(',');
-				for (let i = 0; i < globalVariables.length; i++) {
-					const switchStatus = (await this.platform.fibaroClient.getGlobalVariable(globalVariables[i])).body;
-					this.platform.fibaroClient.getGlobalVariable(globalVariables[i])
-					this.platform.getFunctions.getBool(this.searchCharacteristic(globalVariables[i]), null, null, switchStatus);
-				}
-			}
+			// Manage global variable switches and dimmers
+			this.manageGlobalVariableDevice(this.platform.config.switchglobalvariables, 'G');
+			this.manageGlobalVariableDevice(this.platform.config.dimmerglobalvariables, 'D');
+
 			// Manage Security System state
 			if (this.platform.config.securitysystem == "enabled") {
 				const securitySystemStatus = (await this.platform.fibaroClient.getGlobalVariable("SecuritySystem")).body;
@@ -113,6 +108,36 @@ export class Poller {
 		}
 	}
 
+	async manageGlobalVariableDevice(param, type) {
+		if (param != "") {
+			const globalVariables = param.split(',');
+			for (let i = 0; i < globalVariables.length; i++) {
+				const value = (await this.platform.fibaroClient.getGlobalVariable(globalVariables[i])).body;
+				let a, s, c;
+				switch (type) {
+					case 'G':
+						a = this.platform.accessories.get(globalVariables[i] + "0");
+						s = a.getService(this.hapService.Switch);
+						c = s.getCharacteristic(this.hapCharacteristic.On);
+						this.platform.getFunctions.getBool(c, null, null, value);
+						break;
+					case 'D':
+						a = this.platform.accessories.get(globalVariables[i] + "0");
+						s = a.getService(this.hapService.Lightbulb);
+						c = s.getCharacteristic(this.hapCharacteristic.On);
+						this.platform.getFunctions.getBool(c, null, null, value);
+						a = this.platform.accessories.get(globalVariables[i] + "0");
+						s = a.getService(this.hapService.Lightbulb);
+						c = s.getCharacteristic(this.hapCharacteristic.Brightness);
+						this.platform.getFunctions.getBrightness(c, null, null, value);
+						break;
+					default:
+						break;
+				}
+			}
+		}
+	}
+
 	manageColor(change) {
 		for (let i = 0; i < this.platform.updateSubscriptions.length; i++) {
 			let subscription = this.platform.updateSubscriptions[i];
@@ -152,13 +177,5 @@ export class Poller {
 					getFunction.function.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
 			}
 		}
-	}
-
-
-	searchCharacteristic(globalVariablesID) {
-		let a = this.platform.accessories.get(globalVariablesID + "0");
-		let s = a.getService(this.hapService.Switch);
-		let c = s.getCharacteristic(this.hapCharacteristic.On);
-		return c;
 	}
 }
