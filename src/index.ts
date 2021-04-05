@@ -268,7 +268,7 @@ class FibaroHC3 {
 		if (service.subtype == undefined) return;
 		let IDs = service.subtype.split("-");
 		// IDs[0] is always device ID, "0" for security system and "G" for global variables switches
-		// IDs[1] is reserved for the button ID for virtual devices, otherwise is ""
+		// IDs[1] is reserved for the button ID for virtual devices, or the global variable name for global variable devices, otherwise is ""
 		// IDs[2] is a subdevice type "HP" for Harmony Plugin, "LOCK" for locks, "SC" for Scenes
 		// IDs[3] is the ID of a related device: FLOAT_SVC_ID (e.g.: a temperature sensor associated to a thermostat)
 		service.isVirtual = IDs[1] != "" ? true : false;

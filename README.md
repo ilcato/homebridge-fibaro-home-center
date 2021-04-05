@@ -30,5 +30,6 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Last release note
-Version 1.1.12
-+ Fix Global variables set issue
+Version 1.1.13
++ Fix Global variables get issue
++ Cleanup code
