@@ -26,6 +26,7 @@
 //            "pollerperiod": "PUT 0 FOR DISABLING POLLING, 1 - 100 INTERVAL IN SECONDS. 5 SECONDS IS THE DEFAULT",
 //  		  "thermostattimeout": "PUT THE NUMBER OF SECONDS FOR THE THERMOSTAT TIMEOUT, DEFAULT: 7200 (2 HOURS). PUT 0 FOR INFINITE",
 //			  "switchglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A BISTABLE SWITCH",
+//			  "dimmerglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A DIMMER",
 //			  "securitysystem": "PUT enabled OR disabled IN ORDER TO MANAGE THE AVAILABILITY OF THE SECURITY SYSTEM",
 //     }
 // ],
@@ -77,6 +78,7 @@ class Config {
 	thermostattimeout?: string;
 	enablecoolingstatemanagemnt?: string;
 	switchglobalvariables?: string;
+	dimmerglobalvariables?: string;
 	securitysystem?: string;
 	FibaroTemperatureUnit?: string;
 	addRoomNameToDeviceName?: string;
@@ -126,6 +128,8 @@ class FibaroHC3 {
 			this.config.enablecoolingstatemanagemnt = defaultEnableCoolingStateManagemnt;
 		if (this.config.switchglobalvariables == undefined)
 			this.config.switchglobalvariables = "";
+		if (this.config.dimmerglobalvariables == undefined)
+			this.config.dimmerglobalvariables = "";
 		if (this.config.securitysystem == undefined || (this.config.securitysystem != "enabled" && this.config.securitysystem != "disabled"))
 			this.config.securitysystem = "disabled";
 		if (this.config.FibaroTemperatureUnit == undefined)
@@ -154,7 +158,7 @@ class FibaroHC3 {
 				this.scenes[s.name] = s.id;
 				if (s.name.startsWith('_')) {
 					let device = { name: s.name.substring(1), roomID: 0, id: s.id };
-					this.addAccessory(ShadowAccessory.createShadowSceneAccessory(device, Accessory, Service, Characteristic, this));	
+					this.addAccessory(ShadowAccessory.createShadowSceneAccessory(device, Accessory, Service, Characteristic, this));
 				}
 			});
 			this.setFunctions = new SetFunctions(Characteristic, this);	// There's a dependency in setFunction to Scene Mapping
@@ -202,14 +206,19 @@ class FibaroHC3 {
 			}
 		});
 
-		// Create Global Variable Switches
-		if (this.config.switchglobalvariables && this.config.switchglobalvariables != "") {
-			let globalVariables = this.config.switchglobalvariables.split(',');
-			for (let i = 0; i < globalVariables.length; i++) {
-				let device = { name: globalVariables[i], roomID: 0, id: 0 };
-				this.addAccessory(ShadowAccessory.createShadowGlobalVariableSwitchAccessory(device, Accessory, Service, Characteristic, this));
+		// Create Global Variable Switches and Dimmers
+		const createGlobalVariableDevices = (param, type, platform) => {
+			if (param && param != "") {
+				let globalVariables = param.split(',');
+				for (let i = 0; i < globalVariables.length; i++) {
+					let device = { name: globalVariables[i], roomID: 0, id: 0 };
+					this.addAccessory(ShadowAccessory.createShadowGlobalVariableAccessory(device, Accessory, Service, Characteristic, platform, type));
+				}
 			}
 		}
+		createGlobalVariableDevices(this.config.switchglobalvariables, 'G', this);
+		createGlobalVariableDevices(this.config.dimmerglobalvariables, 'D', this);
+
 
 		// Create Security System accessory
 		if (this.config.securitysystem == "enabled") {
@@ -274,6 +283,7 @@ class FibaroHC3 {
 		service.isVirtual = IDs[1] != "" ? true : false;
 		service.isSecuritySystem = IDs[0] == "0" ? true : false;
 		service.isGlobalVariableSwitch = IDs[0] == "G" ? true : false;
+		service.isGlobalVariableDimmer = IDs[0] == "D" ? true : false;
 		service.isHarmonyDevice = (IDs.length >= 3 && IDs[2] == "HP") ? true : false;
 		service.isLockSwitch = (IDs.length >= 3 && IDs[2] == "LOCK") ? true : false;
 		service.isScene = (IDs.length >= 3 && IDs[2] == "SC") ? true : false;
@@ -288,7 +298,7 @@ class FibaroHC3 {
 				propertyChanged = "targettemperature";
 			if (service.UUID === (Service.WindowCovering.UUID) && (characteristic.UUID === (new Characteristic.CurrentHorizontalTiltAngle).UUID))
 				propertyChanged = "value2";
-			if (service.UUID === (Service.WindowCovering.UUID) && (characteristic.UUID === (new Characteristic.TargetHorizontalTiltAngle).UUID)) 
+			if (service.UUID === (Service.WindowCovering.UUID) && (characteristic.UUID === (new Characteristic.TargetHorizontalTiltAngle).UUID))
 				propertyChanged = "value2";
 			this.subscribeUpdate(service, characteristic, propertyChanged);
 		}
@@ -301,7 +311,7 @@ class FibaroHC3 {
 				callback(undefined, characteristic.value);
 				return;
 			}
-			if ((service.isVirtual && !service.isGlobalVariableSwitch) || service.isScene) {
+			if ((service.isVirtual && !service.isGlobalVariableSwitch && !service.isGlobalVariableDimmer) || service.isScene) {
 				// a push button is normally off
 				callback(undefined, false);
 			} else {
@@ -343,6 +353,19 @@ class FibaroHC3 {
 				const switchStatus = (await this.fibaroClient.getGlobalVariable(IDs[1])).body;
 				if (this.getFunctions)
 					this.getFunctions.getBool(characteristic, service, IDs, switchStatus);
+				callback(undefined, characteristic.value);
+				return;
+			}
+			// Manage global variable dimmers
+			if (service.isGlobalVariableDimmer) {
+				const value = (await this.fibaroClient.getGlobalVariable(IDs[1])).body;
+				if (this.getFunctions) {
+					if (characteristic.UUID == (new Characteristic.Brighness()).UUID) {
+						this.getFunctions.getBrightness(characteristic, service, IDs, value);
+					} else if (characteristic.UUID == (new Characteristic.On()).UUID) {
+						this.getFunctions.getBool(characteristic, service, IDs, value);
+					}
+				}
 				callback(undefined, characteristic.value);
 				return;
 			}

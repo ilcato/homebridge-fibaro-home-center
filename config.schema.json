@@ -52,6 +52,12 @@
         "type": "string",
         "required": false
       },
+      "dimmerglobalvariables": {
+        "description": "A comma separeted list of Fibaro Home Center 3 global variables acting like a dimmer.",
+        "title": "Global variables switches",
+        "type": "string",
+        "required": false
+      },
       "securitysystem": {
         "description": "Enable or disable the Security system, see wiki for detail.",
         "title": "Security system",
