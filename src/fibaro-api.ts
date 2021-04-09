@@ -39,24 +39,30 @@ export class FibaroClient {
 		this.headers = {
 			"Authorization": this.auth
 		};
-		let configPath = '/homebridge';
-		try {
-			this.ca = fs.readFileSync(configPath + '/ca.cer');
-		} catch (e) {
-			if (e.code === 'ENOENT') {
-				let configPath = process.env.UIX_CONFIG_PATH
-				if (configPath) {
-					configPath = configPath.substring(0, configPath.lastIndexOf("/config.json"))
+		if (this.url) {
+			let configPath = '/homebridge';
+			try {
+				this.ca = fs.readFileSync(configPath + '/ca.cer');
+			} catch (e) {
+				if (e.code === 'ENOENT') {
+					let configPath = process.env.UIX_CONFIG_PATH
+					if (configPath) {
+						configPath = configPath.substring(0, configPath.lastIndexOf("/config.json"))
+					} else {
+						configPath = path.resolve(os.homedir(), '.homebridge');
+					}
+					try {
+						this.ca = fs.readFileSync(configPath + '/ca.cer');
+					} catch (e) {
+						if (e.code !== 'ENOENT') {
+							log("Error reading ca.cer: ", e);
+						} else {
+							log("Cannot find ca.cer in: ", configPath);
+						}
+					}
 				} else {
-					configPath = path.resolve(os.homedir(), '.homebridge');
-				}
-				try {
-					this.ca = fs.readFileSync(configPath + '/ca.cer');
-				} catch (e) {
 					log("Error reading ca.cer: ", e);
 				}
-			} else {
-				log("Error reading ca.cer: ", e);
 			}
 		}
 		if (this.url && !this.ca) {
