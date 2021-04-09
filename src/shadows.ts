@@ -16,8 +16,8 @@
 
 'use strict'
 
-export const pluginName = 'homebridge-fibaro-hc3'
-export const platformName = 'FibaroHC3'
+export const pluginName = 'homebridge-fibaro-home-center'
+export const platformName = 'FibaroHC'
 
 export class ShadowService {
 	controlService: any;

@@ -16,7 +16,7 @@ The plugin is published through [NPM](https://www.npmjs.com/package/homebridge-f
     
 # Configuration
 Remember to configure the plugin in config.json in your home directory inside the .homebridge directory. Configuration parameters:
-+ "url": "PUT URL OF YOUR HOME CENTER HERE CONTAINING PROTOCOL AND NAME, E.G.: https://hc3-00000XXX.local, ca.cer file in the same folder as config.json"
++ "url": "PUT URL OF YOUR HOME CENTER HERE CONTAINING PROTOCOL AND NAME, E.G.: https://hc-00000XXX.local, ca.cer file in the same folder as config.json"
 + "host": "PUT IP ADDRESS OF YOUR HOME CENTER HERE. IF URL PARAMETER IS PRESENT THIS PARAMETER IS IGNORED"
 + "username": "PUT USERNAME OF YOUR HOME CENTER HERE"
 + "password": "PUT PASSWORD OF YOUR HOME CENTER HERE"

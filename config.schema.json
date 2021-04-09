@@ -1,9 +1,9 @@
 {
-  "pluginAlias": "FibaroHC3",
+  "pluginAlias": "FibaroHC",
   "pluginType": "platform",
   "singular": true,
   "headerDisplay": "Homebridge plugin for Fibaro Home Center 3.",
-  "footerDisplay": "For additonal information see [wiki](https://github.com/ilcato/homebridge-fibaro-hc3/wiki).",
+  "footerDisplay": "For additonal information see [wiki](https://github.com/ilcato/homebridge-fibaro-home-center/wiki).",
   "schema": {
     "type": "object",
     "properties": {
@@ -12,10 +12,10 @@
         "title": "Name",
         "type": "string",
         "required": true,
-        "default": "FibaroHC3"
+        "default": "FibaroHC"
       },
       "url": {
-        "description": "URL of the Fibaro Home Center 3 machine. Must contain protocol and host name, e.g: https://hc3-00000XXX.local",
+        "description": "URL of the Fibaro Home Center 3 machine. Must contain protocol and host name, e.g: https://hc-00000XXX.local",
         "title": "Url",
         "type": "string",
         "required": false

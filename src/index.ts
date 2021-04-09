@@ -19,7 +19,7 @@
 //     {
 //            "platform": "FibaroHC",
 //            "name": "FibaroHC",
-//            "url": "PUT URL OF YOUR HC3 HERE",
+//            "url": "PUT URL OF YOUR MOME CENTER HERE",
 //            "host": "PUT IP ADDRESS OF YOUR HOME CENTER HERE",
 //            "username": "PUT USERNAME OF YOUR HOME CENTER HERE",
 //            "password": "PUT PASSWORD OF YOUR HOME CENTER HERE",
@@ -65,7 +65,7 @@ export = function (homebridge) {
 	HAPStatus = homebridge.hap.HAPStatus;
 	Characteristic = homebridge.hap.Characteristic
 	UUIDGen = homebridge.hap.uuid
-	homebridge.registerPlatform(pluginName, platformName, FibaroHC3, true)
+	homebridge.registerPlatform(pluginName, platformName, FibaroHC, true)
 }
 
 class Config {
@@ -116,7 +116,7 @@ class FibaroHC {
 		this.config = config;
 
 		if (!config) {
-			this.log('Fibaro HC3 configuration:', 'cannot find configuration for the plugin');
+			this.log('Fibaro HC configuration:', 'cannot find configuration for the plugin');
 			return;
 		}
 		let pollerPeriod = this.config.pollerperiod ? parseInt(this.config.pollerperiod) : defaultPollerPeriod;
