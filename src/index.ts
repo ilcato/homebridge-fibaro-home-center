@@ -17,12 +17,12 @@
 // Remember to add platform to config.json. Example:
 // "platforms": [
 //     {
-//            "platform": "FibaroHC3",
-//            "name": "FibaroHC3",
+//            "platform": "FibaroHC",
+//            "name": "FibaroHC",
 //            "url": "PUT URL OF YOUR HC3 HERE",
-//            "host": "PUT IP ADDRESS OF YOUR HC3 HERE",
-//            "username": "PUT USERNAME OF YOUR HC3 HERE",
-//            "password": "PUT PASSWORD OF YOUR HC3 HERE",
+//            "host": "PUT IP ADDRESS OF YOUR HOME CENTER HERE",
+//            "username": "PUT USERNAME OF YOUR HOME CENTER HERE",
+//            "password": "PUT PASSWORD OF YOUR HOME CENTER HERE",
 //            "pollerperiod": "PUT 0 FOR DISABLING POLLING, 1 - 100 INTERVAL IN SECONDS. 5 SECONDS IS THE DEFAULT",
 //  		  "thermostattimeout": "PUT THE NUMBER OF SECONDS FOR THE THERMOSTAT TIMEOUT, DEFAULT: 7200 (2 HOURS). PUT 0 FOR INFINITE",
 //			  "switchglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A BISTABLE SWITCH",
@@ -91,7 +91,7 @@ class Config {
 	}
 }
 
-class FibaroHC3 {
+class FibaroHC {
 	log: (format: string, message: any) => void;
 	config: Config;
 	api: any;
