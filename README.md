@@ -31,5 +31,5 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Last release note
-Version 1.1.14
-+ Added global variable dimmers
+Version 1.1.15
++ Fix ca.cer error when not using URL param
