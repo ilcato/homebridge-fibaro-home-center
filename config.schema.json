@@ -2,7 +2,7 @@
   "pluginAlias": "FibaroHC",
   "pluginType": "platform",
   "singular": true,
-  "headerDisplay": "Homebridge plugin for Fibaro Home Center 3.",
+  "headerDisplay": "Homebridge plugin for Fibaro Home Center.",
   "footerDisplay": "For additonal information see [wiki](https://github.com/ilcato/homebridge-fibaro-home-center/wiki).",
   "schema": {
     "type": "object",
@@ -15,31 +15,31 @@
         "default": "FibaroHC"
       },
       "url": {
-        "description": "URL of the Fibaro Home Center 3 machine. Must contain protocol and host name, e.g: https://hc-00000XXX.local",
+        "description": "URL of the Fibaro Home Center machine. Must contain protocol and host name, e.g: https://hc-00000XXX.local",
         "title": "Url",
         "type": "string",
         "required": false
       },
       "host": {
-        "description": "IP address (or hostname) of the Fibaro Home Center 3 machine. Ignored if Url is present",
+        "description": "IP address (or hostname) of the Fibaro Home Center machine. Ignored if Url is present",
         "title": "Host",
         "type": "string",
         "required": false
       },
       "username": {
-        "description": "Username for accessing Fibaro Home Center 3 machine.",
+        "description": "Username for accessing Fibaro Home Center machine.",
         "title": "Username",
         "type": "string",
         "required": true
       },
       "password": {
-        "description": "Password for accessing Fibaro Home Center 3 machine.",
+        "description": "Password for accessing Fibaro Home Center machine.",
         "title": "Password",
         "type": "string",
         "required": true
       },
       "pollerperiod": {
-        "description": "Polling interval for querying Fibaro Home Center 3 machine (0: disabled).",
+        "description": "Polling interval for querying Fibaro Home Center machine (0: disabled).",
         "title": "Poller period",
         "type": "integer",
         "required": false,
@@ -47,13 +47,13 @@
         "minimum": 0
       },
       "switchglobalvariables": {
-        "description": "A comma separeted list of Fibaro Home Center 3 global variables acting like a bistable switch.",
+        "description": "A comma separeted list of Fibaro Home Center global variables acting like a bistable switch.",
         "title": "Global variables switches",
         "type": "string",
         "required": false
       },
       "dimmerglobalvariables": {
-        "description": "A comma separeted list of Fibaro Home Center 3 global variables acting like a dimmer.",
+        "description": "A comma separeted list of Fibaro Home Center global variables acting like a dimmer.",
         "title": "Global variables switches",
         "type": "string",
         "required": false
