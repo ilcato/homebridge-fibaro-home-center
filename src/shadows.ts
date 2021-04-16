@@ -127,7 +127,7 @@ export class ShadowAccessory {
 			case "com.fibaro.multilevelSwitch":
 			case "com.fibaro.FGD212":
 			case "com.fibaro.FGWD111":
-				switch (device.properties.deviceControlType) {
+				switch (parseInt(device.properties.deviceControlType)) {
 					case 2: // Lighting
 					case 23: // Lighting
 						controlService = new hapService.Lightbulb(device.name);
@@ -144,7 +144,7 @@ export class ShadowAccessory {
 			case "com.fibaro.developer.bxs.virtualBinarySwitch":
 			case "com.fibaro.satelOutput":
 			case "com.fibaro.FGWDS221":
-				switch (device.properties.deviceControlType) {
+				switch (parseInt(device.properties.deviceControlType)) {
 					case 2: // Lighting
 					case 5: // Bedside Lamp
 					case 7: // Wall Lamp

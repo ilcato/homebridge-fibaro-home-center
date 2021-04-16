@@ -31,5 +31,5 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Last release note
-Version 1.1.16
-+ Fixed homebridge UI parameter schema
+Version 1.1.17
++ Fixed issue #20
