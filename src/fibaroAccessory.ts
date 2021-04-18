@@ -332,15 +332,17 @@ export class FibaroAccessory {
       });
     }
 
-    setCharacteristicValue(value, context, characteristic, service, IDs) {
+    async setCharacteristicValue(value, context, characteristic, service, IDs) {
       if (context !== 'fromFibaro' && context !== 'fromSetValue') {
-        const d = (IDs[0] !== 'G' && IDs[0] !== 'D') ? IDs[0] : IDs[1];
         if (this.platform.setFunctions) {
           const setFunction = this.platform.setFunctions.setFunctionsMapping.get(characteristic.UUID);
-          if (setFunction && this.platform.poller) {
-            this.platform.poller.cancelPoll();
-            setFunction.call(this.platform.setFunctions, value, context, characteristic, service, IDs);
-            this.platform.poller.restartPoll(5000);
+          const platform = this.platform;
+          if (setFunction && platform.poller !== undefined) {
+            await this.platform.mutex.runExclusive(async () => {
+              platform.poller?.cancelPoll();
+              setFunction.call(platform.setFunctions, value, context, characteristic, service, IDs);
+              platform.poller?.restartPoll(5000);
+            });
           }
         }
       }

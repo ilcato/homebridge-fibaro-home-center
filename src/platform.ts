@@ -6,6 +6,7 @@ import { FibaroClient } from './fibaro-api';
 import { SetFunctions } from './setFunctions';
 import { GetFunctions } from './getFunctions';
 import { Poller } from './pollerupdate';
+import { Mutex } from 'async-mutex';
 
 const defaultPollerPeriod = 5;
 const timeOffset = 2 * 3600;
@@ -28,6 +29,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
   public fibaroClient?: FibaroClient;
   public setFunctions?: SetFunctions;
   public getFunctions?: GetFunctions;
+  public mutex;
 
 
   constructor(
@@ -37,6 +39,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
   ) {
     this.updateSubscriptions = [];
     this.scenes = {};
+    this.mutex = new Mutex();
 
     if (!config) {
       this.log.error('Fibaro HC configuration: cannot find configuration for the plugin');
