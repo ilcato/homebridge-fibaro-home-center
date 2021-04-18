@@ -37,13 +37,15 @@ export class FibaroClient {
 	url: string;
 	host: string;
 	auth: string;
+	isHC2: boolean;
 	headers: any;
 	ca: any;
 	status: boolean;
 
-	constructor(url, host, username, password, log) {
+	constructor(url, host, username, password, isHC2, log) {
 		this.url = url;
 		this.host = host;
+		this.isHC2 = isHC2;
 		this.auth = "Basic " + new Buffer.from(username + ":" + password).toString("base64");
 		this.headers = {
 			"Authorization": this.auth
@@ -142,7 +144,7 @@ export class FibaroClient {
 	}
 	executeScene(ID) {
 		const body = {};
-		return this.genericPost('/api/scenes/' + ID + '/execute', body)
+		return this.genericPost('/api/scenes/' + ID + (this.isHC2 ? '/action/start' : '/execute'), body)
 	}
 	getGlobalVariable(globalVariableID) {
 		return this.genericGet('/api/globalVariables/' + globalVariableID);
