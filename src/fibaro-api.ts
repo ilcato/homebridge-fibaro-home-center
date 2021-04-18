@@ -17,11 +17,20 @@
 'use strict';
 
 import superagent = require('superagent');
+import Throttle = require('superagent-throttle');
 import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
 
 declare const Buffer;
+
+// fix HC2 - 503-error (devices > 100)
+const throttle = new Throttle({
+	active: true,
+	rate: 1000,
+	ratePer: 3000,
+	concurrent: 50 // how many requests can be sent concurrently
+});
 
 export class FibaroClient {
 
@@ -83,6 +92,7 @@ export class FibaroClient {
 
 		return superagent
 			.get(url)
+			.use(throttle.plugin())
 			.set('Authorization', this.auth)
 			.set('accept', 'json')
 			.ca(this.ca);
@@ -91,6 +101,7 @@ export class FibaroClient {
 		const url = this.composeURL(service);
 		return superagent
 			.post(url)
+			.use(throttle.plugin())
 			.send(body)
 			.set('Authorization', this.auth)
 			.set('accept', 'json')
@@ -100,6 +111,7 @@ export class FibaroClient {
 		const url = this.composeURL(service);
 		return superagent
 			.put(url)
+			.use(throttle.plugin())
 			.send(body)
 			.set('Authorization', this.auth)
 			.set('accept', 'json')
