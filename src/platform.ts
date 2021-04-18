@@ -236,13 +236,13 @@ export class FibaroHC implements DynamicPlatformPlugin {
 
   findServiceByName(name, service) {
     const a = this.accessories.find((accessory) => {
-	    const s = accessory.getService(service);
-	    if (s && s.displayName === name) {
-		  return true;
-	    } else {
-		  return false;
-	    }
-	  });
+      const s = accessory.getService(service);
+      if (s && s.displayName === name) {
+        return true;
+      } else {
+        return false;
+      }
+    });
     if (a) {
       return a.getService(service);
     } else {
