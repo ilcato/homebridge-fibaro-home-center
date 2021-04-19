@@ -1,21 +1,27 @@
 {
+  "displayName": "homebridge Fibaro Home Center",
   "name": "homebridge-fibaro-home-center",
-  "version": "1.1.17",
+  "version": "1.2.1-beta.1",
   "description": "Homebridge plugin for Fibaro Home Center 3 ",
-  "note": "peerDependencies is hardcoded to peerDepdendencies in homebridge!!!",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "prepare": "tsc",
-    "start": "echo \"Error: configure and run homebridge to start\" && exit 1"
-  },
-  "engines": {
-    "node": ">12.0.0",
-    "homebridge": ">=0.4.0"
-  },
+  "author": "ilcato",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/ilcato/homebridge-fibaro-home-center.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ilcato/homebridge-fibaro-home-center/issues"
+  },
+  "engines": {
+    "node": ">=10.17.0",
+    "homebridge": ">=1.3.0"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "lint": "eslint src/**.ts --max-warnings=20",
+    "watch": "npm run build && npm link && nodemon",
+    "build": "rimraf ./dist && tsc",
+    "prepublishOnly": "npm run lint && npm run build"
   },
   "keywords": [
     "homebridge-plugin",
@@ -26,17 +32,20 @@
     "Siri"
   ],
   "dependencies": {
+    "async-mutex": "^0.3.1",
     "superagent": "^6.1.0",
     "superagent-throttle": "^1.0.1"
   },
   "devDependencies": {
     "@types/node": "^14.14.31",
-    "typescript": "^3.8.2"
-  },
-  "author": "ilcato",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/ilcato/homebridge-fibaro-home-center/issues"
+    "@typescript-eslint/eslint-plugin": "^4.16.1",
+    "@typescript-eslint/parser": "^4.16.1",
+    "eslint": "^7.21.0",
+    "homebridge": "^1.3.1",
+    "nodemon": "^2.0.7",
+    "rimraf": "^3.0.2",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.2"
   },
   "homepage": "https://github.com/ilcato/homebridge-fibaro-home-center",
   "funding": [
