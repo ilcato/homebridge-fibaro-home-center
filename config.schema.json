@@ -73,12 +73,6 @@
           }
         ],
         "default": "disabled"
-      },
-      "isHC2": {
-        "title": "Home Center 2",
-        "type": "boolean",
-        "description": "Use HC2 Api.",
-        "default": false
       }
     }
   },

@@ -26,6 +26,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
   public updateSubscriptions: Array<unknown>;
   public poller?: Poller;
   public scenes: Record<string, string>;
+  public info: Record<string, string>;
   public fibaroClient?: FibaroClient;
   public setFunctions?: SetFunctions;
   public getFunctions?: GetFunctions;
@@ -40,6 +41,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
     this.updateSubscriptions = [];
     this.scenes = {};
     this.mutex = new Mutex();
+    this.info = {};
 
     if (!config) {
       this.log.error('Fibaro HC configuration: cannot find configuration for the plugin');
@@ -68,11 +70,8 @@ export class FibaroHC implements DynamicPlatformPlugin {
     if (this.config.addRoomNameToDeviceName === undefined) {
       this.config.addRoomNameToDeviceName = 'disabled';
     }
-    if (this.config.isHC2 === undefined) {
-      this.config.isHC2 = false;
-    }
 
-    this.fibaroClient = new FibaroClient(this.config.url, this.config.host, this.config.username, this.config.password, this.config.isHC2, this.log);
+    this.fibaroClient = new FibaroClient(this.config.url, this.config.host, this.config.username, this.config.password, this.log);
     if (this.fibaroClient.status === false) {
       this.log.error('Cannot connect to Fibaro Home Center. Check credentials, url/host or ca.cer file');
       return;
@@ -97,6 +96,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
       }
 
       try {
+        this.info = (await this.fibaroClient.getInfo()).body;
         const scenes = (await this.fibaroClient.getScenes()).body;
         scenes.map((s) => {
           this.scenes[s.name] = s.id;
@@ -255,6 +255,11 @@ export class FibaroHC implements DynamicPlatformPlugin {
     } else {
       return undefined;
     }
+  }
+
+  isOldApi() {
+    return this.info && this.info.serialNumber &&
+        (this.info.serialNumber.indexOf('HC2-') === 0 || this.info.serialNumber.indexOf('HLC-') === 0);
   }
 
 }
