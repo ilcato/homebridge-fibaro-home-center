@@ -31,5 +31,6 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Last release note
-Version 1.1.17
-+ Fixed issue #20
+Version 1.2.0
++ Refactoring
++ Fix issue #48
