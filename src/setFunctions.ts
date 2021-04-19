@@ -231,7 +231,7 @@ export class SetFunctions {
 
     async scene(sceneID) {
       try {
-        await this.platform.fibaroClient.executeScene(sceneID);
+        await this.platform.fibaroClient.executeScene(sceneID, this.platform.isOldApi());
       } catch (e) {
         this.platform.log('There was a problem executing scene: ', sceneID);
       }

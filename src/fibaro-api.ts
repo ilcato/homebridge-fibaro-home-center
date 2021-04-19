@@ -123,6 +123,10 @@ export class FibaroClient {
         .ca(this.ca);
     }
 
+    getInfo() {
+      return this.genericGet('/api/settings/info');
+    }
+
     getScenes() {
       return this.genericGet('/api/scenes');
     }
@@ -151,9 +155,9 @@ export class FibaroClient {
       return this.genericPost('/api/devices/' + ID + '/action/' + action, body);
     }
 
-    executeScene(ID) {
+    executeScene(ID, useOldApi) {
       const body = {};
-      return this.genericPost('/api/scenes/' + ID + '/execute', body);
+      return this.genericPost('/api/scenes/' + ID + (useOldApi ? '/action/start' : '/execute'), body)
     }
 
     getGlobalVariable(globalVariableID) {
