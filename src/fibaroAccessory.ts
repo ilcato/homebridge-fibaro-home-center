@@ -1,0 +1,446 @@
+//    Copyright 2021 ilcato
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+
+// Fibaro Home Center Platform plugin for HomeBridge
+import { PlatformAccessory, HAPStatus } from 'homebridge';
+import { FibaroHC } from './platform';
+
+export class FibaroAccessory {
+    mainService;
+    batteryService;
+    mainCharacteristics;
+    batteryCharacteristics;
+    isValid;
+
+    constructor(
+        private readonly platform: FibaroHC,
+        private readonly accessory: PlatformAccessory,
+        private readonly device,
+        private readonly siblings,
+    ) {
+      this.isValid = true;
+      // set accessory information
+      const properties = this.device.properties || {};
+      const manufacturer = (properties.zwaveCompany || 'IlCato').replace('Fibargroup', 'Fibar Group');
+
+        this.accessory.getService(this.platform.Service.AccessoryInformation)!
+          .setCharacteristic(this.platform.Characteristic.Manufacturer, manufacturer)
+          .setCharacteristic(this.platform.Characteristic.Model, `${this.device.type.length > 1 ?
+            this.device.type :
+            'HomeCenter Bridged Accessory'}`)
+          .setCharacteristic(this.platform.Characteristic.SerialNumber, `${properties.serialNumber || '<unknown>'}`);
+
+        let service;
+        let floatServiceId;
+        let subtype = this.device.id + '----';
+
+        switch (this.device.type) {
+          case 'com.fibaro.multilevelSwitch':
+          case 'com.fibaro.FGD212':
+          case 'com.fibaro.FGWD111':
+            switch (parseInt(this.device.properties.deviceControlType)) {
+              case 2: // Lighting
+              case 23: // Lighting
+                service = this.platform.Service.Lightbulb;
+                this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.Brightness];
+                break;
+              default:
+                service = this.platform.Service.Switch;
+                this.mainCharacteristics = [this.platform.Characteristic.On];
+                break;
+            }
+            break;
+          case 'com.fibaro.binarySwitch':
+          case 'com.fibaro.developer.bxs.virtualBinarySwitch':
+          case 'com.fibaro.satelOutput':
+          case 'com.fibaro.FGWDS221':
+            switch (parseInt(this.device.properties.deviceControlType)) {
+              case 2: // Lighting
+              case 5: // Bedside Lamp
+              case 7: // Wall Lamp
+                service = this.platform.Service.Lightbulb;
+                this.mainCharacteristics = [this.platform.Characteristic.On];
+                break;
+              case 25: // Video gate open
+                service = this.platform.Service.LockMechanism;
+                subtype = device.id + '--' + 'LOCK';
+                this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
+                break;
+              default:
+                service = this.platform.Service.Switch;
+                this.mainCharacteristics = [this.platform.Characteristic.On];
+                break;
+            }
+            break;
+          case 'com.fibaro.barrier':
+            service = this.platform.Service.GarageDoorOpener;
+            this.mainCharacteristics =
+                    [this.platform.Characteristic.CurrentDoorState,
+                      this.platform.Characteristic.TargetDoorState,
+                      this.platform.Characteristic.ObstructionDetected];
+            break;
+          case 'com.fibaro.FGR221':
+          case 'com.fibaro.FGRM222':
+          case 'com.fibaro.FGR223':
+          case 'com.fibaro.rollerShutter':
+          case 'com.fibaro.FGWR111':
+            service = this.platform.Service.WindowCovering;
+            this.mainCharacteristics = [
+              this.platform.Characteristic.CurrentPosition,
+              this.platform.Characteristic.TargetPosition,
+              this.platform.Characteristic.PositionState,
+            ];
+            if (parseInt(this.device.properties.deviceControlType) === 55) {
+              this.mainCharacteristics.push(
+                this.platform.Characteristic.CurrentHorizontalTiltAngle,
+                this.platform.Characteristic.TargetHorizontalTiltAngle,
+              );
+            }
+            break;
+          case 'com.fibaro.FGMS001':
+          case 'com.fibaro.FGMS001v2':
+          case 'com.fibaro.motionSensor':
+            service = this.platform.Service.MotionSensor;
+            this.mainCharacteristics = [this.platform.Characteristic.MotionDetected];
+            break;
+          case 'com.fibaro.temperatureSensor':
+            service = this.platform.Service.TemperatureSensor;
+            this.mainCharacteristics = [this.platform.Characteristic.CurrentTemperature];
+            break;
+          case 'com.fibaro.humiditySensor':
+            service = this.platform.Service.HumiditySensor;
+            this.mainCharacteristics = [this.platform.Characteristic.CurrentRelativeHumidity];
+            break;
+          case 'com.fibaro.binarySensor':
+          case 'com.fibaro.doorSensor':
+          case 'com.fibaro.FGDW002':
+          case 'com.fibaro.windowSensor':
+          case 'com.fibaro.satelZone':
+            service = this.platform.Service.ContactSensor;
+            this.mainCharacteristics = [this.platform.Characteristic.ContactSensorState];
+            break;
+          case 'com.fibaro.FGFS101':
+          case 'com.fibaro.floodSensor':
+            service = this.platform.Service.LeakSensor;
+            this.mainCharacteristics = [this.platform.Characteristic.LeakDetected];
+            break;
+          case 'com.fibaro.FGSS001':
+          case 'com.fibaro.smokeSensor':
+          case 'com.fibaro.gasDetector':
+            service = this.platform.Service.SmokeSensor;
+            this.mainCharacteristics = [this.platform.Characteristic.SmokeDetected];
+            break;
+          case 'com.fibaro.FGCD001':
+            service = this.platform.Service.CarbonMonoxideSensor;
+            this.mainCharacteristics =
+                    [this.platform.Characteristic.CarbonMonoxideDetected,
+                      this.platform.Characteristic.CarbonMonoxideLevel,
+                      this.platform.Characteristic.CarbonMonoxidePeakLevel, this.platform.Characteristic.BatteryLevel];
+            break;
+          case 'com.fibaro.lightSensor':
+            service = this.platform.Service.LightSensor;
+            this.mainCharacteristics = [this.platform.Characteristic.CurrentAmbientLightLevel];
+            break;
+          case 'com.fibaro.FGWP101':
+          case 'com.fibaro.FGWP102':
+          case 'com.fibaro.FGWPG111':
+          case 'com.fibaro.FGWOEF011':
+            service = this.platform.Service.Outlet;
+            this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
+            break;
+          case 'com.fibaro.doorLock':
+          case 'com.fibaro.gerda':
+            service = this.platform.Service.LockMechanism;
+            this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
+            break;
+          case 'com.fibaro.setPoint':
+          case 'com.fibaro.thermostatDanfoss':
+          case 'com.fibaro.com.fibaro.thermostatHorstmann':
+          case 'com.fibaro.FGT001':
+          case 'com.fibaro.hvacSystem':
+            service = this.platform.Service.Thermostat;
+            this.mainCharacteristics =
+                    [this.platform.Characteristic.CurrentTemperature,
+                      this.platform.Characteristic.TargetTemperature,
+                      this.platform.Characteristic.CurrentHeatingCoolingState,
+                      this.platform.Characteristic.TargetHeatingCoolingState,
+                      this.platform.Characteristic.TemperatureDisplayUnits];
+            // Check if there's a temperature Sensor and use it instead of the provided float value
+            if (this.siblings.get('com.fibaro.temperatureSensor')) {
+              floatServiceId = this.siblings.get('com.fibaro.temperatureSensor').id;
+              subtype = this.device.id + '---' + this.siblings.get('com.fibaro.temperatureSensor').id;
+            }
+            break;
+          case 'com.fibaro.FGRGBW441M':
+          case 'com.fibaro.colorController':
+          case 'com.fibaro.FGRGBW442':
+          case 'com.fibaro.FGRGBW442CC':
+            service = this.platform.Service.Lightbulb;
+            this.mainCharacteristics =
+                    [this.platform.Characteristic.On,
+                      this.platform.Characteristic.Brightness,
+                      this.platform.Characteristic.Hue,
+                      this.platform.Characteristic.Saturation];
+            break;
+          case 'com.fibaro.logitechHarmonyActivity':
+            service = this.platform.Service.Switch;
+            subtype = device.id + '--' + 'HP'; 					// HP: Harmony Plugin
+            break;
+          case 'securitySystem':
+            service = this.platform.Service.SecuritySystem;
+            this.mainCharacteristics =
+                    [this.platform.Characteristic.SecuritySystemCurrentState,
+                      this.platform.Characteristic.SecuritySystemTargetState];
+            subtype = '0--';
+            break;
+          case 'scene':
+            service = this.platform.Service.Switch;
+            this.mainCharacteristics = [this.platform.Characteristic.On];
+            subtype = device.id + '--SC';
+            break;
+          case 'G':
+            service = this.platform.Service.Switch;
+            this.mainCharacteristics = [this.platform.Characteristic.On];
+            subtype = this.device.type + '-' + this.device.name + '-';
+            break;
+          case 'D':
+            service = this.platform.Service.Lightbulb;
+            this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.Brightness];
+            subtype = this.device.type + '-' + this.device.name + '-';
+            break;
+          default:
+            this.isValid = false;
+            return;
+        }
+
+
+        this.mainService = this.accessory.getService(service);
+        if (!this.mainService) {
+          this.mainService = this.accessory.addService(new service(this.device.name));
+          this.mainService.subtype = subtype;
+        }
+        this.mainService.floatServiceId = floatServiceId;
+        this.bindCharactersticsEvent(this.mainService, this.mainCharacteristics);
+
+        if (this.device.interfaces && this.device.interfaces.includes('battery')) {
+          this.batteryService = this.accessory.getService(this.platform.Service.BatteryService);
+          if (!this.batteryService) {
+            this.batteryService = this.accessory.addService(new this.platform.Service.BatteryService(this.device.name + ' Battery'));
+          }
+          this.batteryCharacteristics =
+                [this.platform.Characteristic.BatteryLevel,
+                  this.platform.Characteristic.ChargingState,
+                  this.platform.Characteristic.StatusLowBattery];
+          this.bindCharactersticsEvent(this.batteryService, this.batteryCharacteristics);
+        }
+
+        // Remove no more existing services
+        for (let t = 0; t < this.accessory.services.length; t++) {
+          const s = this.accessory.services[t];
+          if (s.displayName !== this.mainService.displayName &&
+                s.UUID !== this.platform.Service.AccessoryInformation.UUID &&
+                s.UUID !== this.platform.Service.BatteryService.UUID) {
+            this.accessory.removeService(s);
+          }
+        }
+    }
+
+    bindCharactersticsEvent(service, characteristics) {
+      for (let i = 0; i < characteristics.length; i++) {
+        const characteristic = service.getCharacteristic(characteristics[i]);
+        if (characteristic.UUID === this.platform.Characteristic.CurrentAmbientLightLevel.UUID) {
+          characteristic.props.maxValue = 100000;
+          characteristic.props.minStep = 1;
+          characteristic.props.minValue = 0;
+        }
+        if (characteristic.UUID === this.platform.Characteristic.CurrentTemperature.UUID) {
+          characteristic.props.minValue = -50;
+        }
+        this.bindCharacteristicEvents(characteristic, service);
+      }
+    }
+
+    bindCharacteristicEvents(characteristic, service) {
+      if (service.subtype === undefined) {
+        return;
+      }
+      const IDs = service.subtype.split('-');
+      // IDs[0] is always device ID, "0" for security system and "G" for global variables switches
+      // IDs[1] is reserved for the button ID for virtual devices, or the global variable name for global variable devices, otherwise is ""
+      // IDs[2] is a subdevice type "HP" for Harmony Plugin, "LOCK" for locks, "SC" for Scenes
+      // IDs[3] is the ID of a related device: FLOAT_SVC_ID (e.g.: a temperature sensor associated to a thermostat)
+      service.isVirtual = IDs[1] !== '' ? true : false;
+      service.isSecuritySystem = IDs[0] === '0' ? true : false;
+      service.isGlobalVariableSwitch = IDs[0] === 'G' ? true : false;
+      service.isGlobalVariableDimmer = IDs[0] === 'D' ? true : false;
+      service.isHarmonyDevice = (IDs.length >= 3 && IDs[2] === 'HP') ? true : false;
+      service.isLockSwitch = (IDs.length >= 3 && IDs[2] === 'LOCK') ? true : false;
+      service.isScene = (IDs.length >= 3 && IDs[2] === 'SC') ? true : false;
+      if ((IDs.length >= 4 && IDs[3] !== '')) {
+        service.floatServiceId = IDs[3];
+      }
+
+      if (!service.isVirtual && !service.isScene) {
+        let propertyChanged = 'value'; // subscribe to the changes of this property
+        if (characteristic.UUID === this.platform.Characteristic.Hue.UUID
+                || characteristic.UUID === this.platform.Characteristic.Saturation.UUID) {
+          propertyChanged = 'color';
+        }
+        if (characteristic.UUID === this.platform.Characteristic.CurrentHeatingCoolingState.UUID ||
+                characteristic.UUID === this.platform.Characteristic.TargetHeatingCoolingState.UUID) {
+          propertyChanged = 'mode';
+        }
+        if (characteristic.UUID === this.platform.Characteristic.TargetTemperature.UUID) {
+          propertyChanged = 'targettemperature';
+        }
+        if (service.UUID === this.platform.Service.WindowCovering.UUID
+                && characteristic.UUID === this.platform.Characteristic.CurrentHorizontalTiltAngle.UUID) {
+          propertyChanged = 'value2';
+        }
+        if (service.UUID === this.platform.Service.WindowCovering.UUID
+                && characteristic.UUID === this.platform.Characteristic.TargetHorizontalTiltAngle.UUID) {
+          propertyChanged = 'value2';
+        }
+        this.subscribeUpdate(service, characteristic, propertyChanged);
+      }
+      characteristic.on('set', async (value, callback, context) => {
+        this.setCharacteristicValue(value, context, characteristic, service, IDs);
+        callback();
+      });
+      characteristic.on('get', async (callback) => {
+        if (characteristic.UUID === this.platform.Characteristic.Name.UUID) {
+          callback(undefined, characteristic.value);
+          return;
+        }
+        if ((service.isVirtual && !service.isGlobalVariableSwitch && !service.isGlobalVariableDimmer) || service.isScene) {
+          // a push button is normally off
+          callback(undefined, false);
+        } else {
+          this.getCharacteristicValue(callback, characteristic, service, this.accessory, IDs);
+        }
+      });
+    }
+
+    async setCharacteristicValue(value, context, characteristic, service, IDs) {
+      if (context !== 'fromFibaro' && context !== 'fromSetValue') {
+        if (this.platform.setFunctions) {
+          const setFunction = this.platform.setFunctions.setFunctionsMapping.get(characteristic.UUID);
+          const platform = this.platform;
+          if (setFunction && platform.poller !== undefined) {
+            await this.platform.mutex.runExclusive(async () => {
+              platform.poller?.cancelPoll();
+              setFunction.call(platform.setFunctions, value, context, characteristic, service, IDs);
+              platform.poller?.restartPoll(5000);
+            });
+          }
+        }
+      }
+    }
+
+    async getCharacteristicValue(callback, characteristic, service, accessory, IDs) {
+      this.platform.log.info('Getting value from device: ', `${IDs[0]}  parameter: ${characteristic.displayName}`);
+      try {
+        if (!this.platform.fibaroClient) {
+          this.platform.log.error('No Fibaro client available.');
+          callback(undefined, characteristic.value);
+          return;
+        }
+        // Manage security system status
+        if (service.isSecuritySystem) {
+          const securitySystemStatus = (await this.platform.fibaroClient.getGlobalVariable('SecuritySystem')).body;
+          if (this.platform.getFunctions) {
+            this.platform.getFunctions.getSecuritySystemState(characteristic, service, IDs, securitySystemStatus);
+          }
+          callback(undefined, characteristic.value);
+          return;
+        }
+        // Manage global variable switches
+        if (service.isGlobalVariableSwitch) {
+          const switchStatus = (await this.platform.fibaroClient.getGlobalVariable(IDs[1])).body;
+          if (this.platform.getFunctions) {
+            this.platform.getFunctions.getBool(characteristic, service, IDs, switchStatus);
+          }
+          callback(undefined, characteristic.value);
+          return;
+        }
+        // Manage global variable dimmers
+        if (service.isGlobalVariableDimmer) {
+          const value = (await this.platform.fibaroClient.getGlobalVariable(IDs[1])).body;
+          if (this.platform.getFunctions) {
+            if (characteristic.UUID === this.platform.Characteristic.Brightness.UUID) {
+              this.platform.getFunctions.getBrightness(characteristic, service, IDs, value);
+            } else if (characteristic.UUID === this.platform.Characteristic.On.UUID) {
+              this.platform.getFunctions.getBool(characteristic, service, IDs, value);
+            }
+          }
+          callback(undefined, characteristic.value);
+          return;
+        }
+      } catch (e) {
+        this.platform.log.error('There was a problem getting value from Global Variables', ` - Err: ${e}`);
+        callback(undefined, characteristic.value);
+        return;
+      }
+      // Manage all other status
+      if (!this.platform.getFunctions) {
+        callback(undefined, characteristic.value);
+        return;
+      }
+
+      const getFunction = this.platform.getFunctions.getFunctionsMapping.get(characteristic.UUID);
+      if (getFunction) {
+        setTimeout(async () => {
+          if (!this.platform.fibaroClient) {
+            return;
+          }
+          try {
+            const properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
+            if (getFunction.function) {
+              if (this.platform.config.FibaroTemperatureUnit === 'F') {
+                if (characteristic.displayName === 'Current Temperature') {
+                  properties.value = (properties.value - 32) * 5 / 9;
+                }
+              }
+              if (Object.prototype.hasOwnProperty.call(properties, 'dead') && properties.dead === 'true') {
+                service.dead = true;
+                this.platform.log.info('Device dead: ', `${IDs[0]}  parameter: ${characteristic.displayName}`);
+              } else {
+                service.dead = false;
+                getFunction.function.call(this.platform.getFunctions, characteristic, service, IDs, properties);
+              }
+            } else {
+              this.platform.log.error('No get function defined for: ', `${characteristic.displayName}`);
+            }
+          } catch (e) {
+            service.dead = true;
+            this.platform.log.error('G1 - There was a problem getting value from: ', `${IDs[0]} - Err: ${e}`);
+          }
+        }, getFunction.delay * 100);
+      }
+      if (service.dead) {
+        callback(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+      } else {
+        callback(undefined, characteristic.value);
+      }
+    }
+
+    subscribeUpdate(service, characteristic, propertyChanged) {
+      const IDs = service.subtype.split('-');
+      this.platform.updateSubscriptions.push(
+        { 'id': IDs[0], 'service': service, 'characteristic': characteristic, 'property': propertyChanged },
+      );
+    }
+}
+
+
