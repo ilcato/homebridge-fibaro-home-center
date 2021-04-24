@@ -31,6 +31,7 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Last release note
-Version 1.2.0
+Version 1.2.1
 + Refactoring
 + Fix issue #48
++ Fix Global Variable dimmers blinks

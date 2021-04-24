@@ -69,6 +69,10 @@ export class SetFunctions {
       } else if (service.isGlobalVariableSwitch) {
         this.setGlobalVariable(IDs[1], value === true ? 'true' : 'false');
       } else if (service.isGlobalVariableDimmer) {
+        const currentDimmerValue = (await this.getGlobalVariable(IDs[1])).body.value;
+        if (currentDimmerValue !== '0' && value === true) {
+          return;
+        }
         this.setGlobalVariable(IDs[1], value === true ? '100' : '0');
       } else if (service.isHarmonyDevice) {
         await this.command('changeActivityState', null, service, IDs);
@@ -225,7 +229,7 @@ export class SetFunctions {
         await this.platform.fibaroClient.executeDeviceAction(IDs[0], c, value);
         this.platform.log('Command: ', c + ((value !== null) ? ', value: ' + value : '') + ', to: ' + IDs[0]);
       } catch (e) {
-        this.platform.log('There was a problem sending command ', c + ' to ' + IDs[0]);
+        this.platform.log.error('There was a problem sending command ', c + ' to ' + IDs[0]);
       }
     }
 
@@ -233,7 +237,7 @@ export class SetFunctions {
       try {
         await this.platform.fibaroClient.executeScene(sceneID, this.platform.isOldApi());
       } catch (e) {
-        this.platform.log('There was a problem executing scene: ', sceneID);
+        this.platform.log.error('There was a problem executing scene: ', sceneID);
       }
     }
 
@@ -241,7 +245,16 @@ export class SetFunctions {
       try {
         await this.platform.fibaroClient.setGlobalVariable(variableID, value);
       } catch (e) {
-        this.platform.log('There was a problem setting variable: ', `${variableID} to ${value}`);
+        this.platform.log.error('There was a problem setting variable: ', `${variableID} to ${value}`);
+      }
+    }
+
+    async getGlobalVariable(variableID) {
+      try {
+        const value = await this.platform.fibaroClient.getGlobalVariable(variableID);
+        return value;
+      } catch (e) {
+        this.platform.log.error('There was a problem getting variable: ', `${variableID}`);
       }
     }
 
@@ -251,10 +264,10 @@ export class SetFunctions {
         const currentValue = (properties.value === true) ?
           this.platform.Characteristic.LockCurrentState.SECURED : this.platform.Characteristic.LockCurrentState.UNSECURED;
         if (currentValue !== value) {
-          this.platform.log('There was a problem setting value to Lock: ', `${IDs[0]}`);
+          this.platform.log.error('There was a problem setting value to Lock: ', `${IDs[0]}`);
         }
       } catch (e) {
-        this.platform.log('There was a problem getting value from: ', `${IDs[0]} - Err: ${e}`);
+        this.platform.log.error('There was a problem getting value from: ', `${IDs[0]} - Err: ${e}`);
       }
     }
 
