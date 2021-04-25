@@ -30,7 +30,7 @@ Remember to configure the plugin in config.json in your home directory inside th
 Look for a sample config in [config.json example](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/config.json)
 
 
-# Last release note
+# Last release notes
 Version 1.2.1
 + Refactoring
 + Fix issue #48
