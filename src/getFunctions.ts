@@ -333,7 +333,8 @@ export class GetFunctions {
         this.platform.log('batteryLevel is not a number.', '');
         return;
       }
-      const r = parseFloat(properties.batteryLevel) <= 30 ? 1 : 0;
+      let batteryLevel = parseFloat(properties.batteryLevel);
+      const r = (batteryLevel <= 20 || batteryLevel > 100) ? 1 : 0;
       characteristic.updateValue(r);
     }
 

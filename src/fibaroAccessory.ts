@@ -238,6 +238,9 @@ export class FibaroAccessory {
           if (!this.batteryService) {
             this.batteryService = this.accessory.addService(new this.platform.Service.BatteryService(this.device.name + ' Battery'));
           }
+          if (!this.batteryService.subtype) {
+            this.batteryService.subtype = this.device.id + '----';
+          }
           this.batteryCharacteristics =
                 [this.platform.Characteristic.BatteryLevel,
                   this.platform.Characteristic.ChargingState,
