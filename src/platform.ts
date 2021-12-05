@@ -26,6 +26,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
   public updateSubscriptions: Array<unknown>;
   public poller?: Poller;
   public scenes: Record<string, string>;
+  public climateZones: Record<string, string>;
   public info: Record<string, string>;
   public fibaroClient?: FibaroClient;
   public setFunctions?: SetFunctions;
@@ -40,6 +41,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
   ) {
     this.updateSubscriptions = [];
     this.scenes = {};
+    this.climateZones = {};
     this.mutex = new Mutex();
     this.info = {};
 
@@ -104,6 +106,12 @@ export class FibaroHC implements DynamicPlatformPlugin {
             const device = { name: s.name.substring(1), roomID: 0, id: s.id, type: 'scene' };
             this.addAccessory(device, null);
           }
+        });
+        const climateZones = (await this.fibaroClient.getClimateZones()).body;
+        climateZones.map((s) => {
+          this.climateZones[s.name] = s.id;
+          const device = { name: s.name, roomID: 0, id: s.id, type: 'climateZone', properties: s.properties };
+          this.addAccessory(device, null);
         });
         this.setFunctions = new SetFunctions(this);	// There's a dependency in setFunction to Scene Mapping
         const devices = this.fibaroClient ? (await this.fibaroClient.getDevices()).body : {};
