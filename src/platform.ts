@@ -125,14 +125,14 @@ export class FibaroHC implements DynamicPlatformPlugin {
               this.addAccessory(device, null);
             });
           }
-          this.setFunctions = new SetFunctions(this);	// There's a dependency in setFunction to Scene Mapping
-          const devices = this.fibaroClient ? (await this.fibaroClient.getDevices()).body : {};
-          let rooms = null;
-          if (this.config.addRoomNameToDeviceName === 'enabled' && this.fibaroClient) {
-            rooms = (await this.fibaroClient.getRooms()).body;
-          }
-          this.LoadAccessories(devices, rooms);
         }
+        this.setFunctions = new SetFunctions(this);	// There's a dependency in setFunction to Scene Mapping
+        const devices = this.fibaroClient ? (await this.fibaroClient.getDevices()).body : {};
+        let rooms = null;
+        if (this.config.addRoomNameToDeviceName === 'enabled' && this.fibaroClient) {
+          rooms = (await this.fibaroClient.getRooms()).body;
+        }
+        this.LoadAccessories(devices, rooms);
       } catch (e) {
         this.log.error('Error getting data from Home Center: ', e);
         throw e;
