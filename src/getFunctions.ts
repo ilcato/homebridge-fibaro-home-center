@@ -157,7 +157,7 @@ export class GetFunctions {
       if (service.isClimateZone) {
         try {
           const properties = (await this.platform.fibaroClient.getClimateZone(IDs[0])).body.properties;
-          if (!properties.currentTemperatureHeating) {
+          if (!Object.prototype.hasOwnProperty.call(properties, 'currentTemperatureHeating')) {
             this.platform.log('No value for Temperature.', '');
             return;
           }
@@ -169,7 +169,7 @@ export class GetFunctions {
       } else if (service.isHeatingZone) {
         try {
           const properties = (await this.platform.fibaroClient.getHeatingZone(IDs[0])).body.properties;
-          if (!properties.handTemperature) {
+          if (!Object.prototype.hasOwnProperty.call(properties, 'handTemperature')) {
             this.platform.log('No value for Temperature.', '');
             return;
           }

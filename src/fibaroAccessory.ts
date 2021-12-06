@@ -407,10 +407,15 @@ export class FibaroAccessory {
             return;
           }
           try {
-            const properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
+            let properties;
+            if (!service.isClimateZone && !service.isHeatingZone) {
+              properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
+            } else {
+              properties = {};
+            }
             if (getFunction.function) {
               if (this.platform.config.FibaroTemperatureUnit === 'F') {
-                if (characteristic.displayName === 'Current Temperature') {
+                if (Object.prototype.hasOwnProperty.call(properties, 'value') && characteristic.displayName === 'Current Temperature') {
                   properties.value = (properties.value - 32) * 5 / 9;
                 }
               }
