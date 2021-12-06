@@ -32,5 +32,5 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 # Last release notes
 Version 1.2.2
-+ Expose climate zones as thermostats
++ Expose climate zones as thermostats (only heating zones for HC2)
 + Remove previous thermostat implementation
