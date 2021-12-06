@@ -107,24 +107,20 @@ export class FibaroHC implements DynamicPlatformPlugin {
             this.addAccessory(device, null);
           }
         });
-        const respClimateZones = (await this.fibaroClient.getClimateZones());
-        if (respClimateZones.status === 200) {
-          const climateZones = respClimateZones.body;
+        if (this.isOldApi()) {
+          const heatingZones = (await this.fibaroClient.getHeatingZones()).body;
+          heatingZones.map((s) => {
+            this.climateZones[s.name] = s.id;
+            const device = { name: s.name, roomID: 0, id: s.id, type: 'heatingZone', properties: s.properties };
+            this.addAccessory(device, null);
+          });
+        } else {
+          const climateZones = (await this.fibaroClient.getClimateZones()).body;
           climateZones.map((s) => {
             this.climateZones[s.name] = s.id;
             const device = { name: s.name, roomID: 0, id: s.id, type: 'climateZone', properties: s.properties };
             this.addAccessory(device, null);
           });
-        } else {
-          const respHeatingZones = (await this.fibaroClient.getHeatingZones());
-          if (respHeatingZones.status === 200) {
-            const heatingZones = respHeatingZones.body;
-            heatingZones.map((s) => {
-              this.climateZones[s.name] = s.id;
-              const device = { name: s.name, roomID: 0, id: s.id, type: 'heatingZone', properties: s.properties };
-              this.addAccessory(device, null);
-            });
-          }
         }
         this.setFunctions = new SetFunctions(this);	// There's a dependency in setFunction to Scene Mapping
         const devices = this.fibaroClient ? (await this.fibaroClient.getDevices()).body : {};
