@@ -166,6 +166,17 @@ export class GetFunctions {
           this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
           return;
         }
+      } else if (service.isHeatingZone) {
+        try {
+          const properties = (await this.platform.fibaroClient.getHeatingZone(IDs[0])).body.properties;
+          if (!properties.handTemperature) {
+            this.platform.log('No value for Temperature.', '');
+            return;
+          }
+          characteristic.updateValue(properties.handTemperature);
+        } catch (e) {
+          this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
+        }
       } else {
         const value = properties.value;
         characteristic.updateValue(value);
@@ -184,6 +195,17 @@ export class GetFunctions {
         } catch (e) {
           this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
           return;
+        }
+      } else if (service.isHeatingZone) {
+        try {
+          const properties = (await this.platform.fibaroClient.getHeatingZone(IDs[0])).body.properties;
+          if (!properties.handTemperature) {
+            this.platform.log('No value for Temperature.', '');
+            return;
+          }
+          characteristic.updateValue(properties.handTemperature);
+        } catch (e) {
+          this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
         }
       } else {
         const value = properties.value;
@@ -275,6 +297,8 @@ export class GetFunctions {
           this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
           return;
         }
+      } else if (service.isHeatingZone) {
+        characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
       }
     }
 
@@ -303,6 +327,8 @@ export class GetFunctions {
           this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
           return;
         }
+      } else if (service.isHeatingZone) {
+        characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
       }
     }
 

@@ -107,19 +107,32 @@ export class FibaroHC implements DynamicPlatformPlugin {
             this.addAccessory(device, null);
           }
         });
-        const climateZones = (await this.fibaroClient.getClimateZones()).body;
-        climateZones.map((s) => {
-          this.climateZones[s.name] = s.id;
-          const device = { name: s.name, roomID: 0, id: s.id, type: 'climateZone', properties: s.properties };
-          this.addAccessory(device, null);
-        });
-        this.setFunctions = new SetFunctions(this);	// There's a dependency in setFunction to Scene Mapping
-        const devices = this.fibaroClient ? (await this.fibaroClient.getDevices()).body : {};
-        let rooms = null;
-        if (this.config.addRoomNameToDeviceName === 'enabled' && this.fibaroClient) {
-          rooms = (await this.fibaroClient.getRooms()).body;
+        const respClimateZones = (await this.fibaroClient.getClimateZones());
+        if (respClimateZones.status === 200) {
+          const climateZones = respClimateZones.body;
+          climateZones.map((s) => {
+            this.climateZones[s.name] = s.id;
+            const device = { name: s.name, roomID: 0, id: s.id, type: 'climateZone', properties: s.properties };
+            this.addAccessory(device, null);
+          });
+        } else {
+          const respHeatingZones = (await this.fibaroClient.getHeatingZones());
+          if (respHeatingZones.status === 200) {
+            const heatingZones = respHeatingZones.body;
+            heatingZones.map((s) => {
+              this.climateZones[s.name] = s.id;
+              const device = { name: s.name, roomID: 0, id: s.id, type: 'heatingZone', properties: s.properties };
+              this.addAccessory(device, null);
+            });
+          }
+          this.setFunctions = new SetFunctions(this);	// There's a dependency in setFunction to Scene Mapping
+          const devices = this.fibaroClient ? (await this.fibaroClient.getDevices()).body : {};
+          let rooms = null;
+          if (this.config.addRoomNameToDeviceName === 'enabled' && this.fibaroClient) {
+            rooms = (await this.fibaroClient.getRooms()).body;
+          }
+          this.LoadAccessories(devices, rooms);
         }
-        this.LoadAccessories(devices, rooms);
       } catch (e) {
         this.log.error('Error getting data from Home Center: ', e);
         throw e;
@@ -216,7 +229,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
       // Create accessory handler
       const fa = new FibaroAccessory(this, accessory, device, sibling);
       if (fa.isValid) {
-      // link the accessory to the platform
+        // link the accessory to the platform
         this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
 
         this.accessories.push(accessory);
@@ -267,7 +280,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
 
   isOldApi() {
     return this.info && this.info.serialNumber &&
-        (this.info.serialNumber.indexOf('HC2-') === 0 || this.info.serialNumber.indexOf('HLC-') === 0);
+      (this.info.serialNumber.indexOf('HC2-') === 0 || this.info.serialNumber.indexOf('HLC-') === 0);
   }
 
 }

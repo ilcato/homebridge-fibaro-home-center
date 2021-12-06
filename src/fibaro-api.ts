@@ -139,6 +139,14 @@ export class FibaroClient {
     return this.genericGet('/api/panels/climate/' + ID);
   }
 
+  getHeatingZones() {
+    return this.genericGet('/api/panels/heating');
+  }
+
+  getHeatingZone(ID) {
+    return this.genericGet('/api/panels/heating/' + ID);
+  }
+
   setClimateZoneHandTemperature(ID, mode, temperature, timestamp) {
     const body = {
       'properties': {
@@ -155,6 +163,16 @@ export class FibaroClient {
         break;
     }
     return this.genericPut('/api/panels/climate/' + ID, body);
+  }
+
+  setHeatingZoneHandTemperature(ID, temperature, timestamp) {
+    const body = {
+      'properties': {
+        'handTemperature': temperature,
+        'handTimestamp': timestamp,
+      },
+    };
+    return this.genericPut('/api/panels/heating/' + ID, body);
   }
 
   getRooms() {

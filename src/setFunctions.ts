@@ -135,49 +135,57 @@ export class SetFunctions {
   }
 
   async setTargetHeatingCoolingState(value, context, characteristic, service, IDs) {
-    const currentTemperature = service.getCharacteristic(this.platform.Characteristic.CurrentTemperature).value;
-    let mode = '';
-    switch (value) {
-      case this.platform.Characteristic.TargetHeatingCoolingState.OFF:
-        mode = 'Off';
-        break;
-      case this.platform.Characteristic.TargetHeatingCoolingState.HEAT:
-        mode = 'Heat';
-        break;
-      case this.platform.Characteristic.TargetHeatingCoolingState.COOL:
-        mode = 'Cool';
-        break;
-      case this.platform.Characteristic.TargetHeatingCoolingState.AUTO:
-        mode = 'Auto';
-        break;
-      default:
-        return;
+    if (service.isClimateZone) {
+      const currentTemperature = service.getCharacteristic(this.platform.Characteristic.CurrentTemperature).value;
+      let mode = '';
+      switch (value) {
+        case this.platform.Characteristic.TargetHeatingCoolingState.OFF:
+          mode = 'Off';
+          break;
+        case this.platform.Characteristic.TargetHeatingCoolingState.HEAT:
+          mode = 'Heat';
+          break;
+        case this.platform.Characteristic.TargetHeatingCoolingState.COOL:
+          mode = 'Cool';
+          break;
+        case this.platform.Characteristic.TargetHeatingCoolingState.AUTO:
+          mode = 'Auto';
+          break;
+        default:
+          return;
+      }
+      const timestamp = parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000);
+      await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, currentTemperature, timestamp);
+    } else if (service.isHeatingZone) {
+      return;
     }
-    const timestamp = parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000);
-    await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, currentTemperature, timestamp);
   }
 
   async setTargetTemperature(value, context, characteristic, service, IDs) {
-    let mode = '';
-    const currentHeatingCoolingState = service.getCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState).value;
-    switch (currentHeatingCoolingState) {
-      case this.platform.Characteristic.CurrentHeatingCoolingState.OFF:
-        mode = 'Off';
-        break;
-      case this.platform.Characteristic.CurrentHeatingCoolingState.HEAT:
-        mode = 'Heat';
-        break;
-      case this.platform.Characteristic.CurrentHeatingCoolingState.COOL:
-        mode = 'Cool';
-        break;
-      case this.platform.Characteristic.CurrentHeatingCoolingState.AUTO:
-        mode = 'Auto';
-        break;
-      default:
-        return;
-    }
     const timestamp = parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000);
-    await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, value, timestamp);
+    if (service.isClimateZone) {
+      let mode = '';
+      const currentHeatingCoolingState = service.getCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState).value;
+      switch (currentHeatingCoolingState) {
+        case this.platform.Characteristic.CurrentHeatingCoolingState.OFF:
+          mode = 'Off';
+          break;
+        case this.platform.Characteristic.CurrentHeatingCoolingState.HEAT:
+          mode = 'Heat';
+          break;
+        case this.platform.Characteristic.CurrentHeatingCoolingState.COOL:
+          mode = 'Cool';
+          break;
+        case this.platform.Characteristic.CurrentHeatingCoolingState.AUTO:
+          mode = 'Auto';
+          break;
+        default:
+          return;
+      }
+      await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, value, timestamp);
+    } else if (service.isHeatingZone) {
+      await this.platform.fibaroClient.setHeatingZoneHandTemperature(IDs[0], value, timestamp);
+    }
   }
 
   setHue(value, context, characteristic, service, IDs) {

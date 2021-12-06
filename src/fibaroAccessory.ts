@@ -200,6 +200,16 @@ export class FibaroAccessory {
                       this.platform.Characteristic.TemperatureDisplayUnits];
             subtype = device.id + '--CZ';
             break;
+          case 'heatingZone':
+            service = this.platform.Service.Thermostat;
+            this.mainCharacteristics =
+                      [this.platform.Characteristic.CurrentTemperature,
+                        this.platform.Characteristic.TargetTemperature,
+                        this.platform.Characteristic.CurrentHeatingCoolingState,
+                        this.platform.Characteristic.TargetHeatingCoolingState,
+                        this.platform.Characteristic.TemperatureDisplayUnits];
+            subtype = device.id + '--HZ';
+            break;
           case 'G':
             service = this.platform.Service.Switch;
             this.mainCharacteristics = [this.platform.Characteristic.On];
@@ -271,7 +281,8 @@ export class FibaroAccessory {
       const IDs = service.subtype.split('-');
       // IDs[0] is always device ID, "0" for security system and "G" for global variables switches
       // IDs[1] is reserved for the button ID for virtual devices, or the global variable name for global variable devices, otherwise is ""
-      // IDs[2] is a subdevice type: "HP" for Harmony Plugin, "LOCK" for locks, "SC" for Scenes, "CZ" for Climate zones, "G" for global variables, "D" for dimmer global variables
+      // IDs[2] is a subdevice type: "HP" for Harmony Plugin, "LOCK" for locks, "SC" for Scenes, "CZ" for Climate zones,
+      //                             "HZ" for heating zones, "G" for global variables, "D" for dimmer global variables
       service.isVirtual = IDs[1] !== '' ? true : false;
       service.isSecuritySystem = IDs[0] === '0' ? true : false;
       service.isGlobalVariableSwitch = IDs[0] === 'G' ? true : false;
@@ -280,6 +291,7 @@ export class FibaroAccessory {
       service.isLockSwitch = (IDs.length >= 3 && IDs[2] === 'LOCK') ? true : false;
       service.isScene = (IDs.length >= 3 && IDs[2] === 'SC') ? true : false;
       service.isClimateZone = (IDs.length >= 3 && IDs[2] === 'CZ') ? true : false;
+      service.isHeatingZone = (IDs.length >= 3 && IDs[2] === 'HZ') ? true : false;
 
       if (!service.isVirtual && !service.isScene) {
         let propertyChanged = 'value'; // subscribe to the changes of this property
