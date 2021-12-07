@@ -199,11 +199,11 @@ export class GetFunctions {
       } else if (service.isHeatingZone) {
         try {
           const properties = (await this.platform.fibaroClient.getHeatingZone(IDs[0])).body.properties;
-          if (!properties.handTemperature) {
+          if (!Object.prototype.hasOwnProperty.call(properties, 'currentTemperature')) {
             this.platform.log('No value for Temperature.', '');
             return;
           }
-          characteristic.updateValue(properties.handTemperature);
+          characteristic.updateValue(properties.currentTemperature);
         } catch (e) {
           this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
         }
