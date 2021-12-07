@@ -82,6 +82,7 @@ export class FibaroAccessory {
                 break;
             }
             break;
+          case 'com.fibaro.baseShutter':
           case 'com.fibaro.barrier':
             service = this.platform.Service.GarageDoorOpener;
             this.mainCharacteristics =
@@ -174,10 +175,6 @@ export class FibaroAccessory {
                       this.platform.Characteristic.Hue,
                       this.platform.Characteristic.Saturation];
             break;
-          case 'com.fibaro.logitechHarmonyActivity':
-            service = this.platform.Service.Switch;
-            subtype = device.id + '--' + 'HP'; 					// HP: Harmony Plugin
-            break;
           case 'securitySystem':
             service = this.platform.Service.SecuritySystem;
             this.mainCharacteristics =
@@ -234,9 +231,9 @@ export class FibaroAccessory {
         this.bindCharactersticsEvent(this.mainService, this.mainCharacteristics);
 
         if (this.device.interfaces && this.device.interfaces.includes('battery')) {
-          this.batteryService = this.accessory.getService(this.platform.Service.BatteryService);
+          this.batteryService = this.accessory.getService(this.platform.Service.Battery);
           if (!this.batteryService) {
-            this.batteryService = this.accessory.addService(new this.platform.Service.BatteryService(this.device.name + ' Battery'));
+            this.batteryService = this.accessory.addService(new this.platform.Service.Battery(this.device.name + ' Battery'));
           }
           if (!this.batteryService.subtype) {
             this.batteryService.subtype = this.device.id + '----';
@@ -253,13 +250,16 @@ export class FibaroAccessory {
           const s = this.accessory.services[t];
           if (s.displayName !== this.mainService.displayName &&
                 s.UUID !== this.platform.Service.AccessoryInformation.UUID &&
-                s.UUID !== this.platform.Service.BatteryService.UUID) {
+                s.UUID !== this.platform.Service.Battery.UUID) {
             this.accessory.removeService(s);
           }
         }
     }
 
     bindCharactersticsEvent(service, characteristics) {
+      if (!characteristics) {
+        return;
+      }
       for (let i = 0; i < characteristics.length; i++) {
         const characteristic = service.getCharacteristic(characteristics[i]);
         if (characteristic.UUID === this.platform.Characteristic.CurrentAmbientLightLevel.UUID) {
@@ -275,19 +275,18 @@ export class FibaroAccessory {
     }
 
     bindCharacteristicEvents(characteristic, service) {
-      if (service.subtype === undefined) {
+      if (!characteristic || !service || !service.subtype) {
         return;
       }
       const IDs = service.subtype.split('-');
       // IDs[0] is always device ID, "0" for security system and "G" for global variables switches
       // IDs[1] is reserved for the button ID for virtual devices, or the global variable name for global variable devices, otherwise is ""
-      // IDs[2] is a subdevice type: "HP" for Harmony Plugin, "LOCK" for locks, "SC" for Scenes, "CZ" for Climate zones,
+      // IDs[2] is a subdevice type: "LOCK" for locks, "SC" for Scenes, "CZ" for Climate zones,
       //                             "HZ" for heating zones, "G" for global variables, "D" for dimmer global variables
       service.isVirtual = IDs[1] !== '' ? true : false;
       service.isSecuritySystem = IDs[0] === '0' ? true : false;
       service.isGlobalVariableSwitch = IDs[0] === 'G' ? true : false;
       service.isGlobalVariableDimmer = IDs[0] === 'D' ? true : false;
-      service.isHarmonyDevice = (IDs.length >= 3 && IDs[2] === 'HP') ? true : false;
       service.isLockSwitch = (IDs.length >= 3 && IDs[2] === 'LOCK') ? true : false;
       service.isScene = (IDs.length >= 3 && IDs[2] === 'SC') ? true : false;
       service.isClimateZone = (IDs.length >= 3 && IDs[2] === 'CZ') ? true : false;
