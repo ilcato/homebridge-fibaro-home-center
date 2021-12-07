@@ -82,6 +82,7 @@ export class FibaroAccessory {
                 break;
             }
             break;
+          case 'com.fibaro.baseShutter':
           case 'com.fibaro.barrier':
             service = this.platform.Service.GarageDoorOpener;
             this.mainCharacteristics =
