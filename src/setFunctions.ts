@@ -74,8 +74,6 @@ export class SetFunctions {
         return;
       }
       this.setGlobalVariable(IDs[1], value === true ? '100' : '0');
-    } else if (service.isHarmonyDevice) {
-      await this.command('changeActivityState', null, service, IDs);
     } else {
       await this.command(value === false ? 'turnOff' : 'turnOn', null, service, IDs);
     }
