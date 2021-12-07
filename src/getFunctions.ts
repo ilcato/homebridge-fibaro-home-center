@@ -154,44 +154,63 @@ export class GetFunctions {
     }
 
     async getCurrentTemperature(characteristic, service, IDs, properties) {
-      if (service.floatServiceId) {
+      if (service.isClimateZone) {
         try {
-          const properties = (await this.platform.fibaroClient.getDeviceProperties(service.floatServiceId)).body.properties;
-          if (!properties.value) {
+          const properties = (await this.platform.fibaroClient.getClimateZone(IDs[0])).body.properties;
+          if (!Object.prototype.hasOwnProperty.call(properties, 'currentTemperatureHeating')) {
             this.platform.log('No value for Temperature.', '');
             return;
           }
-          characteristic.updateValue(properties.value);
+          characteristic.updateValue(properties.currentTemperatureHeating);
         } catch (e) {
-          this.platform.log('There was a problem getting value from: ', `${service.floatServiceId} - Err: ${e}`);
+          this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
           return;
         }
-      } else {
-        let value = properties.value;
-        if (!value) {
-          value = properties.heatingThermostatSetpoint;
-          if (!value) {
+      } else if (service.isHeatingZone) {
+        try {
+          const properties = (await this.platform.fibaroClient.getHeatingZone(IDs[0])).body.properties;
+          if (!Object.prototype.hasOwnProperty.call(properties, 'currentTemperature')) {
             this.platform.log('No value for Temperature.', '');
             return;
           }
+          characteristic.updateValue(properties.currentTemperature);
+        } catch (e) {
+          this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
         }
+      } else {
+        const value = properties.value;
         characteristic.updateValue(value);
       }
     }
 
-    getTargetTemperature(characteristic, service, IDs, properties) {
-      if (isNaN(properties.heatingThermostatSetpoint)) {
-        this.platform.log('heatingThermostatSetpoint is not a number.', '');
-        return;
+    async getTargetTemperature(characteristic, service, IDs, properties) {
+      if (service.isClimateZone) {
+        try {
+          const properties = (await this.platform.fibaroClient.getClimateZone(IDs[0])).body.properties;
+          if (!properties.currentTemperatureHeating) {
+            this.platform.log('No value for Temperature.', '');
+            return;
+          }
+          characteristic.updateValue(properties.currentTemperatureHeating);
+        } catch (e) {
+          this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
+          return;
+        }
+      } else if (service.isHeatingZone) {
+        try {
+          const properties = (await this.platform.fibaroClient.getHeatingZone(IDs[0])).body.properties;
+          if (!Object.prototype.hasOwnProperty.call(properties, 'currentTemperature')) {
+            this.platform.log('No value for Temperature.', '');
+            return;
+          }
+          characteristic.updateValue(properties.currentTemperature);
+        } catch (e) {
+          this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
+        }
+      } else {
+        const value = properties.value;
+        characteristic.updateValue(value);
       }
-      const t = parseFloat(properties.heatingThermostatSetpoint);
-      if (t < characteristic.props.minValue) {
-        return;
-      }
-      characteristic.updateValue(t);
-      setTimeout(() => {
-        characteristic.setValue(t, undefined, 'fromFibaro');
-      }, 100);
     }
 
     getContactSensorState(characteristic, service, IDs, properties) {
@@ -253,39 +272,63 @@ export class GetFunctions {
         this.platform.Characteristic.LockCurrentState.UNSECURED);
     }
 
-    getCurrentHeatingCoolingState(characteristic, service, IDs, properties) {
-      switch (properties.thermostatMode) {
-        case 'Off': // OFF
-          characteristic.updateValue(this.platform.Characteristic.CurrentHeatingCoolingState.OFF);
-          break;
-        case 'Heat': // HEAT
-          characteristic.updateValue(this.platform.Characteristic.CurrentHeatingCoolingState.HEAT);
-          break;
-        case 'Cool': // COOL
-          characteristic.updateValue(this.platform.Characteristic.CurrentHeatingCoolingState.COOL);
-          break;
-        default:
-          break;
+    async getCurrentHeatingCoolingState(characteristic, service, IDs, properties) {
+      if (service.isClimateZone) {
+        try {
+          const properties = (await this.platform.fibaroClient.getClimateZone(IDs[0])).body.properties;
+          if (!properties.mode) {
+            this.platform.log('No value for heating cooling steate.', '');
+            return;
+          }
+          switch (properties.mode) {
+            case 'Off': // OFF
+              characteristic.updateValue(this.platform.Characteristic.CurrentHeatingCoolingState.OFF);
+              break;
+            case 'Heat': // HEAT
+              characteristic.updateValue(this.platform.Characteristic.CurrentHeatingCoolingState.HEAT);
+              break;
+            case 'Cool': // COOL
+              characteristic.updateValue(this.platform.Characteristic.CurrentHeatingCoolingState.COOL);
+              break;
+            default:
+              break;
+          }
+        } catch (e) {
+          this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
+          return;
+        }
+      } else if (service.isHeatingZone) {
+        characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
       }
     }
 
-    getTargetHeatingCoolingState(characteristic, service, IDs, properties) {
-      const m = properties.thermostatModeFuture ? properties.thermostatModeFuture : properties.thermostatMode;
-      switch (m) {
-        case 'Off': // OFF
-          characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.OFF);
-          break;
-        case 'Heat': // HEAT
-          characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
-          break;
-        case 'Cool': // COOL
-          characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.COOL);
-          break;
-        case 'Auto': // AUTO
-          characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.AUTO);
-          break;
-        default:
-          break;
+    async getTargetHeatingCoolingState(characteristic, service, IDs, properties) {
+      if (service.isClimateZone) {
+        try {
+          const properties = (await this.platform.fibaroClient.getClimateZone(IDs[0])).body.properties;
+          if (!properties.mode) {
+            this.platform.log('No value for heating cooling steate.', '');
+            return;
+          }
+          switch (properties.mode) {
+            case 'Off': // OFF
+              characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.OFF);
+              break;
+            case 'Heat': // HEAT
+              characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
+              break;
+            case 'Cool': // COOL
+              characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.COOL);
+              break;
+            default:
+              break;
+          }
+        } catch (e) {
+          this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
+          return;
+        }
+      } else if (service.isHeatingZone) {
+        characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
       }
     }
 
@@ -333,7 +376,7 @@ export class GetFunctions {
         this.platform.log('batteryLevel is not a number.', '');
         return;
       }
-      let batteryLevel = parseFloat(properties.batteryLevel);
+      const batteryLevel = parseFloat(properties.batteryLevel);
       const r = (batteryLevel <= 20 || batteryLevel > 100) ? 1 : 0;
       characteristic.updateValue(r);
     }

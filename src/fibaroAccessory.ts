@@ -42,7 +42,6 @@ export class FibaroAccessory {
           .setCharacteristic(this.platform.Characteristic.SerialNumber, `${properties.serialNumber || '<unknown>'}`);
 
         let service;
-        let floatServiceId;
         let subtype = this.device.id + '----';
 
         switch (this.device.type) {
@@ -164,24 +163,6 @@ export class FibaroAccessory {
             service = this.platform.Service.LockMechanism;
             this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
             break;
-          case 'com.fibaro.setPoint':
-          case 'com.fibaro.thermostatDanfoss':
-          case 'com.fibaro.com.fibaro.thermostatHorstmann':
-          case 'com.fibaro.FGT001':
-          case 'com.fibaro.hvacSystem':
-            service = this.platform.Service.Thermostat;
-            this.mainCharacteristics =
-                    [this.platform.Characteristic.CurrentTemperature,
-                      this.platform.Characteristic.TargetTemperature,
-                      this.platform.Characteristic.CurrentHeatingCoolingState,
-                      this.platform.Characteristic.TargetHeatingCoolingState,
-                      this.platform.Characteristic.TemperatureDisplayUnits];
-            // Check if there's a temperature Sensor and use it instead of the provided float value
-            if (this.siblings.get('com.fibaro.temperatureSensor')) {
-              floatServiceId = this.siblings.get('com.fibaro.temperatureSensor').id;
-              subtype = this.device.id + '---' + this.siblings.get('com.fibaro.temperatureSensor').id;
-            }
-            break;
           case 'com.fibaro.FGRGBW441M':
           case 'com.fibaro.colorController':
           case 'com.fibaro.FGRGBW442':
@@ -209,6 +190,26 @@ export class FibaroAccessory {
             this.mainCharacteristics = [this.platform.Characteristic.On];
             subtype = device.id + '--SC';
             break;
+          case 'climateZone':
+            service = this.platform.Service.Thermostat;
+            this.mainCharacteristics =
+                    [this.platform.Characteristic.CurrentTemperature,
+                      this.platform.Characteristic.TargetTemperature,
+                      this.platform.Characteristic.CurrentHeatingCoolingState,
+                      this.platform.Characteristic.TargetHeatingCoolingState,
+                      this.platform.Characteristic.TemperatureDisplayUnits];
+            subtype = device.id + '--CZ';
+            break;
+          case 'heatingZone':
+            service = this.platform.Service.Thermostat;
+            this.mainCharacteristics =
+                      [this.platform.Characteristic.CurrentTemperature,
+                        this.platform.Characteristic.TargetTemperature,
+                        this.platform.Characteristic.CurrentHeatingCoolingState,
+                        this.platform.Characteristic.TargetHeatingCoolingState,
+                        this.platform.Characteristic.TemperatureDisplayUnits];
+            subtype = device.id + '--HZ';
+            break;
           case 'G':
             service = this.platform.Service.Switch;
             this.mainCharacteristics = [this.platform.Characteristic.On];
@@ -230,7 +231,6 @@ export class FibaroAccessory {
           this.mainService = this.accessory.addService(new service(this.device.name));
           this.mainService.subtype = subtype;
         }
-        this.mainService.floatServiceId = floatServiceId;
         this.bindCharactersticsEvent(this.mainService, this.mainCharacteristics);
 
         if (this.device.interfaces && this.device.interfaces.includes('battery')) {
@@ -281,8 +281,8 @@ export class FibaroAccessory {
       const IDs = service.subtype.split('-');
       // IDs[0] is always device ID, "0" for security system and "G" for global variables switches
       // IDs[1] is reserved for the button ID for virtual devices, or the global variable name for global variable devices, otherwise is ""
-      // IDs[2] is a subdevice type "HP" for Harmony Plugin, "LOCK" for locks, "SC" for Scenes
-      // IDs[3] is the ID of a related device: FLOAT_SVC_ID (e.g.: a temperature sensor associated to a thermostat)
+      // IDs[2] is a subdevice type: "HP" for Harmony Plugin, "LOCK" for locks, "SC" for Scenes, "CZ" for Climate zones,
+      //                             "HZ" for heating zones, "G" for global variables, "D" for dimmer global variables
       service.isVirtual = IDs[1] !== '' ? true : false;
       service.isSecuritySystem = IDs[0] === '0' ? true : false;
       service.isGlobalVariableSwitch = IDs[0] === 'G' ? true : false;
@@ -290,9 +290,8 @@ export class FibaroAccessory {
       service.isHarmonyDevice = (IDs.length >= 3 && IDs[2] === 'HP') ? true : false;
       service.isLockSwitch = (IDs.length >= 3 && IDs[2] === 'LOCK') ? true : false;
       service.isScene = (IDs.length >= 3 && IDs[2] === 'SC') ? true : false;
-      if ((IDs.length >= 4 && IDs[3] !== '')) {
-        service.floatServiceId = IDs[3];
-      }
+      service.isClimateZone = (IDs.length >= 3 && IDs[2] === 'CZ') ? true : false;
+      service.isHeatingZone = (IDs.length >= 3 && IDs[2] === 'HZ') ? true : false;
 
       if (!service.isVirtual && !service.isScene) {
         let propertyChanged = 'value'; // subscribe to the changes of this property
@@ -408,10 +407,15 @@ export class FibaroAccessory {
             return;
           }
           try {
-            const properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
+            let properties;
+            if (!service.isClimateZone && !service.isHeatingZone) {
+              properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
+            } else {
+              properties = {};
+            }
             if (getFunction.function) {
               if (this.platform.config.FibaroTemperatureUnit === 'F') {
-                if (characteristic.displayName === 'Current Temperature') {
+                if (Object.prototype.hasOwnProperty.call(properties, 'value') && characteristic.displayName === 'Current Temperature') {
                   properties.value = (properties.value - 32) * 5 / 9;
                 }
               }

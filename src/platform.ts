@@ -26,6 +26,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
   public updateSubscriptions: Array<unknown>;
   public poller?: Poller;
   public scenes: Record<string, string>;
+  public climateZones: Record<string, string>;
   public info: Record<string, string>;
   public fibaroClient?: FibaroClient;
   public setFunctions?: SetFunctions;
@@ -40,6 +41,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
   ) {
     this.updateSubscriptions = [];
     this.scenes = {};
+    this.climateZones = {};
     this.mutex = new Mutex();
     this.info = {};
 
@@ -105,6 +107,21 @@ export class FibaroHC implements DynamicPlatformPlugin {
             this.addAccessory(device, null);
           }
         });
+        if (this.isOldApi()) {
+          const heatingZones = (await this.fibaroClient.getHeatingZones()).body;
+          heatingZones.map((s) => {
+            this.climateZones[s.name] = s.id;
+            const device = { name: s.name, roomID: 0, id: s.id, type: 'heatingZone', properties: s.properties };
+            this.addAccessory(device, null);
+          });
+        } else {
+          const climateZones = (await this.fibaroClient.getClimateZones()).body;
+          climateZones.map((s) => {
+            this.climateZones[s.name] = s.id;
+            const device = { name: s.name, roomID: 0, id: s.id, type: 'climateZone', properties: s.properties };
+            this.addAccessory(device, null);
+          });
+        }
         this.setFunctions = new SetFunctions(this);	// There's a dependency in setFunction to Scene Mapping
         const devices = this.fibaroClient ? (await this.fibaroClient.getDevices()).body : {};
         let rooms = null;
@@ -208,7 +225,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
       // Create accessory handler
       const fa = new FibaroAccessory(this, accessory, device, sibling);
       if (fa.isValid) {
-      // link the accessory to the platform
+        // link the accessory to the platform
         this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
 
         this.accessories.push(accessory);
@@ -259,7 +276,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
 
   isOldApi() {
     return this.info && this.info.serialNumber &&
-        (this.info.serialNumber.indexOf('HC2-') === 0 || this.info.serialNumber.indexOf('HLC-') === 0);
+      (this.info.serialNumber.indexOf('HC2-') === 0 || this.info.serialNumber.indexOf('HLC-') === 0);
   }
 
 }
