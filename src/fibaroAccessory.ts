@@ -230,9 +230,9 @@ export class FibaroAccessory {
         this.bindCharactersticsEvent(this.mainService, this.mainCharacteristics);
 
         if (this.device.interfaces && this.device.interfaces.includes('battery')) {
-          this.batteryService = this.accessory.getService(this.platform.Service.BatteryService);
+          this.batteryService = this.accessory.getService(this.platform.Service.Battery);
           if (!this.batteryService) {
-            this.batteryService = this.accessory.addService(new this.platform.Service.BatteryService(this.device.name + ' Battery'));
+            this.batteryService = this.accessory.addService(new this.platform.Service.Battery(this.device.name + ' Battery'));
           }
           if (!this.batteryService.subtype) {
             this.batteryService.subtype = this.device.id + '----';
@@ -249,7 +249,7 @@ export class FibaroAccessory {
           const s = this.accessory.services[t];
           if (s.displayName !== this.mainService.displayName &&
                 s.UUID !== this.platform.Service.AccessoryInformation.UUID &&
-                s.UUID !== this.platform.Service.BatteryService.UUID) {
+                s.UUID !== this.platform.Service.Battery.UUID) {
             this.accessory.removeService(s);
           }
         }

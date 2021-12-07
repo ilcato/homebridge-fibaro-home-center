@@ -367,8 +367,7 @@ export class GetFunctions {
     }
 
     getChargingState(characteristic, service, IDs, properties) {
-      const r = 0;//parseFloat(properties.batteryLevel);
-      characteristic.updateValue(r);
+      characteristic.updateValue(0);
     }
 
     getStatusLowBattery(characteristic, service, IDs, properties) {
