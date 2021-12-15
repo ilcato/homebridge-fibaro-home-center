@@ -31,5 +31,5 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Last release notes
-Version 1.2.3
-+ Removed Logitech Harmony implementation. Please use the specific homebridge plugin
+Version 1.2.4
++ Removed again virtual devices

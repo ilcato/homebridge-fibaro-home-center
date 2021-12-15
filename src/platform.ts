@@ -276,7 +276,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
 
   isOldApi() {
     return this.info && this.info.serialNumber &&
-      (this.info.serialNumber.indexOf('HC2-') === 0 || this.info.serialNumber.indexOf('HLC-') === 0);
+      (this.info.serialNumber.indexOf('HC2-') === 0 || this.info.serialNumber.indexOf('HCL-') === 0);
   }
 
 }
