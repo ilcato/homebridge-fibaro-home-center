@@ -73,7 +73,23 @@
           }
         ],
         "default": "disabled"
-      }
+      },
+      "addRoomNameToDeviceName": {
+        "description": "Enable or disable adding the Room name to the device name.",
+        "title": "Add room name to devices",
+        "type": "string",
+        "oneOf": [
+          {
+            "title": "Enabled",
+            "enum": ["enabled"]
+          },
+          {
+            "title": "Disabled",
+            "enum": ["disabled"]
+          }
+        ],
+        "default": "disabled"
+      }      
     }
   },
   "form": null,
