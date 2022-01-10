@@ -345,9 +345,25 @@ export class GetFunctions {
     }
 
     getCurrentDoorState(characteristic, service, IDs, properties) {
-      characteristic.updateValue(properties.state === 'Closed' ?
-        this.platform.Characteristic.CurrentDoorState.CLOSED :
-        this.platform.Characteristic.CurrentDoorState.OPEN);
+      switch(properties.state) {
+        case 'Closed':
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
+          break;
+        case 'Opened':
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
+          break;
+        case 'Opening':
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPENING);
+          break;
+        case 'Closing':
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSING);
+          break;
+        case 'Stopped':
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.STOPPED);
+          break;
+        default:
+          break;
+      }
     }
 
     getObstructionDetected(characteristic, service, IDs, properties) {
