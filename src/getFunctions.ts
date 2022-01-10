@@ -358,7 +358,7 @@ export class GetFunctions {
         case 'Closing':
           characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSING);
           break;
-        case 'Stopped':
+        case 'Unknow':
           characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.STOPPED);
           break;
         default:
