@@ -49,7 +49,7 @@ export class FibaroClient {
     this.headers = {
       'Authorization': this.auth,
     };
-    this.https = this.url.indexOf('https:') !== -1;
+    this.https = (this.url) ? this.url.indexOf('https:') !== -1 : false;
     this.ca = null;
 
     if (this.url && this.https) {
