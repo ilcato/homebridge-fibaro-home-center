@@ -33,6 +33,7 @@
   ],
   "dependencies": {
     "async-mutex": "^0.3.2",
+    "dns-packet": "^5.3.1",
     "superagent": "^7.0.1",
     "superagent-throttle": "^1.0.1"
   },
