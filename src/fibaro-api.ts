@@ -37,18 +37,18 @@ export class FibaroClient {
   url: string;
   host: string;
   auth: string;
-  headers: unknown;
+  adminAuth : any;
   https: boolean;
   ca: unknown;
   status: boolean;
 
-  constructor(url, host, username, password, log) {
+  constructor(url, host, username, password, log, adminUsername, adminPassword) {
     this.url = url;
     this.host = host;
     this.auth = 'Basic ' + new Buffer.from(username + ':' + password).toString('base64');
-    this.headers = {
-      'Authorization': this.auth,
-    };
+    if (adminUsername) {
+      this.adminAuth = 'Basic ' + new Buffer(adminUsername + ':' + adminPassword).toString('base64');
+    }
     this.https = (this.url) ? this.url.indexOf('https:') !== -1 : false;
     this.ca = null;
 
@@ -153,6 +153,26 @@ export class FibaroClient {
     }
   }
 
+  genericAdminPut(service, body) {
+    const url = this.composeURL(service);
+    if (this.https) {
+      return superagent
+        .put(url)
+        .use(throttle.plugin())
+        .send(body)
+        .set('Authorization', this.adminAuth)
+        .set('accept', 'json')
+        .ca(this.ca);
+    } else {
+      return superagent
+        .put(url)
+        .use(throttle.plugin())
+        .send(body)
+        .set('Authorization', this.adminAuth)
+        .set('accept', 'json');
+    }
+  }
+
   getInfo() {
     return this.genericGet('/api/settings/info');
   }
@@ -243,6 +263,6 @@ export class FibaroClient {
       'value': value,
       'invokeScenes': true,
     } : null;
-    return this.genericPut('/api/globalVariables/' + globalVariableID, body);
+    return this.genericAdminPut('/api/globalVariables/' + globalVariableID, body);
   }
 }
