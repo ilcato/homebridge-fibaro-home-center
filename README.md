@@ -35,3 +35,4 @@ Version 1.2.7
 + Use ca.cer only for https urls
 + Support for garage door opener additonal states (opening, closing, stopped)
 + update dependencies
++ Fix issue #71
