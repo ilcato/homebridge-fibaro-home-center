@@ -57,7 +57,7 @@ export class GetFunctions {
         [(new platform.Characteristic.Hue()).UUID, { 'function': this.getHue, 'delay': 0 }],
         [(new platform.Characteristic.Saturation()).UUID, { 'function': this.getSaturation, 'delay': 0 }],
         [(new platform.Characteristic.CurrentDoorState()).UUID, { 'function': this.getCurrentDoorState, 'delay': 0 }],
-        [(new platform.Characteristic.TargetDoorState()).UUID, { 'function': this.getCurrentDoorState, 'delay': 0 }],
+        [(new platform.Characteristic.TargetDoorState()).UUID, { 'function': this.getTargetDoorState, 'delay': 0 }],
         [(new platform.Characteristic.ObstructionDetected()).UUID, { 'function': this.getObstructionDetected, 'delay': 0 }],
         [(new platform.Characteristic.BatteryLevel()).UUID, { 'function': this.getBatteryLevel, 'delay': 0 }],
         [(new platform.Characteristic.ChargingState()).UUID, { 'function': this.getChargingState, 'delay': 0 }],
@@ -346,20 +346,42 @@ export class GetFunctions {
 
     getCurrentDoorState(characteristic, service, IDs, properties) {
       switch(properties.state) {
-        case 'Closed':
-          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
-          break;
         case 'Opened':
           characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
           break;
         case 'Opening':
-          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPENING);
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
           break;
         case 'Closing':
-          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSING);
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
+          break;
+        case 'Closed':
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
           break;
         case 'Unknow':
           characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.STOPPED);
+          break;
+        default:
+          break;
+      }
+    }
+
+    getTargetDoorState(characteristic, service, IDs, properties) {
+      switch(properties.state) {
+        case 'Opened':
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
+          break;
+        case 'Opening':
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
+          break;
+        case 'Closing':
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
+          break;
+        case 'Closed':
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
+          break;
+        case 'Unknow':
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
           break;
         default:
           break;
