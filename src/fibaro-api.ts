@@ -38,6 +38,7 @@ export class FibaroClient {
   host: string;
   auth: string;
   headers: unknown;
+  https: boolean;
   ca: unknown;
   status: boolean;
 
@@ -48,8 +49,11 @@ export class FibaroClient {
     this.headers = {
       'Authorization': this.auth,
     };
+    this.https = (this.url) ? this.url.indexOf('https:') !== -1 : false;
+    this.ca = null;
 
-    if (this.url) {
+    if (this.url && this.https) {
+
       const configPath = '/homebridge';
       try {
         this.ca = fs.readFileSync(configPath + '/ca.cer');
@@ -75,7 +79,7 @@ export class FibaroClient {
         }
       }
     }
-    if (this.url && !this.ca) {
+    if (this.url && this.https && !this.ca) {
       log('Put a valid ca.cer file in config.json folder.');
       this.status = false;
     } else {
@@ -93,34 +97,60 @@ export class FibaroClient {
 
   async genericGet(service) {
     const url = this.composeURL(service);
-    return superagent
-      .get(url)
-      .use(throttle.plugin())
-      .set('Authorization', this.auth)
-      .set('accept', 'json')
-      .ca(this.ca);
+    if (this.https) {
+      return superagent
+        .get(url)
+        .use(throttle.plugin())
+        .set('Authorization', this.auth)
+        .set('accept', 'json')
+        .ca(this.ca);
+    } else {
+      return superagent
+        .get(url)
+        .use(throttle.plugin())
+        .set('Authorization', this.auth)
+        .set('accept', 'json');
+    }
   }
 
   genericPost(service, body) {
     const url = this.composeURL(service);
-    return superagent
-      .post(url)
-      .use(throttle.plugin())
-      .send(body)
-      .set('Authorization', this.auth)
-      .set('accept', 'json')
-      .ca(this.ca);
+    if (this.https) {
+      return superagent
+        .post(url)
+        .use(throttle.plugin())
+        .send(body)
+        .set('Authorization', this.auth)
+        .set('accept', 'json')
+        .ca(this.ca);
+    } else {
+      return superagent
+        .post(url)
+        .use(throttle.plugin())
+        .send(body)
+        .set('Authorization', this.auth)
+        .set('accept', 'json');
+    }
   }
 
   genericPut(service, body) {
     const url = this.composeURL(service);
-    return superagent
-      .put(url)
-      .use(throttle.plugin())
-      .send(body)
-      .set('Authorization', this.auth)
-      .set('accept', 'json')
-      .ca(this.ca);
+    if (this.https) {
+      return superagent
+        .put(url)
+        .use(throttle.plugin())
+        .send(body)
+        .set('Authorization', this.auth)
+        .set('accept', 'json')
+        .ca(this.ca);
+    } else {
+      return superagent
+        .put(url)
+        .use(throttle.plugin())
+        .send(body)
+        .set('Authorization', this.auth)
+        .set('accept', 'json');
+    }
   }
 
   getInfo() {
