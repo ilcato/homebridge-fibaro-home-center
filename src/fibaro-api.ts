@@ -79,7 +79,7 @@ export class FibaroClient {
         }
       }
     }
-    if (this.url && !this.ca) {
+    if (this.url && this.https && !this.ca) {
       log('Put a valid ca.cer file in config.json folder.');
       this.status = false;
     } else {
