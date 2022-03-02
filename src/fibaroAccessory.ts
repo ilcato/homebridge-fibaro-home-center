@@ -95,6 +95,7 @@ export class FibaroAccessory {
           case 'com.fibaro.FGR223':
           case 'com.fibaro.rollerShutter':
           case 'com.fibaro.FGWR111':
+          case 'com.fibaro.remoteBaseShutter':
             service = this.platform.Service.WindowCovering;
             this.mainCharacteristics = [
               this.platform.Characteristic.CurrentPosition,
