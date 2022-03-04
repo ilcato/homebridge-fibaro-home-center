@@ -58,6 +58,19 @@
         "type": "string",
         "required": false
       },
+      "adminUsername": {
+        "title": "Admin username for accessing Fibaro Home Center machine (only for setting global variables).",
+        "type": "string",
+        "placeholder": "admin",
+        "required": false,
+        "description": "If user provided above doesn't have admin rights in your Home Center, enter admin username of your Home Center to set global variables."
+      },
+      "adminPassword": {
+        "title": "Admin password for accessing Fibaro Home Center machine (only for setting global variables).",
+        "type": "string",
+        "required": false,
+        "description": "If user provided above doesn't have admin rights in your Home Center, enter password of your Home Center to set global variables."
+      },
       "securitysystem": {
         "description": "Enable or disable the Security system, see wiki for detail.",
         "title": "Security system",
@@ -65,11 +78,15 @@
         "oneOf": [
           {
             "title": "Enabled",
-            "enum": ["enabled"]
+            "enum": [
+              "enabled"
+            ]
           },
           {
             "title": "Disabled",
-            "enum": ["disabled"]
+            "enum": [
+              "disabled"
+            ]
           }
         ],
         "default": "disabled"
@@ -81,15 +98,19 @@
         "oneOf": [
           {
             "title": "Enabled",
-            "enum": ["enabled"]
+            "enum": [
+              "enabled"
+            ]
           },
           {
             "title": "Disabled",
-            "enum": ["disabled"]
+            "enum": [
+              "disabled"
+            ]
           }
         ],
         "default": "disabled"
-      }      
+      }
     }
   },
   "form": null,

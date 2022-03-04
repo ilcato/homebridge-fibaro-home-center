@@ -73,7 +73,8 @@ export class FibaroHC implements DynamicPlatformPlugin {
       this.config.addRoomNameToDeviceName = 'disabled';
     }
 
-    this.fibaroClient = new FibaroClient(this.config.url, this.config.host, this.config.username, this.config.password, this.log);
+    this.fibaroClient = new FibaroClient(this.config.url, this.config.host, this.config.username, this.config.password, this.log,
+      this.config.adminUsername, this.config.adminPassword);
     if (this.fibaroClient.status === false) {
       this.log.error('Cannot connect to Fibaro Home Center. Check credentials, url/host or ca.cer file');
       return;

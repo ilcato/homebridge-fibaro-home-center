@@ -31,8 +31,5 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Last release notes
-Version 1.2.7
-+ Use ca.cer only for https urls
-+ Support for garage door opener additonal states (opening, closing, stopped)
-+ update dependencies
-+ Fix issue #71
+Version 1.2.8
++ Use admin user for setting global variables
