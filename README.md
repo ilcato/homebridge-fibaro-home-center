@@ -33,4 +33,4 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 # Last release notes
 Version 1.2.8
 + Use admin user for setting global variables
-+ Added support to Nice roller shutters
++ Added partial support to Nice roller shutters
