@@ -31,6 +31,5 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Last release notes
-Version 1.2.8
-+ Use admin user for setting global variables
-+ Added partial support to Nice roller shutters
+Version 1.2.9
++ Increase max target tgemperature to 100°
