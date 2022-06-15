@@ -271,6 +271,9 @@ export class FibaroAccessory {
         if (characteristic.UUID === this.platform.Characteristic.CurrentTemperature.UUID) {
           characteristic.props.minValue = -50;
         }
+        if (characteristic.UUID === this.platform.Characteristic.TargetTemperature.UUID) {
+          characteristic.props.maxValue = 100;
+        }
         this.bindCharacteristicEvents(characteristic, service);
       }
     }
