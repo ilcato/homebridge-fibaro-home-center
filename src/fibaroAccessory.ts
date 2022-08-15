@@ -128,6 +128,7 @@ export class FibaroAccessory {
           case 'com.fibaro.FGDW002':
           case 'com.fibaro.windowSensor':
           case 'com.fibaro.satelZone':
+          case 'com.fibaro.doorWindowSensor':
             service = this.platform.Service.ContactSensor;
             this.mainCharacteristics = [this.platform.Characteristic.ContactSensorState];
             break;
