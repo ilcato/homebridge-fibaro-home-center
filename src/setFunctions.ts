@@ -39,6 +39,7 @@ export class SetFunctions {
       [this.platform.Characteristic.Hue.UUID, this.setHue],
       [this.platform.Characteristic.Saturation.UUID, this.setSaturation],
       [this.platform.Characteristic.SecuritySystemTargetState.UUID, this.setSecuritySystemTargetState],
+      [this.platform.Characteristic.Active.UUID, this.setActive],
     ]);
 
     this.getTargetSecuritySystemSceneMapping = new Map([
@@ -210,6 +211,11 @@ export class SetFunctions {
     await this.scene(sceneID);
   }
 
+  async setActive(value, context, characteristic, service, IDs) {
+    const action = (value === this.platform.Characteristic.Active.ACTIVE) ? 'turnOn' : 'turnOff';
+    await this.command(action, null, service, IDs);
+  }
+  
   async updateHomeCenterColorFromHomeKit(h, s, service, IDs) {
     if (h !== null) {
       service.h = h;
