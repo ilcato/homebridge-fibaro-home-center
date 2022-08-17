@@ -62,6 +62,8 @@ export class GetFunctions {
         [(new platform.Characteristic.BatteryLevel()).UUID, { 'function': this.getBatteryLevel, 'delay': 0 }],
         [(new platform.Characteristic.ChargingState()).UUID, { 'function': this.getChargingState, 'delay': 0 }],
         [(new platform.Characteristic.StatusLowBattery()).UUID, { 'function': this.getStatusLowBattery, 'delay': 0 }],
+        [(new platform.Characteristic.Active()).UUID, { 'function': this.getActive, 'delay': 0 }],
+        [(new platform.Characteristic.InUse()).UUID, { 'function': this.getInUse, 'delay': 0 }],
       ]);
       this.getCurrentSecuritySystemStateMapping = new Map([
         ['AwayArmed', this.platform.Characteristic.SecuritySystemCurrentState.AWAY_ARM],
@@ -428,6 +430,20 @@ export class GetFunctions {
       if (r !== undefined) {
         characteristic.updateValue(r);
       }
+    }
+
+    getActive(characteristic, service, IDs, properties) {
+      const v = this.getBoolean(properties.value);
+      characteristic.updateValue(v === false ?
+        this.platform.Characteristic.Active.INACTIVE :
+        this.platform.Characteristic.Active.ACTIVE);
+    }
+
+    getInUse(characteristic, service, IDs, properties) {
+      const v = this.getBoolean(properties.value);
+      characteristic.updateValue(v === false ?
+        this.platform.Characteristic.InUse.NOT_IN_USE :
+        this.platform.Characteristic.InUse.IN_USE);
     }
 
     updateHomeKitColorFromHomeCenter(color, service) {

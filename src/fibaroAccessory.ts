@@ -76,6 +76,14 @@ export class FibaroAccessory {
                 subtype = device.id + '--' + 'LOCK';
                 this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
                 break;
+              case 26: // valve
+                service = this.platform.Service.Valve;
+                this.mainCharacteristics = [
+                  this.platform.Characteristic.Active,
+                  this.platform.Characteristic.InUse,
+                  this.platform.Characteristic.ValveType,
+                ];
+                break;
               default:
                 service = this.platform.Service.Switch;
                 this.mainCharacteristics = [this.platform.Characteristic.On];
@@ -275,6 +283,9 @@ export class FibaroAccessory {
         if (characteristic.UUID === this.platform.Characteristic.TargetTemperature.UUID) {
           characteristic.props.maxValue = 100;
         }
+        if (characteristic.UUID === this.platform.Characteristic.ValveType.UUID) {
+          characteristic.value = this.platform.Characteristic.ValveType.GENERIC_VALVE;
+        }
         this.bindCharacteristicEvents(characteristic, service);
       }
     }
@@ -297,7 +308,8 @@ export class FibaroAccessory {
       service.isClimateZone = (IDs.length >= 3 && IDs[2] === 'CZ') ? true : false;
       service.isHeatingZone = (IDs.length >= 3 && IDs[2] === 'HZ') ? true : false;
 
-      if (!service.isVirtual && !service.isScene) {
+      if (!service.isVirtual && !service.isScene
+        && characteristic.UUID !== this.platform.Characteristic.ValveType.UUID) {
         let propertyChanged = 'value'; // subscribe to the changes of this property
         if (characteristic.UUID === this.platform.Characteristic.Hue.UUID
                 || characteristic.UUID === this.platform.Characteristic.Saturation.UUID) {
@@ -325,7 +337,8 @@ export class FibaroAccessory {
         callback();
       });
       characteristic.on('get', async (callback) => {
-        if (characteristic.UUID === this.platform.Characteristic.Name.UUID) {
+        if (characteristic.UUID === this.platform.Characteristic.Name.UUID
+          || characteristic.UUID === this.platform.Characteristic.ValveType.UUID) {
           callback(undefined, characteristic.value);
           return;
         }
