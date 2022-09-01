@@ -22,7 +22,8 @@
             "adminUsername": "PUT ADMIN USERNAME OF YOUR HOME CENTER HERE TO SET GLOBAL VARIABLES",
             "adminPassword": "PUT ADMIN PASSWORD OF YOUR HOME CENTER HERE TO SET GLOBAL VARIABLES",
             "securitysystem": "PUT enabled OR disabled IN ORDER TO MANAGE THE AVAILABILITY OF THE SECURITY SYSTEM",
-            "addRoomNameToDeviceName" : "PUT enabled OR disabled IN ORDER TO ADD THE ROOM NAME TO DEVIVE NAME. DEFAULT disabled"
+            "addRoomNameToDeviceName" : "PUT enabled OR disabled IN ORDER TO ADD THE ROOM NAME TO DEVIVE NAME. DEFAULT disabled",
+            "doorbellDeviceId" : "PUT HOME CENTER BINARY SENSOR DEVICE ID ACTING AS A DOORBELL"
         }
 
     ],

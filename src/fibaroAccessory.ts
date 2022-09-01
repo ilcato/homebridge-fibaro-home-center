@@ -137,8 +137,13 @@ export class FibaroAccessory {
           case 'com.fibaro.windowSensor':
           case 'com.fibaro.satelZone':
           case 'com.fibaro.doorWindowSensor':
-            service = this.platform.Service.ContactSensor;
-            this.mainCharacteristics = [this.platform.Characteristic.ContactSensorState];
+            if (this.device.id === this.platform.config.doorbellDeviceId) {
+              service = this.platform.Service.Doorbell;
+              this.mainCharacteristics = [this.platform.Characteristic.ProgrammableSwitchEvent];
+            } else {
+              service = this.platform.Service.ContactSensor;
+              this.mainCharacteristics = [this.platform.Characteristic.ContactSensorState];
+            }
             break;
           case 'com.fibaro.FGFS101':
           case 'com.fibaro.floodSensor':

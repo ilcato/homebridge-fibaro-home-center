@@ -110,6 +110,12 @@
           }
         ],
         "default": "disabled"
+      },
+      "doorbellDeviceId": {
+        "description": "Device ID acting as a doorbell (Only binary type of sensors are supported)",
+        "title": "Doorbell device ID",
+        "type": "integer",
+        "required": false
       }
     }
   },
