@@ -64,6 +64,7 @@ export class GetFunctions {
         [(new platform.Characteristic.StatusLowBattery()).UUID, { 'function': this.getStatusLowBattery, 'delay': 0 }],
         [(new platform.Characteristic.Active()).UUID, { 'function': this.getActive, 'delay': 0 }],
         [(new platform.Characteristic.InUse()).UUID, { 'function': this.getInUse, 'delay': 0 }],
+        [(new platform.Characteristic.ProgrammableSwitchEvent()).UUID, { 'function': this.getProgrammableSwitchEvent, 'delay': 0 }],
       ]);
       this.getCurrentSecuritySystemStateMapping = new Map([
         ['AwayArmed', this.platform.Characteristic.SecuritySystemCurrentState.AWAY_ARM],
@@ -444,6 +445,13 @@ export class GetFunctions {
       characteristic.updateValue(v === false ?
         this.platform.Characteristic.InUse.NOT_IN_USE :
         this.platform.Characteristic.InUse.IN_USE);
+    }
+
+    getProgrammableSwitchEvent(characteristic, service, IDs, properties) {
+      const v = this.getBoolean(properties.value);
+      if (v) {
+        characteristic.updateValue(this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS)
+      }
     }
 
     updateHomeKitColorFromHomeCenter(color, service) {
