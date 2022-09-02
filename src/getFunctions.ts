@@ -450,7 +450,7 @@ export class GetFunctions {
     getProgrammableSwitchEvent(characteristic, service, IDs, properties) {
       const v = this.getBoolean(properties.value);
       if (v) {
-        characteristic.updateValue(this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS)
+        characteristic.updateValue(this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
       }
     }
 

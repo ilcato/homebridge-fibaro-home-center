@@ -167,6 +167,26 @@ export class FibaroAccessory {
             service = this.platform.Service.LightSensor;
             this.mainCharacteristics = [this.platform.Characteristic.CurrentAmbientLightLevel];
             break;
+          case 'com.fibaro.multilevelSensor':
+            switch (properties.deviceRole) {
+              case 'TemperatureSensor':
+                service = this.platform.Service.TemperatureSensor;
+                this.mainCharacteristics = [this.platform.Characteristic.CurrentTemperature];
+                break;
+              case 'HumiditySensor':
+                service = this.platform.Service.HumiditySensor;
+                this.mainCharacteristics = [this.platform.Characteristic.CurrentRelativeHumidity];
+                break;
+              case 'LightSensor':
+              case 'MultilevelSensor':
+                service = this.platform.Service.LightSensor;
+                this.mainCharacteristics = [this.platform.Characteristic.CurrentAmbientLightLevel];
+                break;
+              default:
+                this.isValid = false;
+                return;
+            }
+            break;
           case 'com.fibaro.FGWP101':
           case 'com.fibaro.FGWP102':
           case 'com.fibaro.FGWPG111':
