@@ -398,10 +398,10 @@ export class FibaroAccessory {
 
     async getCharacteristicValue(callback, characteristic, service, accessory, IDs) {
       this.platform.log.info('Getting value from device: ', `${IDs[0]}  parameter: ${characteristic.displayName}`);
+      callback(undefined, characteristic.value);
       try {
         if (!this.platform.fibaroClient) {
           this.platform.log.error('No Fibaro client available.');
-          callback(undefined, characteristic.value);
           return;
         }
         // Manage security system status
@@ -410,7 +410,6 @@ export class FibaroAccessory {
           if (this.platform.getFunctions) {
             this.platform.getFunctions.getSecuritySystemState(characteristic, service, IDs, securitySystemStatus);
           }
-          callback(undefined, characteristic.value);
           return;
         }
         // Manage global variable switches
@@ -419,7 +418,6 @@ export class FibaroAccessory {
           if (this.platform.getFunctions) {
             this.platform.getFunctions.getBool(characteristic, service, IDs, switchStatus);
           }
-          callback(undefined, characteristic.value);
           return;
         }
         // Manage global variable dimmers
@@ -432,17 +430,13 @@ export class FibaroAccessory {
               this.platform.getFunctions.getBool(characteristic, service, IDs, value);
             }
           }
-          callback(undefined, characteristic.value);
           return;
         }
       } catch (e) {
         this.platform.log.error('There was a problem getting value from Global Variables', ` - Err: ${e}`);
-        callback(undefined, characteristic.value);
         return;
       }
-      // Manage all other status
       if (!this.platform.getFunctions) {
-        callback(undefined, characteristic.value);
         return;
       }
 
@@ -477,11 +471,6 @@ export class FibaroAccessory {
         } catch (e) {
           service.dead = true;
           this.platform.log.error('G1 - There was a problem getting value from: ', `${IDs[0]} - Err: ${e}`);
-        }
-        if (service.dead) {
-          callback(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-        } else {
-          callback(undefined, characteristic.value);
         }
       }
     }
