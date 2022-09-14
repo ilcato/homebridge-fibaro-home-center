@@ -32,5 +32,6 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Last release notes
-Version 1.2.9
-+ Increase max target tgemperature to 100°
+Version 1.2.10
++ Fix service type for Wall Socket binarySwitch #114
+
