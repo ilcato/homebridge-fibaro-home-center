@@ -33,5 +33,8 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 # Last release notes
 Version 1.2.10
-+ Fix service type for Wall Socket binarySwitch #114
++ Support multilevel sensor
++ Support doorbell
++ Support valve
++ Increase max target temperature to 100
 
