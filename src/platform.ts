@@ -105,7 +105,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
           this.scenes[s.name] = s.id;
           if (s.name.startsWith('_')) {
             const device = { name: s.name.substring(1), roomID: 0, id: s.id, type: 'scene' };
-            this.addAccessory(device, null);
+            this.addAccessory(device);
           }
         });
         if (this.isOldApi()) {
@@ -113,14 +113,14 @@ export class FibaroHC implements DynamicPlatformPlugin {
           heatingZones.map((s) => {
             this.climateZones[s.name] = s.id;
             const device = { name: s.name, roomID: 0, id: s.id, type: 'heatingZone', properties: s.properties };
-            this.addAccessory(device, null);
+            this.addAccessory(device);
           });
         } else {
           const climateZones = (await this.fibaroClient.getClimateZones()).body;
           climateZones.map((s) => {
             this.climateZones[s.name] = s.id;
             const device = { name: s.name, roomID: 0, id: s.id, type: 'climateZone', properties: s.properties };
-            this.addAccessory(device, null);
+            this.addAccessory(device);
           });
         }
         this.setFunctions = new SetFunctions(this);	// There's a dependency in setFunction to Scene Mapping
@@ -153,13 +153,12 @@ export class FibaroHC implements DynamicPlatformPlugin {
     this.log.info('Loading accessories');
     devices.map((s, i, a) => {
       if (s.visible === true && !s.name.startsWith('_')) {
-        const siblings = this.findSiblingDevices(s, a);
         if (rooms !== null) {
           // patch device name
           const room = rooms.find(r => r.id === s.roomID);
           s.name = s.name + ' - ' + (room !== null ? room.name : 'no-room');
         }
-        this.addAccessory(s, siblings);
+        this.addAccessory(s);
       }
     });
 
@@ -169,7 +168,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
         const globalVariables = param.split(',');
         for (let i = 0; i < globalVariables.length; i++) {
           const device = { name: globalVariables[i], roomID: 0, id: 0, type: type };
-          this.addAccessory(device, null);
+          this.addAccessory(device);
         }
       }
     };
@@ -180,7 +179,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
     // Create Security System accessory
     if (this.config.securitysystem === 'enabled') {
       const device = { name: 'FibaroSecuritySystem', roomID: 0, id: 0, type: 'securitySystem' };
-      this.addAccessory(device, null);
+      this.addAccessory(device);
     }
 
     // Remove not reviewd accessories: cached accessories no more present in Home Center
@@ -196,7 +195,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
     }
   }
 
-  addAccessory(device, sibling) {
+  addAccessory(device) {
     if (device === undefined) {
       return;
     }
@@ -213,7 +212,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
       this.api.updatePlatformAccessories([existingAccessory]);
 
       // Create accessory handler
-      new FibaroAccessory(this, existingAccessory, device, sibling);
+      new FibaroAccessory(this, existingAccessory, device);
 
     } else {
       // the accessory does not yet exist, so we need to create it
@@ -224,7 +223,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
       accessory.context.reviewed = true;
 
       // Create accessory handler
-      const fa = new FibaroAccessory(this, accessory, device, sibling);
+      const fa = new FibaroAccessory(this, accessory, device);
       if (fa.isValid) {
         // link the accessory to the platform
         this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
@@ -243,20 +242,6 @@ export class FibaroHC implements DynamicPlatformPlugin {
         this.accessories.splice(index, 1);
       }
     });
-  }
-
-  findSiblingDevices(device, devices) {
-    const siblings = new Map<string, unknown>();
-
-    devices.map((s) => {
-      if (s.visible === true && s.name.charAt(0) !== '_') {
-        if (device.parentId === s.parentId && device.id !== s.id) {
-          siblings.set(s.type, s);
-        }
-      }
-    });
-
-    return siblings;
   }
 
   findServiceByName(name, service) {

@@ -27,7 +27,6 @@ export class FibaroAccessory {
         private readonly platform: FibaroHC,
         private readonly accessory: PlatformAccessory,
         private readonly device,
-        private readonly siblings,
     ) {
       this.isValid = true;
       // set accessory information
