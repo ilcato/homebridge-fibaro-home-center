@@ -32,9 +32,5 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 
 # Last release notes
-Version 1.2.10
-+ Support multilevel sensor
-+ Support doorbell
-+ Support valve
-+ Increase max target temperature to 100
-
+Version 1.2.14
++ Fixed double call #72 #108 #111 
