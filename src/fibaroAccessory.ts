@@ -71,6 +71,10 @@ export class FibaroAccessory {
                 service = this.platform.Service.Lightbulb;
                 this.mainCharacteristics = [this.platform.Characteristic.On];
                 break;
+              case 20: // Wall Socket
+                service = this.platform.Service.Outlet;
+                this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
+                break;
               case 25: // Video gate open
                 service = this.platform.Service.LockMechanism;
                 subtype = device.id + '--' + 'LOCK';
