@@ -448,43 +448,41 @@ export class FibaroAccessory {
 
       const getFunction = this.platform.getFunctions.getFunctionsMapping.get(characteristic.UUID);
       if (getFunction) {
-        setTimeout(async () => {
-          if (!this.platform.fibaroClient) {
-            return;
-          }
-          try {
-            let properties;
-            if (!service.isClimateZone && !service.isHeatingZone) {
-              properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
-            } else {
-              properties = {};
-            }
-            if (getFunction.function) {
-              if (this.platform.config.FibaroTemperatureUnit === 'F') {
-                if (Object.prototype.hasOwnProperty.call(properties, 'value') && characteristic.displayName === 'Current Temperature') {
-                  properties.value = (properties.value - 32) * 5 / 9;
-                }
-              }
-              if (Object.prototype.hasOwnProperty.call(properties, 'dead') && properties.dead === 'true') {
-                service.dead = true;
-                this.platform.log.info('Device dead: ', `${IDs[0]}  parameter: ${characteristic.displayName}`);
-              } else {
-                service.dead = false;
-                getFunction.function.call(this.platform.getFunctions, characteristic, service, IDs, properties);
-              }
-            } else {
-              this.platform.log.error('No get function defined for: ', `${characteristic.displayName}`);
-            }
-          } catch (e) {
-            service.dead = true;
-            this.platform.log.error('G1 - There was a problem getting value from: ', `${IDs[0]} - Err: ${e}`);
-          }
-          if (service.dead) {
-            callback(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+        if (!this.platform.fibaroClient) {
+          return;
+        }
+        try {
+          let properties;
+          if (!service.isClimateZone && !service.isHeatingZone) {
+            properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
           } else {
-            callback(undefined, characteristic.value);
+            properties = {};
           }
-        }, getFunction.delay * 100);
+          if (getFunction.function) {
+            if (this.platform.config.FibaroTemperatureUnit === 'F') {
+              if (Object.prototype.hasOwnProperty.call(properties, 'value') && characteristic.displayName === 'Current Temperature') {
+                properties.value = (properties.value - 32) * 5 / 9;
+              }
+            }
+            if (Object.prototype.hasOwnProperty.call(properties, 'dead') && properties.dead === 'true') {
+              service.dead = true;
+              this.platform.log.info('Device dead: ', `${IDs[0]}  parameter: ${characteristic.displayName}`);
+            } else {
+              service.dead = false;
+              getFunction.function.call(this.platform.getFunctions, characteristic, service, IDs, properties);
+            }
+          } else {
+            this.platform.log.error('No get function defined for: ', `${characteristic.displayName}`);
+          }
+        } catch (e) {
+          service.dead = true;
+          this.platform.log.error('G1 - There was a problem getting value from: ', `${IDs[0]} - Err: ${e}`);
+        }
+        if (service.dead) {
+          callback(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+        } else {
+          callback(undefined, characteristic.value);
+        }
       }
     }
 
