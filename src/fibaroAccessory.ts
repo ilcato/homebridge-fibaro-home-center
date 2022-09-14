@@ -479,12 +479,12 @@ export class FibaroAccessory {
             service.dead = true;
             this.platform.log.error('G1 - There was a problem getting value from: ', `${IDs[0]} - Err: ${e}`);
           }
+          if (service.dead) {
+            callback(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+          } else {
+            callback(undefined, characteristic.value);
+          }
         }, getFunction.delay * 100);
-      }
-      if (service.dead) {
-        callback(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-      } else {
-        callback(undefined, characteristic.value);
       }
     }
 
