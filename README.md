@@ -30,6 +30,8 @@ Remember to configure the plugin in config.json in your home directory inside th
 
 Look for a sample config in [config.json example](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/config.json)
 
+# Warning
++ Use different device names within the same room in Home Center.
 
 # Last release notes
 Version 1.2.14
