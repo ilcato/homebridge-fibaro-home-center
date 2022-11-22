@@ -34,5 +34,5 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 + Use different device names within the same room in Home Center.
 
 # Last release notes
-Version 1.2.14
-+ Fixed double call #72 #108 #111 
+Version 1.2.15
++ Added support for Nice Roller shutter 
