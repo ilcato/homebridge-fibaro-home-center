@@ -95,8 +95,7 @@ export class SetFunctions {
 
   async setTargetPosition(value, context, characteristic, service, IDs) {
     if (service.isOpenCloseOnly) {
-      this.platform.log.info('BETATESTNICESHUTTER: call command');
-      if (value == 0) {
+      if (value === 0) {
         await this.command('close', [0], service, IDs);
       } else if (value >= 99) {
         await this.command('open', [0], service, IDs);
