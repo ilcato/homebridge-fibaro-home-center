@@ -121,7 +121,7 @@ export class FibaroAccessory {
             }
             if (this.device.type === 'com.fibaro.remoteBaseShutter') {
               subtype = device.id + '--OPENCLOSEONLY';
-              this.platform.log.info('BETATESTNICESHUTTER: found one');
+              this.platform.log.info('BETATESTNICESHUTTER: found one, subtype=' + subtype);
             }
             break;
           case 'com.fibaro.FGMS001':
@@ -340,11 +340,9 @@ export class FibaroAccessory {
       service.isClimateZone = (IDs.length >= 3 && IDs[2] === 'CZ') ? true : false;
       service.isHeatingZone = (IDs.length >= 3 && IDs[2] === 'HZ') ? true : false;
       service.isOpenCloseOnly = (IDs.length >= 3 && IDs[2] === 'OPENCLOSEONLY') ? true : false;
-      if ((IDs.length >= 3 && IDs[2] === 'OPENCLOSEONLY')) {
+      if (service.isOpenCloseOnly) {
         this.platform.log.info('BETATESTNICESHUTTER: set flag');
       }
-
-
       if (!service.isVirtual && !service.isScene
         && characteristic.UUID !== this.platform.Characteristic.ValveType.UUID) {
         let propertyChanged = 'value'; // subscribe to the changes of this property
