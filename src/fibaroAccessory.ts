@@ -121,7 +121,6 @@ export class FibaroAccessory {
             }
             if (this.device.type === 'com.fibaro.remoteBaseShutter') {
               subtype = device.id + '--OPENCLOSEONLY';
-              this.platform.log.info('BETATESTNICESHUTTER: found one, subtype=' + subtype);
             }
             break;
           case 'com.fibaro.FGMS001':
@@ -268,8 +267,8 @@ export class FibaroAccessory {
         this.mainService = this.accessory.getService(service);
         if (!this.mainService) {
           this.mainService = this.accessory.addService(new service(this.device.name));
-          this.mainService.subtype = subtype;
         }
+        this.mainService.subtype = subtype;
         this.bindCharactersticsEvent(this.mainService, this.mainCharacteristics);
 
         if (this.device.interfaces && this.device.interfaces.includes('battery')) {
