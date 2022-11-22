@@ -119,6 +119,9 @@ export class FibaroAccessory {
                 this.platform.Characteristic.TargetHorizontalTiltAngle,
               );
             }
+            if (this.device.type === 'com.fibaro.remoteBaseShutter') {
+              subtype = device.id + '--OPENCLOSEONLY';               
+            }
             break;
           case 'com.fibaro.FGMS001':
           case 'com.fibaro.FGMS001v2':
@@ -335,6 +338,7 @@ export class FibaroAccessory {
       service.isScene = (IDs.length >= 3 && IDs[2] === 'SC') ? true : false;
       service.isClimateZone = (IDs.length >= 3 && IDs[2] === 'CZ') ? true : false;
       service.isHeatingZone = (IDs.length >= 3 && IDs[2] === 'HZ') ? true : false;
+      service.isOpenCloseOnly = (IDs.length >= 3 && IDs[2] === 'OPENCLOSEONLY') ? true : false;
 
       if (!service.isVirtual && !service.isScene
         && characteristic.UUID !== this.platform.Characteristic.ValveType.UUID) {

@@ -94,7 +94,15 @@ export class SetFunctions {
   }
 
   async setTargetPosition(value, context, characteristic, service, IDs) {
-    await this.command('setValue', [value], service, IDs);
+    if (service.isOpenCloseOnly) {
+      if (value == 0) {
+        await this.command('close', [0], service, IDs);
+      } else if (value >= 99) {
+        await this.command('open', [0], service, IDs);
+      }  
+    } else {
+      await this.command('setValue', [value], service, IDs);
+    }
   }
 
   async setTargetTiltAngle(angle, context, characteristic, service, IDs) {

@@ -57,7 +57,7 @@ export class FibaroClient {
       const configPath = '/homebridge';
       try {
         this.ca = fs.readFileSync(configPath + '/ca.cer');
-      } catch (e) {
+      } catch (e: any) {
         if (e.code === 'ENOENT') {
           let configPath = process.env.UIX_CONFIG_PATH;
           if (configPath) {
@@ -67,7 +67,7 @@ export class FibaroClient {
           }
           try {
             this.ca = fs.readFileSync(configPath + '/ca.cer');
-          } catch (e) {
+          } catch (e: any) {
             if (e.code !== 'ENOENT') {
               log('Error reading ca.cer: ', e);
             } else {
