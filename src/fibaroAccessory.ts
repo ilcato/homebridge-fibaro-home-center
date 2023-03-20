@@ -100,7 +100,8 @@ export class FibaroAccessory {
       case 'com.fibaro.FGWR111':
       case 'com.fibaro.remoteBaseShutter':
       case 'com.fibaro.baseShutter': // only if favoritePositionsNativeSupport is true otherwise it's a garage door
-        if (this.device.type !== 'com.fibaro.baseShutter' || this.device.type === 'com.fibaro.baseShutter' && this.device.properties.favoritePositionsNativeSupport) {
+        if (this.device.type !== 'com.fibaro.baseShutter' ||
+        this.device.type === 'com.fibaro.baseShutter' && this.device.properties.favoritePositionsNativeSupport) {
           service = this.platform.Service.WindowCovering;
           this.mainCharacteristics = [
             this.platform.Characteristic.CurrentPosition,
@@ -113,18 +114,19 @@ export class FibaroAccessory {
               this.platform.Characteristic.TargetHorizontalTiltAngle,
             );
           }
-          if (this.device.type === 'com.fibaro.remoteBaseShutter') {
+          if (this.device.type === 'com.fibaro.remoteBaseShutter' || this.device.type === 'com.fibaro.baseShutter') {
             subtype = device.id + '--OPENCLOSEONLY';
           }
           break;
         } // else it's a garage door
+      // eslint-disable-next-line no-duplicate-case, no-fallthrough
       case 'com.fibaro.baseShutter':
       case 'com.fibaro.barrier':
         service = this.platform.Service.GarageDoorOpener;
         this.mainCharacteristics =
           [this.platform.Characteristic.CurrentDoorState,
-          this.platform.Characteristic.TargetDoorState,
-          this.platform.Characteristic.ObstructionDetected];
+            this.platform.Characteristic.TargetDoorState,
+            this.platform.Characteristic.ObstructionDetected];
         break;
       case 'com.fibaro.FGMS001':
       case 'com.fibaro.FGMS001v2':
@@ -169,8 +171,8 @@ export class FibaroAccessory {
         service = this.platform.Service.CarbonMonoxideSensor;
         this.mainCharacteristics =
           [this.platform.Characteristic.CarbonMonoxideDetected,
-          this.platform.Characteristic.CarbonMonoxideLevel,
-          this.platform.Characteristic.CarbonMonoxidePeakLevel, this.platform.Characteristic.BatteryLevel];
+            this.platform.Characteristic.CarbonMonoxideLevel,
+            this.platform.Characteristic.CarbonMonoxidePeakLevel, this.platform.Characteristic.BatteryLevel];
         break;
       case 'com.fibaro.lightSensor':
         service = this.platform.Service.LightSensor;
@@ -215,15 +217,15 @@ export class FibaroAccessory {
         service = this.platform.Service.Lightbulb;
         this.mainCharacteristics =
           [this.platform.Characteristic.On,
-          this.platform.Characteristic.Brightness,
-          this.platform.Characteristic.Hue,
-          this.platform.Characteristic.Saturation];
+            this.platform.Characteristic.Brightness,
+            this.platform.Characteristic.Hue,
+            this.platform.Characteristic.Saturation];
         break;
       case 'securitySystem':
         service = this.platform.Service.SecuritySystem;
         this.mainCharacteristics =
           [this.platform.Characteristic.SecuritySystemCurrentState,
-          this.platform.Characteristic.SecuritySystemTargetState];
+            this.platform.Characteristic.SecuritySystemTargetState];
         subtype = '0--';
         break;
       case 'scene':
@@ -235,20 +237,20 @@ export class FibaroAccessory {
         service = this.platform.Service.Thermostat;
         this.mainCharacteristics =
           [this.platform.Characteristic.CurrentTemperature,
-          this.platform.Characteristic.TargetTemperature,
-          this.platform.Characteristic.CurrentHeatingCoolingState,
-          this.platform.Characteristic.TargetHeatingCoolingState,
-          this.platform.Characteristic.TemperatureDisplayUnits];
+            this.platform.Characteristic.TargetTemperature,
+            this.platform.Characteristic.CurrentHeatingCoolingState,
+            this.platform.Characteristic.TargetHeatingCoolingState,
+            this.platform.Characteristic.TemperatureDisplayUnits];
         subtype = device.id + '--CZ';
         break;
       case 'heatingZone':
         service = this.platform.Service.Thermostat;
         this.mainCharacteristics =
           [this.platform.Characteristic.CurrentTemperature,
-          this.platform.Characteristic.TargetTemperature,
-          this.platform.Characteristic.CurrentHeatingCoolingState,
-          this.platform.Characteristic.TargetHeatingCoolingState,
-          this.platform.Characteristic.TemperatureDisplayUnits];
+            this.platform.Characteristic.TargetTemperature,
+            this.platform.Characteristic.CurrentHeatingCoolingState,
+            this.platform.Characteristic.TargetHeatingCoolingState,
+            this.platform.Characteristic.TemperatureDisplayUnits];
         subtype = device.id + '--HZ';
         break;
       case 'G':
@@ -284,8 +286,8 @@ export class FibaroAccessory {
       }
       this.batteryCharacteristics =
         [this.platform.Characteristic.BatteryLevel,
-        this.platform.Characteristic.ChargingState,
-        this.platform.Characteristic.StatusLowBattery];
+          this.platform.Characteristic.ChargingState,
+          this.platform.Characteristic.StatusLowBattery];
       this.bindCharactersticsEvent(this.batteryService, this.batteryCharacteristics);
     }
 
