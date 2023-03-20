@@ -126,6 +126,7 @@ export class GetFunctions {
   }
 
   getCurrentPosition(characteristic, service, IDs, properties) {
+    this.platform.log('getCurrentPosition: ', properties.state);
     let r = 0;
     if (isNaN(properties.value)) {
       if (properties.state === 'Closed') {
