@@ -99,29 +99,30 @@ export class FibaroAccessory {
       case 'com.fibaro.rollerShutter':
       case 'com.fibaro.FGWR111':
       case 'com.fibaro.remoteBaseShutter':
-        service = this.platform.Service.WindowCovering;
-        this.mainCharacteristics = [
-          this.platform.Characteristic.CurrentPosition,
-          this.platform.Characteristic.TargetPosition,
-          this.platform.Characteristic.PositionState,
-        ];
-        if (parseInt(this.device.properties.deviceControlType) === 55) {
-          this.mainCharacteristics.push(
-            this.platform.Characteristic.CurrentHorizontalTiltAngle,
-            this.platform.Characteristic.TargetHorizontalTiltAngle,
-          );
-        }
-        if (this.device.type === 'com.fibaro.remoteBaseShutter') {
-          subtype = device.id + '--OPENCLOSEONLY';
-        }
-        break;
+      case 'com.fibaro.baseShutter': // only if favoritePositionsNativeSupport is true otherwise it's a garage door
+        if (this.device.type !== 'com.fibaro.baseShutter' ||
+        this.device.type === 'com.fibaro.baseShutter' && this.device.properties.favoritePositionsNativeSupport) {
+          service = this.platform.Service.WindowCovering;
+          this.mainCharacteristics = [
+            this.platform.Characteristic.CurrentPosition,
+            this.platform.Characteristic.TargetPosition,
+            this.platform.Characteristic.PositionState,
+          ];
+          if (parseInt(this.device.properties.deviceControlType) === 55) {
+            this.mainCharacteristics.push(
+              this.platform.Characteristic.CurrentHorizontalTiltAngle,
+              this.platform.Characteristic.TargetHorizontalTiltAngle,
+            );
+          }
+          if (this.device.type === 'com.fibaro.remoteBaseShutter' || this.device.type === 'com.fibaro.baseShutter') {
+            subtype = device.id + '--OPENCLOSEONLY';
+          }
+          break;
+        } // else it's a garage door
+      // eslint-disable-next-line no-duplicate-case, no-fallthrough
       case 'com.fibaro.baseShutter':
       case 'com.fibaro.barrier':
-        if (this.device.properties.favoritePositionsNativeSupport) {
-          service = this.platform.Service.WindowCovering;
-        } else {
-          service = this.platform.Service.GarageDoorOpener;
-        }
+        service = this.platform.Service.GarageDoorOpener;
         this.mainCharacteristics =
           [this.platform.Characteristic.CurrentDoorState,
             this.platform.Characteristic.TargetDoorState,
