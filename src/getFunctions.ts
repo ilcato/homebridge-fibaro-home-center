@@ -127,6 +127,9 @@ export class GetFunctions {
 
   getCurrentPosition(characteristic, service, IDs, properties) {
     let r = 0;
+    this.platform.log('Debug - value: ', properties.value);
+    this.platform.log('Debug - status: ', properties.status);
+
     if (isNaN(properties.value)) {
       if (properties.state === 'Closed') {
         r = 0;
@@ -145,6 +148,7 @@ export class GetFunctions {
         r = characteristic.props.minValue;
       }
     }
+    this.platform.log('Debug - Position: ', r);
     characteristic.updateValue(r);
   }
 
