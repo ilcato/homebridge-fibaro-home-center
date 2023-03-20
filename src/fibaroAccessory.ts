@@ -107,6 +107,7 @@ export class FibaroAccessory {
             this.platform.Characteristic.CurrentPosition,
             this.platform.Characteristic.TargetPosition,
             this.platform.Characteristic.PositionState,
+            this.platform.Characteristic.HoldPosition,
           ];
           if (parseInt(this.device.properties.deviceControlType) === 55) {
             this.mainCharacteristics.push(

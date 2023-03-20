@@ -31,6 +31,7 @@ export class SetFunctions {
       [this.platform.Characteristic.On.UUID, this.setOn],
       [this.platform.Characteristic.Brightness.UUID, this.setBrightness],
       [this.platform.Characteristic.TargetPosition.UUID, this.setTargetPosition],
+      [this.platform.Characteristic.HoldPosition.UUID, this.setHoldPosition],
       [this.platform.Characteristic.TargetHorizontalTiltAngle.UUID, this.setTargetTiltAngle],
       [this.platform.Characteristic.LockTargetState.UUID, this.setLockTargetState],
       [this.platform.Characteristic.TargetHeatingCoolingState.UUID, this.setTargetHeatingCoolingState],
@@ -102,6 +103,12 @@ export class SetFunctions {
       }
     } else {
       await this.command('setValue', [value], service, IDs);
+    }
+  }
+
+  async setHoldPosition(value, context, characteristic, service, IDs) {
+    if (value) {
+      await this.command('stop', [0], service, IDs);
     }
   }
 

@@ -128,7 +128,7 @@ export class GetFunctions {
   getCurrentPosition(characteristic, service, IDs, properties) {
     let r = 0;
     this.platform.log('Debug - value: ', properties.value);
-    this.platform.log('Debug - status: ', properties.status);
+    this.platform.log('Debug - status: ', properties.state);
 
     if (isNaN(properties.value)) {
       if (properties.state === 'Closed') {
