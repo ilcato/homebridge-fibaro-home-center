@@ -126,6 +126,8 @@ export class GetFunctions {
     }
 
     getCurrentPosition(characteristic, service, IDs, properties) {
+      this.platform.log('getCurrentPosition:', properties.value);
+
       let r = parseInt(properties.value);
       if (r >= characteristic.props.minValue && r <= characteristic.props.maxValue) {
         if (r === 99) {
