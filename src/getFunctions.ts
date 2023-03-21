@@ -1,4 +1,4 @@
-//    Copyright 2021 ilcato
+//    Copyright 2023 ilcato
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -27,43 +27,51 @@ export class GetFunctions {
   constructor(platform) {
     this.platform = platform;
 
-    this.getFunctionsMapping = new Map([
-      [(new platform.Characteristic.On()).UUID, { 'function': this.getBool }],
-      [(new platform.Characteristic.Brightness()).UUID, { 'function': this.getBrightness }],
-      [(new platform.Characteristic.PositionState()).UUID, { 'function': this.getPositionState }],
-      [(new platform.Characteristic.CurrentPosition()).UUID, { 'function': this.getCurrentPosition }],
-      [(new platform.Characteristic.TargetPosition()).UUID, { 'function': this.getCurrentPosition }],
-      [(new platform.Characteristic.CurrentHorizontalTiltAngle()).UUID, { 'function': this.getCurrentTiltAngle }],
-      [(new platform.Characteristic.TargetHorizontalTiltAngle()).UUID, { 'function': this.getCurrentTiltAngle }],
-      [(new platform.Characteristic.MotionDetected()).UUID, { 'function': this.getBool }],
-      [(new platform.Characteristic.CurrentTemperature()).UUID, { 'function': this.getCurrentTemperature }],
-      [(new platform.Characteristic.TargetTemperature()).UUID, { 'function': this.getTargetTemperature }],
-      [(new platform.Characteristic.CurrentRelativeHumidity()).UUID, { 'function': this.getFloat }],
-      [(new platform.Characteristic.ContactSensorState()).UUID, { 'function': this.getContactSensorState }],
-      [(new platform.Characteristic.LeakDetected()).UUID, { 'function': this.getLeakDetected }],
-      [(new platform.Characteristic.SmokeDetected()).UUID, { 'function': this.getSmokeDetected }],
-      [(new platform.Characteristic.CarbonMonoxideDetected()).UUID, { 'function': this.getCarbonMonoxideDetected }],
-      [(new platform.Characteristic.CarbonMonoxideLevel()).UUID, { 'function': this.getCarbonMonoxideLevel }],
-      [(new platform.Characteristic.CarbonMonoxidePeakLevel()).UUID, { 'function': this.getCarbonMonoxidePeakLevel }],
-      [(new platform.Characteristic.CurrentAmbientLightLevel()).UUID, { 'function': this.getFloat }],
-      [(new platform.Characteristic.OutletInUse()).UUID, { 'function': this.getOutletInUse }],
-      [(new platform.Characteristic.LockCurrentState()).UUID, { 'function': this.getLockCurrentState }],
-      [(new platform.Characteristic.LockTargetState()).UUID, { 'function': this.getLockCurrentState }],
-      [(new platform.Characteristic.CurrentHeatingCoolingState()).UUID, { 'function': this.getCurrentHeatingCoolingState }],
-      [(new platform.Characteristic.TargetHeatingCoolingState()).UUID, { 'function': this.getTargetHeatingCoolingState }],
-      [(new platform.Characteristic.TemperatureDisplayUnits()).UUID, { 'function': this.getTemperatureDisplayUnits }],
-      [(new platform.Characteristic.Hue()).UUID, { 'function': this.getHue }],
-      [(new platform.Characteristic.Saturation()).UUID, { 'function': this.getSaturation }],
-      [(new platform.Characteristic.CurrentDoorState()).UUID, { 'function': this.getCurrentDoorState }],
-      [(new platform.Characteristic.TargetDoorState()).UUID, { 'function': this.getTargetDoorState }],
-      [(new platform.Characteristic.ObstructionDetected()).UUID, { 'function': this.getObstructionDetected }],
-      [(new platform.Characteristic.BatteryLevel()).UUID, { 'function': this.getBatteryLevel }],
-      [(new platform.Characteristic.ChargingState()).UUID, { 'function': this.getChargingState }],
-      [(new platform.Characteristic.StatusLowBattery()).UUID, { 'function': this.getStatusLowBattery }],
-      [(new platform.Characteristic.Active()).UUID, { 'function': this.getActive }],
-      [(new platform.Characteristic.InUse()).UUID, { 'function': this.getInUse }],
-      [(new platform.Characteristic.ProgrammableSwitchEvent()).UUID, { 'function': this.getProgrammableSwitchEvent }],
-    ]);
+    const characteristicFunctions = {
+      On: this.getBool,
+      Brightness: this.getBrightness,
+      PositionState: this.getPositionState,
+      CurrentPosition: this.getCurrentPosition,
+      TargetPosition: this.getCurrentPosition,
+      CurrentHorizontalTiltAngle: this.getCurrentTiltAngle,
+      TargetHorizontalTiltAngle: this.getCurrentTiltAngle,
+      MotionDetected: this.getBool,
+      CurrentTemperature: this.getCurrentTemperature,
+      TargetTemperature: this.getTargetTemperature,
+      CurrentRelativeHumidity: this.getFloat,
+      ContactSensorState: this.getContactSensorState,
+      LeakDetected: this.getLeakDetected,
+      SmokeDetected: this.getSmokeDetected,
+      CarbonMonoxideDetected: this.getCarbonMonoxideDetected,
+      CarbonMonoxideLevel: this.getCarbonMonoxideLevel,
+      CarbonMonoxidePeakLevel: this.getCarbonMonoxidePeakLevel,
+      CurrentAmbientLightLevel: this.getFloat,
+      OutletInUse: this.getOutletInUse,
+      LockCurrentState: this.getLockCurrentState,
+      LockTargetState: this.getLockCurrentState,
+      CurrentHeatingCoolingState: this.getCurrentHeatingCoolingState,
+      TargetHeatingCoolingState: this.getTargetHeatingCoolingState,
+      TemperatureDisplayUnits: this.getTemperatureDisplayUnits,
+      Hue: this.getHue,
+      Saturation: this.getSaturation,
+      CurrentDoorState: this.getCurrentDoorState,
+      TargetDoorState: this.getTargetDoorState,
+      ObstructionDetected: this.getObstructionDetected,
+      BatteryLevel: this.getBatteryLevel,
+      ChargingState: this.getChargingState,
+      StatusLowBattery: this.getStatusLowBattery,
+      Active: this.getActive,
+      InUse: this.getInUse,
+      ProgrammableSwitchEvent: this.getProgrammableSwitchEvent,
+    };
+
+    this.getFunctionsMapping = new Map(
+      Object.entries(characteristicFunctions).map(([key, value]) => {
+        const characteristic = new platform.Characteristic[key]();
+        return [characteristic.UUID, { function: value }];
+      }),
+    );
+
     this.getCurrentSecuritySystemStateMapping = new Map([
       ['AwayArmed', this.platform.Characteristic.SecuritySystemCurrentState.AWAY_ARM],
       ['Disarmed', this.platform.Characteristic.SecuritySystemCurrentState.DISARMED],
@@ -127,8 +135,6 @@ export class GetFunctions {
 
   getCurrentPosition(characteristic, service, IDs, properties) {
     let r = 0;
-    this.platform.log('Debug - value: ', properties.value);
-    this.platform.log('Debug - status: ', properties.state);
 
     if (isNaN(properties.value)) {
       if (properties.state === 'Closed') {
@@ -148,7 +154,6 @@ export class GetFunctions {
         r = characteristic.props.minValue;
       }
     }
-    this.platform.log('Debug - Position: ', r);
     characteristic.updateValue(r);
   }
 

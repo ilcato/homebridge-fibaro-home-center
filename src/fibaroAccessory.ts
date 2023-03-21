@@ -1,4 +1,5 @@
-//    Copyright 2021 ilcato
+/* eslint-disable max-len */
+//    Copyright 2023 ilcato
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -13,7 +14,7 @@
 //    limitations under the License.
 
 // Fibaro Home Center Platform plugin for HomeBridge
-import { PlatformAccessory, HAPStatus } from 'homebridge';
+import { PlatformAccessory, CharacteristicEventTypes, CharacteristicSetCallback, CharacteristicGetCallback, CharacteristicValue } from 'homebridge';
 import { FibaroHC } from './platform';
 
 export class FibaroAccessory {
@@ -369,11 +370,11 @@ export class FibaroAccessory {
       }
       this.subscribeUpdate(service, characteristic, propertyChanged);
     }
-    characteristic.on('set', async (value, callback, context) => {
+    characteristic.on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback, context: any) => {
       this.setCharacteristicValue(value, context, characteristic, service, IDs);
       callback();
     });
-    characteristic.on('get', async (callback) => {
+    characteristic.on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
       if (characteristic.UUID === this.platform.Characteristic.Name.UUID
         || characteristic.UUID === this.platform.Characteristic.ValveType.UUID) {
         callback(undefined, characteristic.value);

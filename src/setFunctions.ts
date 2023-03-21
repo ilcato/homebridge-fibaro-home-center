@@ -1,4 +1,4 @@
-//    Copyright 2021 ilcato
+//    Copyright 2023 ilcato
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -27,31 +27,41 @@ export class SetFunctions {
   constructor(platform) {
     this.platform = platform;
 
-    this.setFunctionsMapping = new Map([
-      [this.platform.Characteristic.On.UUID, this.setOn],
-      [this.platform.Characteristic.Brightness.UUID, this.setBrightness],
-      [this.platform.Characteristic.TargetPosition.UUID, this.setTargetPosition],
-      [this.platform.Characteristic.HoldPosition.UUID, this.setHoldPosition],
-      [this.platform.Characteristic.TargetHorizontalTiltAngle.UUID, this.setTargetTiltAngle],
-      [this.platform.Characteristic.LockTargetState.UUID, this.setLockTargetState],
-      [this.platform.Characteristic.TargetHeatingCoolingState.UUID, this.setTargetHeatingCoolingState],
-      [this.platform.Characteristic.TargetTemperature.UUID, this.setTargetTemperature],
-      [this.platform.Characteristic.TargetDoorState.UUID, this.setTargetDoorState],
-      [this.platform.Characteristic.Hue.UUID, this.setHue],
-      [this.platform.Characteristic.Saturation.UUID, this.setSaturation],
-      [this.platform.Characteristic.SecuritySystemTargetState.UUID, this.setSecuritySystemTargetState],
-      [this.platform.Characteristic.Active.UUID, this.setActive],
-    ]);
+    const setCharacteristicFunctions = {
+      On: this.setOn,
+      Brightness: this.setBrightness,
+      TargetPosition: this.setTargetPosition,
+      HoldPosition: this.setHoldPosition,
+      TargetHorizontalTiltAngle: this.setTargetTiltAngle,
+      LockTargetState: this.setLockTargetState,
+      TargetHeatingCoolingState: this.setTargetHeatingCoolingState,
+      TargetTemperature: this.setTargetTemperature,
+      TargetDoorState: this.setTargetDoorState,
+      Hue: this.setHue,
+      Saturation: this.setSaturation,
+      SecuritySystemTargetState: this.setSecuritySystemTargetState,
+      Active: this.setActive,
+    };
+    this.setFunctionsMapping = new Map(
+      Object.entries(setCharacteristicFunctions).map(([key, value]) => {
+        const characteristic = new this.platform.Characteristic[key]();
+        return [characteristic.UUID, value];
+      }),
+    );
 
-    this.getTargetSecuritySystemSceneMapping = new Map([
-      [this.platform.Characteristic.SecuritySystemTargetState.AWAY_ARM, this.platform.scenes.SetAwayArmed],
-      [this.platform.Characteristic.SecuritySystemTargetState.DISARM, this.platform.scenes.SetDisarmed],
-      [this.platform.Characteristic.SecuritySystemTargetState.NIGHT_ARM, this.platform.scenes.SetNightArmed],
-      [this.platform.Characteristic.SecuritySystemTargetState.STAY_ARM, this.platform.scenes.SetStayArmed],
-    ]);
-
+    const targetSecuritySystemSceneFunctions = {
+      AWAY_ARM: this.platform.scenes.SetAwayArmed,
+      DISARM: this.platform.scenes.SetDisarmed,
+      NIGHT_ARM: this.platform.scenes.SetNightArmed,
+      STAY_ARM: this.platform.scenes.SetStayArmed,
+    };
+    this.getTargetSecuritySystemSceneMapping = new Map(
+      Object.entries(targetSecuritySystemSceneFunctions).map(([key, value]) => {
+        const targetState = this.platform.Characteristic.SecuritySystemTargetState[key];
+        return [targetState, value];
+      }),
+    );
   }
-
 
   async setOn(value, context, characteristic, service, IDs) {
     if (service.isVirtual && !service.isGlobalVariableSwitch && !service.isGlobalVariableDimmer) {
