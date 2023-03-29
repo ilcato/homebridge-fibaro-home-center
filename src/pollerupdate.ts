@@ -105,10 +105,10 @@ export class Poller {
               }
             }
             const changePropertyValue = change[property];
-            this.platform.log.info(`Updating ${property} for device: `,
-              `${subscription.id}  parameter: ${subscription.characteristic.displayName}, ${property}: ${changePropertyValue}`);
             const getFunction = this.platform.getFunctions.getFunctionsMapping.get(subscription.characteristic.UUID);
             if (getFunction && getFunction.function) {
+              this.platform.log.info(`Updating ${property} for device: `,
+                `${subscription.id}  parameter: ${subscription.characteristic.displayName}`);
               getFunction.function.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
             }
           }
