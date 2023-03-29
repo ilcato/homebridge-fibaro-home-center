@@ -108,7 +108,11 @@ export class FibaroAccessory {
           this.mainCharacteristics =
             [this.platform.Characteristic.CurrentDoorState,
               this.platform.Characteristic.TargetDoorState,
-              this.platform.Characteristic.ObstructionDetected];
+              this.platform.Characteristic.ObstructionDetected,
+              this.platform.Characteristic.CurrentPosition,
+              this.platform.Characteristic.TargetPosition,
+              this.platform.Characteristic.PositionState,
+              this.platform.Characteristic.HoldPosition];
           break;
         } else if (this.device.type !== 'com.fibaro.baseShutter' ||
         this.device.type === 'com.fibaro.baseShutter' && this.device.properties.favoritePositionsNativeSupport) {
