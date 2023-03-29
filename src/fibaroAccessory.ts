@@ -43,12 +43,13 @@ export class FibaroAccessory {
 
     let service;
     let subtype = this.device.id + '----';
+    const controlType = parseInt(this.device.properties.deviceControlType);
 
     switch (this.device.type) {
       case 'com.fibaro.multilevelSwitch':
       case 'com.fibaro.FGD212':
       case 'com.fibaro.FGWD111':
-        switch (parseInt(this.device.properties.deviceControlType)) {
+        switch (controlType) {
           case 2: // Lighting
           case 23: // Lighting
             service = this.platform.Service.Lightbulb;
@@ -64,7 +65,7 @@ export class FibaroAccessory {
       case 'com.fibaro.developer.bxs.virtualBinarySwitch':
       case 'com.fibaro.satelOutput':
       case 'com.fibaro.FGWDS221':
-        switch (parseInt(this.device.properties.deviceControlType)) {
+        switch (controlType) {
           case 2: // Lighting
           case 5: // Bedside Lamp
           case 7: // Wall Lamp
@@ -101,7 +102,15 @@ export class FibaroAccessory {
       case 'com.fibaro.FGWR111':
       case 'com.fibaro.remoteBaseShutter':
       case 'com.fibaro.baseShutter': // only if favoritePositionsNativeSupport is true otherwise it's a garage door
-        if (this.device.type !== 'com.fibaro.baseShutter' ||
+        if (controlType in [56, 57]) {
+          // it's a garage door
+          service = this.platform.Service.GarageDoorOpener;
+          this.mainCharacteristics =
+            [this.platform.Characteristic.CurrentDoorState,
+              this.platform.Characteristic.TargetDoorState,
+              this.platform.Characteristic.ObstructionDetected];
+          break;
+        } else if (this.device.type !== 'com.fibaro.baseShutter' ||
         this.device.type === 'com.fibaro.baseShutter' && this.device.properties.favoritePositionsNativeSupport) {
           service = this.platform.Service.WindowCovering;
           this.mainCharacteristics = [
@@ -110,7 +119,7 @@ export class FibaroAccessory {
             this.platform.Characteristic.PositionState,
             this.platform.Characteristic.HoldPosition,
           ];
-          if (parseInt(this.device.properties.deviceControlType) === 55) {
+          if (controlType === 55) {
             this.mainCharacteristics.push(
               this.platform.Characteristic.CurrentHorizontalTiltAngle,
               this.platform.Characteristic.TargetHorizontalTiltAngle,
