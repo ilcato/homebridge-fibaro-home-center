@@ -104,7 +104,6 @@ export class Poller {
                 change.value = (change.value - 32) * 5 / 9;
               }
             }
-            const changePropertyValue = change[property];
             const getFunction = this.platform.getFunctions.getFunctionsMapping.get(subscription.characteristic.UUID);
             if (getFunction && getFunction.function) {
               this.platform.log.info(`Updating ${property} for device: `,

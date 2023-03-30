@@ -380,7 +380,17 @@ export class GetFunctions {
       case 'Unknow':
         characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.STOPPED);
         break;
+      case undefined:
+        if (properties.value === '99') {
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
+        } else if (properties.value === '0') {
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
+        } else {
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.STOPPED);
+        }
+        break;
       default:
+        characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.STOPPED);
         break;
     }
   }
@@ -402,7 +412,17 @@ export class GetFunctions {
       case 'Unknow':
         characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
         break;
+      case undefined:
+        if (properties.value === '99') {
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
+        } else if (properties.value === '0') {
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
+        } else {
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.STOPPED);
+        }
+        break;
       default:
+        characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.STOPPED);
         break;
     }
   }
