@@ -1,7 +1,7 @@
 {
   "displayName": "homebridge Fibaro Home Center",
   "name": "homebridge-fibaro-home-center",
-  "version": "1.2.17-beta.3",
+  "version": "1.2.17-beta.4",
   "description": "Homebridge plugin for Fibaro Home Center 3 ",
   "author": "ilcato",
   "license": "Apache-2.0",
