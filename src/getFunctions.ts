@@ -364,6 +364,8 @@ export class GetFunctions {
   }
 
   getCurrentDoorState(characteristic, service, IDs, properties) {
+    const v = parseInt(properties.value);
+    this.platform.log('getCurrentDoorState value:', v);
     switch (properties.state) {
       case 'Opened':
         characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
@@ -377,15 +379,25 @@ export class GetFunctions {
       case 'Closed':
         characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
         break;
-      case 'Unknow':
-        characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.STOPPED);
+      case 'Unknown':
+      case undefined:
+        if (v === 0) {
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
+        } else if (v === 99) {
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
+        } else {
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.STOPPED);
+        }
         break;
       default:
+        characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.STOPPED);
         break;
     }
   }
 
   getTargetDoorState(characteristic, service, IDs, properties) {
+    const v = parseInt(properties.value);
+    this.platform.log('getTargetDoorState value:', v);
     switch (properties.state) {
       case 'Opened':
         characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
@@ -399,10 +411,18 @@ export class GetFunctions {
       case 'Closed':
         characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
         break;
-      case 'Unknow':
-        characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
+      case 'Unknown':
+      case undefined:
+        if (v === 0) {
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
+        } else if (v === 99) {
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
+        } else {
+          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
+        }
         break;
       default:
+        characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
         break;
     }
   }

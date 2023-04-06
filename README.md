@@ -34,6 +34,5 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 + Use different device names within the same room in Home Center.
 
 # Last release notes
-Version 1.2.16
-+ Added support for Elero Roller shutter 
-+ Cleanup code
+Version 1.2.17
++ Fixed issue #107
