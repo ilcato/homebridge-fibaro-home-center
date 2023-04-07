@@ -43,7 +43,7 @@ export class FibaroAccessory {
 
     let service;
     let subtype = this.device.id + '----';
-    const controlType = parseInt(this.device.properties.deviceControlType);
+    const controlType = parseInt(properties.deviceControlType);
 
     switch (this.device.type) {
       case 'com.fibaro.multilevelSwitch':
@@ -111,7 +111,7 @@ export class FibaroAccessory {
               this.platform.Characteristic.ObstructionDetected];
           break;
         } else if (this.device.type !== 'com.fibaro.baseShutter' ||
-        this.device.type === 'com.fibaro.baseShutter' && this.device.properties.favoritePositionsNativeSupport) {
+        this.device.type === 'com.fibaro.baseShutter' && properties.favoritePositionsNativeSupport) {
           service = this.platform.Service.WindowCovering;
           this.mainCharacteristics = [
             this.platform.Characteristic.CurrentPosition,
