@@ -34,5 +34,5 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 + Use different device names within the same room in Home Center.
 
 # Last release notes
-Version 1.2.18
-+ Fixed issue #139
+Version 1.2.19
++ Manage timeout in Fibaro API requests
