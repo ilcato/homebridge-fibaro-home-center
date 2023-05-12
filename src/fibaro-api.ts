@@ -95,6 +95,7 @@ export class FibaroClient {
     }
   }
 
+  // Base function for GET requests. It manages the https,the authentication, the thtrottle, the ca certificate and timeout
   async genericGet(service) {
     const url = this.composeURL(service);
     if (this.https) {
@@ -103,16 +104,19 @@ export class FibaroClient {
         .use(throttle.plugin())
         .set('Authorization', this.auth)
         .set('accept', 'json')
-        .ca(this.ca);
+        .ca(this.ca)
+        .timeout({response: 10000, deadline: 60000});
     } else {
       return superagent
         .get(url)
         .use(throttle.plugin())
         .set('Authorization', this.auth)
-        .set('accept', 'json');
+        .set('accept', 'json')
+        .timeout({response: 10000, deadline: 60000});
     }
   }
 
+  // Base function for SET requests. It manages the https,the authentication, the thtrottle, the ca certificate and timeout
   genericPost(service, body) {
     const url = this.composeURL(service);
     if (this.https) {
@@ -122,6 +126,7 @@ export class FibaroClient {
         .send(body)
         .set('Authorization', this.auth)
         .set('accept', 'json')
+        .timeout({response: 10000, deadline: 60000})
         .ca(this.ca);
     } else {
       return superagent
@@ -129,7 +134,8 @@ export class FibaroClient {
         .use(throttle.plugin())
         .send(body)
         .set('Authorization', this.auth)
-        .set('accept', 'json');
+        .set('accept', 'json')
+        .timeout({response: 10000, deadline: 60000});
     }
   }
 
