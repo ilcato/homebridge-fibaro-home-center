@@ -142,7 +142,6 @@ export class FibaroClient {
         .send(body)
         .set('Authorization', this.auth)
         .set('accept', 'json')
-        .timeout({response: 10000, deadline: 60000})
         .ca(this.ca);
     } else {
       return superagent
@@ -150,8 +149,7 @@ export class FibaroClient {
         .use(throttle.plugin())
         .send(body)
         .set('Authorization', this.auth)
-        .set('accept', 'json')
-        .timeout({response: 10000, deadline: 60000});
+        .set('accept', 'json');
     }
   }
 
@@ -164,7 +162,6 @@ export class FibaroClient {
         .send(body)
         .set('Authorization', this.adminAuth)
         .set('accept', 'json')
-        .timeout({response: 10000, deadline: 60000})
         .ca(this.ca);
     } else {
       return superagent
@@ -172,8 +169,7 @@ export class FibaroClient {
         .use(throttle.plugin())
         .send(body)
         .set('Authorization', this.adminAuth)
-        .set('accept', 'json')
-        .timeout({response: 10000, deadline: 60000});
+        .set('accept', 'json');
     }
   }
 
