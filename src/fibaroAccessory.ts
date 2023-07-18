@@ -212,6 +212,7 @@ export class FibaroAccessory {
       case 'com.fibaro.FGWP101':
       case 'com.fibaro.FGWP102':
       case 'com.fibaro.FGWPG111':
+      case 'com.fibaro.FGWPG121':
       case 'com.fibaro.FGWOEF011':
         service = this.platform.Service.Outlet;
         this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
