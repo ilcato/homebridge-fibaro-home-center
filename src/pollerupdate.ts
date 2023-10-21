@@ -107,15 +107,21 @@ export class Poller {
             const getFunction = this.platform.getFunctions.getFunctionsMapping.get(subscription.characteristic.UUID);
             if (getFunction && getFunction.function) {
                 
-                let val1, val2;                
-                if (subscription.characteristic.displayName === 'Current Temperature') {
-                    val1 = subscription.characteristic.value.toFixed(1);
+                let val1, val2;
+                if (subscription.characteristic.displayName === 'Current Temperature') {    
+                    val1 = subscription.characteristic.value.toFixed(1);           
                     val2 = (this.platform.config.FibaroTemperatureUnit === "F") ? "F" : "C";
                 } else if (subscription.characteristic.displayName === 'Current Relative Humidity') {
                     val1 = subscription.characteristic.value.toFixed(0);
                     val2 = "%";
                 } else {
-                    val1 = subscription.characteristic.value;
+                    if (subscription.characteristic.value === true || subscription.characteristic.value === "turnOn") {
+                        val1 = "On";
+                    } else if (subscription.characteristic.value === false || subscription.characteristic.value === "turnOff") {
+                        val1 = "Off";
+                    } else {
+                        val1 = subscription.characteristic.value;
+                    }
                     val2 = "";
                 }
                 this.platform.log.info(`${subscription.service.displayName} [${subscription.id}]:`, `${val1}`, `${val2}`);
