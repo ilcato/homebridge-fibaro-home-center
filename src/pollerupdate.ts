@@ -107,10 +107,18 @@ export class Poller {
             const getFunction = this.platform.getFunctions.getFunctionsMapping.get(subscription.characteristic.UUID);
             if (getFunction && getFunction.function) {
                 
-                // check if value is numeric with or without dots and format it to 1 decimal place, else value true or false
-                const value = (/^\d*\.?\d+$/).test(subscription.characteristic.value)
-                    ? subscription.characteristic.value.toFixed(1) : subscription.characteristic.value;
-                this.platform.log.info(`${subscription.service.displayName} [${subscription.id}]:`, `${value}`);
+                let val1, val2;                
+                if (subscription.characteristic.displayName === 'Current Temperature') {
+                    val1 = subscription.characteristic.value.toFixed(1);
+                    val2 = (this.platform.config.FibaroTemperatureUnit === "F") ? "F" : "C";
+                } else if (subscription.characteristic.displayName === 'Current Relative Humidity') {
+                    val1 = subscription.characteristic.value.toFixed(0);
+                    val2 = "%";
+                } else {
+                    val1 = subscription.characteristic.value;
+                    val2 = "";
+                }
+                this.platform.log.info(`${subscription.service.displayName} [${subscription.id}]:`, `${val1}`, `${val2}`);
                 getFunction.function.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
             }
           }
