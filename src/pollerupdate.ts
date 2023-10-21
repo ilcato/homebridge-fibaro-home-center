@@ -106,15 +106,11 @@ export class Poller {
             }
             const getFunction = this.platform.getFunctions.getFunctionsMapping.get(subscription.characteristic.UUID);
             if (getFunction && getFunction.function) {
+                
                 // check if value is numeric with or without dots and format it to 1 decimal place, else value true or false
-                var reg = /^\d*\.?\d+$/;
-                if (reg.test(subscription.characteristic.value)) {
-                    var value = subscription.characteristic.value.toFixed(1);
-                }
-                else {
-                    var value = subscription.characteristic.value;
-                }
-                this.platform.log.info(`${subscription.service.displayName} (id: ${subscription.id}): ${value}`);
+                const value = (/^\d*\.?\d+$/).test(subscription.characteristic.value)
+                    ? subscription.characteristic.value.toFixed(1) : subscription.characteristic.value;
+                this.platform.log.info(`${subscription.service.displayName} [${subscription.id}]:`, `${value}`);
                 getFunction.function.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
             }
           }
