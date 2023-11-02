@@ -165,7 +165,9 @@ export class FibaroHC implements DynamicPlatformPlugin {
    * It should be used to setup event handlers for characteristics and update respective values.
    */
   configureAccessory(accessory: PlatformAccessory) {
-    this.log.info('Loading accessory from cache:', accessory.displayName);
+    if (this.config.logsLevel === 2){
+      this.log.info('Loading accessory from cache:', accessory.displayName);
+    }
     // To enable the removing of cached accessories no more present on Fibaro Home Center
     accessory.context.reviewed = false;
     // add the restored accessory to the accessories cache so we can track if it has already been registered
@@ -226,7 +228,9 @@ export class FibaroHC implements DynamicPlatformPlugin {
     const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
     if (existingAccessory) {
       // the accessory already exists
-      this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+      if (this.config.logsLevel === 2){
+        this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+      }
 
       // Update context
       existingAccessory.context.device = device;
