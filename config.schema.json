@@ -116,6 +116,32 @@
         "title": "Doorbell device ID",
         "type": "integer",
         "required": false
+      },
+      "logsLevel": {
+        "description": "Choose what logs to display",
+        "title": "Logs Level",
+        "type": "number",
+        "default": "1",
+        "oneOf": [
+          {
+            "title": "Disabled",
+            "enum": [
+              "0"
+            ]
+          },
+          {
+            "title": "Only changes",
+            "enum": [
+              "1"
+            ]
+          },
+          {
+            "title": "All Logs",
+            "enum": [
+              "2"
+            ]
+          }
+        ]
       }
     }
   },
