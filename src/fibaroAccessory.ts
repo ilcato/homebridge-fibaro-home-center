@@ -65,6 +65,11 @@ export class FibaroAccessory {
       case 'com.fibaro.developer.bxs.virtualBinarySwitch':
       case 'com.fibaro.satelOutput':
       case 'com.fibaro.FGWDS221':
+      case 'com.fibaro.FGWP101':
+      case 'com.fibaro.FGWP102':
+      case 'com.fibaro.FGWPG111':
+      case 'com.fibaro.FGWPG121':
+      case 'com.fibaro.FGWOEF011':
         switch (controlType) {
           case 2: // Lighting
           case 5: // Bedside Lamp
@@ -72,9 +77,10 @@ export class FibaroAccessory {
             service = this.platform.Service.Lightbulb;
             this.mainCharacteristics = [this.platform.Characteristic.On];
             break;
-          case 20: // Wall Socket
-            service = this.platform.Service.Outlet;
-            this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
+          case 1: // Other device
+          case 20: // Other device
+            service = this.platform.Service.Switch;
+            this.mainCharacteristics = [this.platform.Characteristic.On];
             break;
           case 25: // Video gate open
             service = this.platform.Service.LockMechanism;
@@ -90,8 +96,8 @@ export class FibaroAccessory {
             ];
             break;
           default:
-            service = this.platform.Service.Switch;
-            this.mainCharacteristics = [this.platform.Characteristic.On];
+            service = this.platform.Service.Outlet;
+            this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
             break;
         }
         break;
@@ -208,14 +214,6 @@ export class FibaroAccessory {
             this.isValid = false;
             return;
         }
-        break;
-      case 'com.fibaro.FGWP101':
-      case 'com.fibaro.FGWP102':
-      case 'com.fibaro.FGWPG111':
-      case 'com.fibaro.FGWPG121':
-      case 'com.fibaro.FGWOEF011':
-        service = this.platform.Service.Outlet;
-        this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
         break;
       case 'com.fibaro.doorLock':
       case 'com.fibaro.gerda':
