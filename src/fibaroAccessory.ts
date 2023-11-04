@@ -87,6 +87,7 @@ export class FibaroAccessory {
             subtype = device.id + '--' + 'LOCK';
             this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
             break;
+          case 3: // sprinkler
           case 26: // valve
             service = this.platform.Service.Valve;
             this.mainCharacteristics = [
