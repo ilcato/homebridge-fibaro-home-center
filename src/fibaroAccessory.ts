@@ -82,6 +82,7 @@ export class FibaroAccessory {
             service = this.platform.Service.Switch;
             this.mainCharacteristics = [this.platform.Characteristic.On];
             break;
+          case 24: // Video intercom
           case 25: // Video gate open
             service = this.platform.Service.LockMechanism;
             subtype = device.id + '--' + 'LOCK';
