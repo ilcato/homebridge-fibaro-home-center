@@ -112,7 +112,7 @@ export class FibaroAccessory {
       case 'com.fibaro.barrier':
       case 'com.fibaro.baseShutter':  
         // only if favoritePositionsNativeSupport is true otherwise it's a garage door
-        if (this.device.type !== 'com.fibaro.baseShutter' ||
+        if ((this.device.type !== 'com.fibaro.baseShutter' && this.device.type !== 'com.fibaro.barrier') ||
         (this.device.type === 'com.fibaro.baseShutter' && properties.favoritePositionsNativeSupport) || 
         (this.device.type === 'com.fibaro.baseShutter' && controlType === 53)){
           service = this.platform.Service.WindowCovering;
