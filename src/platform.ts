@@ -95,6 +95,9 @@ export class FibaroHC implements DynamicPlatformPlugin {
     if (this.config.addRoomNameToDeviceName === undefined) {
       this.config.addRoomNameToDeviceName = 'disabled';
     }
+    if (this.config.logsLevel === undefined) {
+      this.config.logsLevel = '1';
+    }
 
     this.fibaroClient = new FibaroClient(this.config.url, this.config.host, this.config.username, this.config.password, this.log,
       this.config.adminUsername, this.config.adminPassword);

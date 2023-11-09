@@ -27,6 +27,7 @@ Remember to configure the plugin in config.json in your home directory inside th
 + "securitysystem": "PUT enabled OR disabled IN ORDER TO MANAGE THE AVAILABILITY OF THE SECURITY SYSTEM"
 + "addRoomNameToDeviceName" : "PUT enabled OR disabled IN ORDER TO ADD THE ROOM NAME TO DEVICE NAME. DEFAULT disabled"
 + "doorbellDeviceId" : "PUT HOME CENTER BINARY SENSOR DEVICE ID ACTING AS A DOORBELL"
++ "logsLevel": "PUT THE DESIRED LOG LEVEL: 0 DISABLED, 1 ONLY CHANGES, 2 ALL"
 
 Look for a sample config in [config.json example](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/config.json)
 
@@ -34,5 +35,6 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 + Use different device names within the same room in Home Center.
 
 # Last release notes
-Version 1.2.20
-+ Revert changes in 1.2.19
+Version 1.3.0
++ Log management improved - Thanks to @mkz212
++ Wallplug and outlet management improved - Thanks to @mkz212

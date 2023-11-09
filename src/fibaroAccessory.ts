@@ -417,7 +417,7 @@ export class FibaroAccessory {
 
   async getCharacteristicValue(callback, characteristic, service, accessory, IDs) {
     if (this.platform.config.logsLevel === 2) {
-      this.platform.log.info(`${this.device.name} [${IDs[0]}]:`, `getting`, `${characteristic.displayName}`);
+      this.platform.log.info(`${this.device.name} [${IDs[0]}]:`, 'getting', `${characteristic.displayName}`);
     }
     callback(undefined, characteristic.value);
     try {

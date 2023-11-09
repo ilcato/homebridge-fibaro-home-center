@@ -289,7 +289,7 @@ export class SetFunctions {
     try {
       await this.platform.fibaroClient.executeDeviceAction(IDs[0], c, value);
       if (this.platform.config.logsLevel >= 1) {
-        const nc = c.replaceAll('turnOn','On').replaceAll('turnOff','Off').replaceAll('setValue','Set');
+        const nc = c.replaceAll('turnOn', 'On').replaceAll('turnOff', 'Off').replaceAll('setValue', 'Set');
         this.platform.log(service.displayName + ' [' + IDs[0] + ']: ' + nc + ((value !== null) ? ' ' + value + ' %' : ''));
       }
     } catch (e) {
