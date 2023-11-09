@@ -122,6 +122,7 @@
         "title": "Logs Level",
         "type": "number",
         "default": "1",
+        "required": true,
         "oneOf": [
           {
             "title": "Disabled",
