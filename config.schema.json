@@ -118,7 +118,7 @@
         "required": false
       },
       "logsLevel": {
-        "description": "Choose what logs to display",
+        "description": "Choose what logs to display. The most important logs will be displayed regardless of this choice.",
         "title": "Logs Level",
         "type": "number",
         "default": "1",
