@@ -288,7 +288,10 @@ export class SetFunctions {
   async command(c, value, service, IDs) {
     try {
       await this.platform.fibaroClient.executeDeviceAction(IDs[0], c, value);
-      this.platform.log('Command: ', c + ((value !== null) ? ', value: ' + value : '') + ', to: ' + IDs[0]);
+      if (this.platform.config.logsLevel >= 1) {
+        const nc = c.replaceAll('turnOn','On').replaceAll('turnOff','Off').replaceAll('setValue','Set');
+        this.platform.log(service.displayName + ' [' + IDs[0] + ']: ' + nc + ((value !== null) ? ' ' + value + ' %' : ''));
+      }
     } catch (e) {
       this.platform.log.error('There was a problem sending command ', c + ' to ' + IDs[0]);
     }
