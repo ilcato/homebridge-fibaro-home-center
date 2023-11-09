@@ -35,6 +35,6 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 + Use different device names within the same room in Home Center.
 
 # Last release notes
-Version 1.3.0
+Version 1.4.0
 + Log management improved - Thanks to @mkz212
 + Wallplug and outlet management improved - Thanks to @mkz212
