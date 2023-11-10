@@ -109,17 +109,12 @@ export class FibaroAccessory {
       case 'com.fibaro.rollerShutter':
       case 'com.fibaro.FGWR111':
       case 'com.fibaro.remoteBaseShutter':
-      case 'com.fibaro.baseShutter': // only if favoritePositionsNativeSupport is true otherwise it's a garage door
-        if (controlType === 56 || controlType === 57) {
-          // it's a garage door
-          service = this.platform.Service.GarageDoorOpener;
-          this.mainCharacteristics =
-            [this.platform.Characteristic.CurrentDoorState,
-              this.platform.Characteristic.TargetDoorState,
-              this.platform.Characteristic.ObstructionDetected];
-          break;
-        } else if (this.device.type !== 'com.fibaro.baseShutter' ||
-        this.device.type === 'com.fibaro.baseShutter' && properties.favoritePositionsNativeSupport) {
+      case 'com.fibaro.barrier':
+      case 'com.fibaro.baseShutter':  
+        // only if favoritePositionsNativeSupport is true otherwise it's a garage door
+        if ((this.device.type !== 'com.fibaro.baseShutter' && this.device.type !== 'com.fibaro.barrier') ||
+        (this.device.type === 'com.fibaro.baseShutter' && properties.favoritePositionsNativeSupport) || 
+        (this.device.type === 'com.fibaro.baseShutter' && controlType === 53)){
           service = this.platform.Service.WindowCovering;
           this.mainCharacteristics = [
             this.platform.Characteristic.CurrentPosition,
@@ -133,20 +128,23 @@ export class FibaroAccessory {
               this.platform.Characteristic.TargetHorizontalTiltAngle,
             );
           }
-          if (this.device.type === 'com.fibaro.remoteBaseShutter' || this.device.type === 'com.fibaro.baseShutter') {
+          if (this.device.type === 'com.fibaro.remoteBaseShutter' || 
+              this.device.type === 'com.fibaro.baseShutter' ||
+              (this.device.type === 'com.fibaro.baseShutter' && controlType === 53)) {
             subtype = device.id + '--OPENCLOSEONLY';
           }
           break;
-        } // else it's a garage door
-      // eslint-disable-next-line no-duplicate-case, no-fallthrough
-      case 'com.fibaro.baseShutter':
-      case 'com.fibaro.barrier':
-        service = this.platform.Service.GarageDoorOpener;
-        this.mainCharacteristics =
-          [this.platform.Characteristic.CurrentDoorState,
-            this.platform.Characteristic.TargetDoorState,
-            this.platform.Characteristic.ObstructionDetected];
-        break;
+        } else if (this.device.type === 'com.fibaro.baseShutter' ||
+          this.device.type === 'com.fibaro.barrier' ||
+          controlType === 56 || controlType === 57) {
+          // it's a garage door
+            service = this.platform.Service.GarageDoorOpener;
+            this.mainCharacteristics =
+              [this.platform.Characteristic.CurrentDoorState,
+                this.platform.Characteristic.TargetDoorState,
+                this.platform.Characteristic.ObstructionDetected];
+            break;
+        }  
       case 'com.fibaro.FGMS001':
       case 'com.fibaro.FGMS001v2':
       case 'com.fibaro.motionSensor':
