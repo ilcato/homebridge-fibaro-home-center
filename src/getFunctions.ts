@@ -195,6 +195,7 @@ export class GetFunctions {
         characteristic.updateValue(properties.currentTemperature);
       } catch (e) {
         this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
+        return
       }
     } else {
       const value = properties.value;
@@ -225,6 +226,7 @@ export class GetFunctions {
         characteristic.updateValue(properties.currentTemperature);
       } catch (e) {
         this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
+        return
       }
     } else {
       const value = properties.value;
