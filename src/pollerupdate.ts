@@ -120,9 +120,9 @@ export class Poller {
                           subscription.characteristic.displayName === 'Target Position') {
                   val1 = subscription.characteristic.value.toFixed(0);
                   val2 = '%';
-                } else if (subscription.characteristic.value === true || subscription.characteristic.value === 'turnOn') {
+                } else if (subscription.characteristic.displayName === 'On') {
                     val1 = 'On';
-                } else if (subscription.characteristic.value === false || subscription.characteristic.value === 'turnOff') {
+                } else if (subscription.characteristic.displayName === 'Off') {
                     val1 = 'Off';
                 } else {
                     val1 = subscription.characteristic.value;
