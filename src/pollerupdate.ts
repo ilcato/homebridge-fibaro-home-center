@@ -121,13 +121,12 @@ export class Poller {
                   val1 = subscription.characteristic.value.toFixed(0);
                   val2 = '%';
                 } else if (subscription.characteristic.displayName === 'On') {
-                    val1 = 'On';
-                } else if (subscription.characteristic.displayName === 'Off') {
-                    val1 = 'Off';
-                } else if (subscription.characteristic.displayName === 'Open') {
-                    val1 = 'Open';
-                } else if (subscription.characteristic.displayName === 'Close') {
-                    val1 = 'Close';
+                    if (subscription.characteristic.value === true || subscription.characteristic.value === 'turnOn') {
+                        val1 = 'On';
+                    } else if (subscription.characteristic.value === false || subscription.characteristic.value === 'turnOff') {
+                        val1 = 'Off';
+                    }
+                }
                 } else if (subscription.characteristic.displayName === 'Motion Detected') {
                     val1 = 'Motion Detected';
                 } else {
