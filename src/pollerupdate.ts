@@ -114,18 +114,23 @@ export class Poller {
                 if (subscription.characteristic.displayName === 'Current Temperature') {
                   val1 = subscription.characteristic.value.toFixed(1);
                   val2 = (this.platform.config.FibaroTemperatureUnit === 'F') ? 'F' : 'C';
-                } else if (subscription.characteristic.displayName === 'Current Relative Humidity') {
+                } else if (subscription.characteristic.displayName === 'Current Relative Humidity' ||
+                           subscription.characteristic.displayName === 'Brightness' ||
+                           subscription.characteristic.displayName === 'Current Position' ||
+                           subscription.characteristic.displayName === 'Target Position') {
                   val1 = subscription.characteristic.value.toFixed(0);
                   val2 = '%';
+                } else if (subscription.characteristic.displayName === 'Current Ambient Light Level') {
+                  val1 = subscription.characteristic.value.toFixed(1);
+                  val2 = 'lux';
+                } else if (subscription.characteristic.displayName === 'On') {
+                    if (subscription.characteristic.value === true || subscription.characteristic.value === 'turnOn') {
+                        val1 = 'On';
+                    } else if (subscription.characteristic.value === false || subscription.characteristic.value === 'turnOff') {
+                        val1 = 'Off';
+                    }
                 } else {
-                  if (subscription.characteristic.value === true || subscription.characteristic.value === 'turnOn') {
-                    val1 = 'On';
-                  } else if (subscription.characteristic.value === false || subscription.characteristic.value === 'turnOff') {
-                    val1 = 'Off';
-                  } else {
                     val1 = subscription.characteristic.value;
-                    val2 = '%';
-                  }
                 }
                 this.platform.log.info(`${subscription.service.displayName} [${subscription.id}]:`, `${val1}`, `${val2}`);
               }
