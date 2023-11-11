@@ -129,19 +129,6 @@ export class Poller {
                     } else if (subscription.characteristic.value === false || subscription.characteristic.value === 'turnOff') {
                         val1 = 'Off';
                     }
-                }
-                } else if (subscription.characteristic.displayName === 'Lock Current State' ||
-                          subscription.characteristic.displayName === 'Lock Target State' ||
-                          subscription.characteristic.displayName === 'Current Door State' ||
-                          subscription.characteristic.displayName === 'Target Door State') {
-                  if (subscription.characteristic.value === true || subscription.characteristic.value === 'turnOn') {
-                      val1 = 'Open';
-                  } else if (subscription.characteristic.value === false || subscription.characteristic.value === 'turnOff') {
-                      val1 = 'Close';
-                  }
-                }
-                } else if (subscription.characteristic.displayName === 'Motion Detected') {
-                    val1 = 'Motion Detected';
                 } else {
                     val1 = subscription.characteristic.value;
                 }
