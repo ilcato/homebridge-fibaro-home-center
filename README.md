@@ -35,7 +35,8 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 + Use different device names within the same room in Home Center.
 
 # Troubleshooting
-+ If device displays incorrectly (e.g. as Switch but should be Outlet) or double, you must remove this device from cache (in Homebridge Settings).
++ If device displays incorrectly (e.g. as Switch but should be Outlet) or double (one device is displayed as two), you must remove this device from cache (in Homebridge Settings).
++ If your device is not supported or displays incorrectly despite removing it from the cache - [see here](https://github.com/ilcato/homebridge-fibaro-home-center/issues/157).
 
 # Last release notes
 Version 1.4.0
