@@ -34,6 +34,9 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 # Warning
 + Use different device names within the same room in Home Center.
 
+# Troubleshooting
++ The device displays incorrectly (e.g. as Switch and should be Outlet) or double. Sometimes this happens, especially after changing the type of display (e.g. from Switch to Outlet). You must remove this device from cache in Homebridge Settings.
+
 # Last release notes
 Version 1.4.0
 + Log management improved - Thanks to @mkz212
