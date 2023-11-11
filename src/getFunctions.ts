@@ -36,8 +36,8 @@ export class GetFunctions {
       CurrentHorizontalTiltAngle: this.getCurrentTiltAngle,
       TargetHorizontalTiltAngle: this.getCurrentTiltAngle,
       MotionDetected: this.getBool,
-      CurrentTemperature: this.getCurrentTemperature,
-      TargetTemperature: this.getTargetTemperature,
+      CurrentTemperature: this.getCurrentTemperature || 0,
+      TargetTemperature: this.getTargetTemperature || 0,
       CurrentRelativeHumidity: this.getFloat,
       ContactSensorState: this.getContactSensorState,
       LeakDetected: this.getLeakDetected,
@@ -195,6 +195,7 @@ export class GetFunctions {
         characteristic.updateValue(properties.currentTemperature);
       } catch (e) {
         this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
+        return
       }
     } else {
       const value = properties.value;
@@ -225,6 +226,7 @@ export class GetFunctions {
         characteristic.updateValue(properties.currentTemperature);
       } catch (e) {
         this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
+        return
       }
     } else {
       const value = properties.value;
