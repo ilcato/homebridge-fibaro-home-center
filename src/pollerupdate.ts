@@ -115,9 +115,10 @@ export class Poller {
                   val1 = subscription.characteristic.value.toFixed(1);
                   val2 = (this.platform.config.FibaroTemperatureUnit === 'F') ? 'F' : 'C';
                 } else if (subscription.characteristic.displayName === 'Current Relative Humidity' ||
-                          subscription.characteristic.displayName === 'Brightness' ||
-                          subscription.characteristic.displayName === 'Current Position' ||
-                          subscription.characteristic.displayName === 'Target Position') {
+                           subscription.characteristic.displayName === 'Current Ambient Light Level' ||
+                           subscription.characteristic.displayName === 'Brightness' ||
+                           subscription.characteristic.displayName === 'Current Position' ||
+                           subscription.characteristic.displayName === 'Target Position') {
                   val1 = subscription.characteristic.value.toFixed(0);
                   val2 = '%';
                 } else if (subscription.characteristic.displayName === 'On') {
@@ -126,6 +127,16 @@ export class Poller {
                     } else if (subscription.characteristic.value === false || subscription.characteristic.value === 'turnOff') {
                         val1 = 'Off';
                     }
+                }
+                } else if (subscription.characteristic.displayName === 'Lock Current State' ||
+                          subscription.characteristic.displayName === 'Lock Target State' ||
+                          subscription.characteristic.displayName === 'Current Door State' ||
+                          subscription.characteristic.displayName === 'Target Door State') {
+                  if (subscription.characteristic.value === true || subscription.characteristic.value === 'turnOn') {
+                      val1 = 'Open';
+                  } else if (subscription.characteristic.value === false || subscription.characteristic.value === 'turnOff') {
+                      val1 = 'Close';
+                  }
                 }
                 } else if (subscription.characteristic.displayName === 'Motion Detected') {
                     val1 = 'Motion Detected';
