@@ -124,6 +124,12 @@ export class Poller {
                     val1 = 'On';
                 } else if (subscription.characteristic.displayName === 'Off') {
                     val1 = 'Off';
+                } else if (subscription.characteristic.displayName === 'Open') {
+                    val1 = 'Open';
+                } else if (subscription.characteristic.displayName === 'Close') {
+                    val1 = 'Close';
+                } else if (subscription.characteristic.displayName === 'Motion Detected') {
+                    val1 = 'Motion Detected';
                 } else {
                     val1 = subscription.characteristic.value;
                 }
