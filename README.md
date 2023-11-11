@@ -50,4 +50,6 @@ To see the effect after changing, you must remove this device from cache in Home
 # Last release notes
 Version 1.4.1
 + Now for devices like Switch, Double Switch, Smart Implant, Wall Plug etc. you can change how it will display in Homekit - in the Fibaro panel go to this device and check field Role (or What controls the device). Selecting Light should set device as Light, selecting "Other" / "Another device" should set the device as Switch, selecting Sprinkler or Valve should set device as Valve, and any other case will be Outlet.
-+ If device displays incorrectly (e.g. as Switch but should be Outlet) or double (one device is displayed as two), you must remove this device from cache (in Homebridge Settings).
+
+#### IMPORTANT!
+If device displays incorrectly (e.g. as Switch but should be Outlet) or double (one device is displayed as two), you must remove this device from cache (in Homebridge Settings).
