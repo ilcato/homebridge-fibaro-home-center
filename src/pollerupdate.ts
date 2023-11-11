@@ -117,15 +117,12 @@ export class Poller {
                 } else if (subscription.characteristic.displayName === 'Current Relative Humidity') {
                   val1 = subscription.characteristic.value.toFixed(0);
                   val2 = '%';
-                } else {
-                  if (subscription.characteristic.value === true || subscription.characteristic.value === 'turnOn') {
+                } else if (subscription.characteristic.value === true || subscription.characteristic.value === 'turnOn') {
                     val1 = 'On';
-                  } else if (subscription.characteristic.value === false || subscription.characteristic.value === 'turnOff') {
+                } else if (subscription.characteristic.value === false || subscription.characteristic.value === 'turnOff') {
                     val1 = 'Off';
-                  } else {
+                } else {
                     val1 = subscription.characteristic.value;
-                    val2 = '%';
-                  }
                 }
                 this.platform.log.info(`${subscription.service.displayName} [${subscription.id}]:`, `${val1}`, `${val2}`);
               }
