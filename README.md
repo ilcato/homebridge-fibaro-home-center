@@ -41,11 +41,10 @@ For devices like Switch, Double Switch, Smart Implant, Wall Plug etc. you can ch
 + selecting Sprinkler or Valve should set device as Valve,
 + and any other case will be Outlet.
 
-To see the effect after changing, you must remove this device from cache in Homebridge Settings.
+To see the effect after changing, you must remove this device from cache in Homebridge Settings. Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
 
 # Troubleshooting
 + If device displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
-+ If your device is not supported or displays incorrectly despite removing it from the cache - [see here](https://github.com/ilcato/homebridge-fibaro-home-center/issues/157).
 
 # Latest release notes
 Version 1.4.1
