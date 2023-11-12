@@ -145,7 +145,7 @@
         ]
       },
       "newRole": {
-        "description": "Enable this if you want the device type in Homekit to depend on how the device role in Fibaro is selected. WARNING: To see the effect after changing, or if device is displayed doubled, you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).",
+        "description": "Enable this if you want the device type in Homekit to depend on how the device role in Fibaro is selected. WARNING: Every change of devices display can make it display doubled. If device displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).",
         "title": "Device type depending on the Role",
         "type": "number",
         "default": "0",
