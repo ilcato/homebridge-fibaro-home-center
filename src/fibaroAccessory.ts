@@ -65,7 +65,7 @@ export class FibaroAccessory {
       case 'com.fibaro.developer.bxs.virtualBinarySwitch':
       case 'com.fibaro.satelOutput':
       case 'com.fibaro.FGWDS221':
-        if (this.platform.config.newCode === 1) {
+        if (this.platform.config.newRole === 1) {
           switch (controlType) {
             case 2: // Lighting
             case 5: // Bedside Lamp
@@ -136,7 +136,7 @@ export class FibaroAccessory {
       case 'com.fibaro.FGWPG111':
       case 'com.fibaro.FGWPG121':
       case 'com.fibaro.FGWOEF011':
-        if (this.platform.config.newCode === 1) {
+        if (this.platform.config.newRole === 1) {
           switch (controlType) {
             case 2: // Lighting
             case 5: // Bedside Lamp
