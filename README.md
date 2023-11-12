@@ -48,5 +48,5 @@ Every change of devices display can make it display doubled. If device displays 
 # Latest release notes
 Version 1.5.0
 + New function to enable in plugin settings if you want the device type in Homekit to depend on how the device role in Fibaro is selected. For devices like Switch, Double Switch, Smart Implant, Wall Plug etc. you can change how it will display in Homekit - in the Fibaro panel go to this device and check field Role (or What controls the device). Selecting Light should set device as Light, selecting "Other" / "Another device" should set the device as Switch, selecting Sprinkler or Valve should set device as Valve, and any other case will be Outlet.
-
-Every change of devices display can make it display doubled. If device displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
+#### IMPORTANT WARNING
++ Every change of devices display can make it display doubled. If device displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
