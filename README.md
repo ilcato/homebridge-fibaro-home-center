@@ -53,3 +53,4 @@ Version 1.5.0
 
 #### IMPORTANT WARNING
 + Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). If device displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
++ It is recommended to turn off the Apple hub before updating and re-enable it after all completes (setting plugin and devices). 
