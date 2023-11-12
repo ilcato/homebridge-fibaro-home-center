@@ -65,44 +65,116 @@ export class FibaroAccessory {
       case 'com.fibaro.developer.bxs.virtualBinarySwitch':
       case 'com.fibaro.satelOutput':
       case 'com.fibaro.FGWDS221':
+        if (this.platform.config.advControl === 1) {
+          switch (controlType) {
+            case 2: // Lighting
+            case 5: // Bedside Lamp
+            case 7: // Wall Lamp
+              service = this.platform.Service.Lightbulb;
+              this.mainCharacteristics = [this.platform.Characteristic.On];
+              break;
+            case 1: // Other device
+            case 20: // Other device
+              service = this.platform.Service.Switch;
+              this.mainCharacteristics = [this.platform.Characteristic.On];
+              break;
+            case 24: // Video intercom
+            case 25: // Video gate open
+              service = this.platform.Service.LockMechanism;
+              subtype = device.id + '--' + 'LOCK';
+              this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
+              break;
+            case 3: // sprinkler
+            case 26: // valve
+              service = this.platform.Service.Valve;
+              this.mainCharacteristics = [
+                this.platform.Characteristic.Active,
+                this.platform.Characteristic.InUse,
+                this.platform.Characteristic.ValveType,
+              ];
+              break;
+            default:
+              service = this.platform.Service.Outlet;
+              this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
+              break;
+          }
+          break;
+        } else {
+          switch (controlType) {
+            case 2: // Lighting
+            case 5: // Bedside Lamp
+            case 7: // Wall Lamp
+              service = this.platform.Service.Lightbulb;
+              this.mainCharacteristics = [this.platform.Characteristic.On];
+              break;
+            case 20: // Other device
+              service = this.platform.Service.Outlet;
+              this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
+              break;
+            case 25: // Video gate open
+              service = this.platform.Service.LockMechanism;
+              subtype = device.id + '--' + 'LOCK';
+              this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
+              break;
+            case 26: // valve
+              service = this.platform.Service.Valve;
+              this.mainCharacteristics = [
+                this.platform.Characteristic.Active,
+                this.platform.Characteristic.InUse,
+                this.platform.Characteristic.ValveType,
+              ];
+              break;
+            default:
+              service = this.platform.Service.Switch;
+              this.mainCharacteristics = [this.platform.Characteristic.On];
+              break;
+          }
+          break;
+        } 
       case 'com.fibaro.FGWP101':
       case 'com.fibaro.FGWP102':
       case 'com.fibaro.FGWPG111':
       case 'com.fibaro.FGWPG121':
       case 'com.fibaro.FGWOEF011':
-        switch (controlType) {
-          case 2: // Lighting
-          case 5: // Bedside Lamp
-          case 7: // Wall Lamp
-            service = this.platform.Service.Lightbulb;
-            this.mainCharacteristics = [this.platform.Characteristic.On];
-            break;
-          case 1: // Other device
-          case 20: // Other device
-            service = this.platform.Service.Switch;
-            this.mainCharacteristics = [this.platform.Characteristic.On];
-            break;
-          case 24: // Video intercom
-          case 25: // Video gate open
-            service = this.platform.Service.LockMechanism;
-            subtype = device.id + '--' + 'LOCK';
-            this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
-            break;
-          case 3: // sprinkler
-          case 26: // valve
-            service = this.platform.Service.Valve;
-            this.mainCharacteristics = [
-              this.platform.Characteristic.Active,
-              this.platform.Characteristic.InUse,
-              this.platform.Characteristic.ValveType,
-            ];
-            break;
-          default:
-            service = this.platform.Service.Outlet;
-            this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
-            break;
+        if (this.platform.config.advControl === 1) {
+          switch (controlType) {
+            case 2: // Lighting
+            case 5: // Bedside Lamp
+            case 7: // Wall Lamp
+              service = this.platform.Service.Lightbulb;
+              this.mainCharacteristics = [this.platform.Characteristic.On];
+              break;
+            case 1: // Other device
+            case 20: // Other device
+              service = this.platform.Service.Switch;
+              this.mainCharacteristics = [this.platform.Characteristic.On];
+              break;
+            case 24: // Video intercom
+            case 25: // Video gate open
+              service = this.platform.Service.LockMechanism;
+              subtype = device.id + '--' + 'LOCK';
+              this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
+              break;
+            case 3: // sprinkler
+            case 26: // valve
+              service = this.platform.Service.Valve;
+              this.mainCharacteristics = [
+                this.platform.Characteristic.Active,
+                this.platform.Characteristic.InUse,
+                this.platform.Characteristic.ValveType,
+              ];
+              break;
+            default:
+              service = this.platform.Service.Outlet;
+              this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
+              break;
+          }
+          break;
+        } else {
+          service = this.platform.Service.Outlet;
+          this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
+          break;
         }
-        break;
       case 'com.fibaro.FGR221':
       case 'com.fibaro.FGRM222':
       case 'com.fibaro.FGR223':
