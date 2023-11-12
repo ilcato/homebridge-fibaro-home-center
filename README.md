@@ -28,12 +28,12 @@ Remember to configure the plugin in config.json in your home directory inside th
 + "addRoomNameToDeviceName" : "PUT enabled OR disabled IN ORDER TO ADD THE ROOM NAME TO DEVICE NAME. DEFAULT disabled"
 + "doorbellDeviceId" : "PUT HOME CENTER BINARY SENSOR DEVICE ID ACTING AS A DOORBELL"
 + "logsLevel": "PUT THE DESIRED LOG LEVEL: 0 DISABLED, 1 ONLY CHANGES, 2 ALL"
-+ "advControl": "ENABLE IF YOU WANT THE DEVICE TYPE IN HOMEKIT TO DEPEND ON HOW THE DEVICE ROLE IN FIBARO IS SELECTED"
++ "advControl": "ENABLE IF YOU WANT THE DEVICE TYPE IN HOMEKIT TO DEPEND ON HOW THE DEVICE ROLE IN FIBARO IS SELECTED. 0-DISABLED, 1-ENABLED"
 
 # Links
-Sample config: [config.json example](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/config.json)
-Advanced Control: [Advanced Control page](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/advcontrol.md)
-Wiki: [Wiki page](https://github.com/ilcato/homebridge-Fibaro-home-center/wiki)
++ Sample config: [config.json example](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/config.json)
++ Advanced Control: [Advanced Control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/advcontrol.md)
++ Wiki: [Wiki](https://github.com/ilcato/homebridge-Fibaro-home-center/wiki)
 
 # Warning / Troubleshooting
 + Use different device names within the same room in Home Center.
