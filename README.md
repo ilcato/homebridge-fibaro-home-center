@@ -34,7 +34,7 @@ Look for a sample config in [config.json example](https://github.com/ilcato/home
 
 # Warning / Troubleshooting
 + Use different device names within the same room in Home Center.
-+ Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). If device displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
++ Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). It is recommended to turn off Apple hubs during changes. If device displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
 
 # New function - Changing the display type of the device
 Now you can enable new option in plugin settings if you want the device type in Homekit to depend on how the device role in Fibaro is selected. For devices like Switch, Double Switch, Smart Implant, Wall Plug etc. you can change how it will display in Homekit - in the Fibaro panel go to this device and check field Role (or What controls the device).
@@ -43,7 +43,7 @@ Now you can enable new option in plugin settings if you want the device type in 
 + selecting Sprinkler or Valve should set device as Valve,
 + and any other case will be Outlet.
 
-Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). If device displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
+Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). It is recommended to turn off Apple hubs during changes. If device displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
 
 # Latest release notes
 Version 1.5.0
@@ -53,4 +53,4 @@ Version 1.5.0
 
 #### IMPORTANT WARNING
 + Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). If device displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
-+ It is recommended to turn off the Apple hub before updating and re-enable it after all completes (setting plugin and devices). 
++ It is recommended to turn off the Apple hubs before updating and re-enable it after all completes (setting plugin and devices). 
