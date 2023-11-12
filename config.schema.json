@@ -145,7 +145,7 @@
         ]
       },
       "advControl": {
-        "description": "Enable this if you want the device type in Homekit to depend on how the device role in Fibaro is selected. Details can be found on Homepage (link in footer). Be sure to read the page before enabling this feature! Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled) until removed from cache in Homebridge Settings - unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).",
+        "description": "Enable this if you want the device type in Homekit to depend on how the device role in Fibaro is selected. Details can be found on Homepage (link in footer). Be sure to read the page BEFORE ENABLING this feature! Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled) until removed from cache in Homebridge Settings - unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).",
         "title": "Advanced control",
         "type": "number",
         "default": "0",
