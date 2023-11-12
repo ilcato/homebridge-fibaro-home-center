@@ -194,8 +194,6 @@ export class FibaroAccessory {
         } else if (this.device.type !== 'com.fibaro.baseShutter' ||
                    this.device.type === 'com.fibaro.baseShutter' && properties.favoritePositionsNativeSupport) {
           service = this.platform.Service.WindowCovering;
-          this.mainCharacteristics = [this.platform.Characteristic.CurrentPosition,
-                                      service = this.platform.Service.WindowCovering;
           this.mainCharacteristics = [
             this.platform.Characteristic.CurrentPosition,
             this.platform.Characteristic.TargetPosition,
