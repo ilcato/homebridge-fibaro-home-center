@@ -12,4 +12,4 @@ Every change of devices display type (e.g. from Switch to Outlet etc.) can make 
 ## Look what it changed
 
 
-<img width="844" alt="Zrzut ekranu 2023-11-12 o 11 37 24" src="https://github.com/mkz212/homebridge-fibaro-home-center/assets/82271669/9a070316-1eed-4daf-a100-1a43cfd6049f">
+<img width="844" alt="" src="https://github.com/mkz212/homebridge-fibaro-home-center/assets/82271669/9a070316-1eed-4daf-a100-1a43cfd6049f">
