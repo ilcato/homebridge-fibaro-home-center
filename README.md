@@ -30,10 +30,9 @@ Remember to configure the plugin in config.json in your home directory inside th
 + "logsLevel": "PUT THE DESIRED LOG LEVEL: 0 DISABLED, 1 ONLY CHANGES, 2 ALL"
 + "advControl": "ENABLE IF YOU WANT THE DEVICE TYPE IN HOMEKIT TO DEPEND ON HOW THE DEVICE ROLE IN FIBARO IS SELECTED"
 
-Look for a sample config in [config.json example](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/config.json)
-
-Info about Advanced Control option: [Advanced Control page](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/advcontrol.md)
-
+# Links
+Sample config: [config.json example](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/config.json)
+Advanced Control: [Advanced Control page](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/advcontrol.md)
 Wiki: [Wiki page](https://github.com/ilcato/homebridge-Fibaro-home-center/wiki)
 
 # Warning / Troubleshooting
