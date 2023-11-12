@@ -3,7 +3,7 @@
   "pluginType": "platform",
   "singular": true,
   "headerDisplay": "Homebridge plugin for Fibaro Home Center.",
-  "footerDisplay": "For additonal information see [wiki](https://github.com/ilcato/homebridge-fibaro-home-center/wiki).",
+  "footerDisplay": "For additonal information see [Homepage](https://github.com/ilcato/homebridge-fibaro-home-center).",
   "schema": {
     "type": "object",
     "properties": {
@@ -145,7 +145,7 @@
         ]
       },
       "advControl": {
-        "description": "Enable this if you want the device type in Homekit to depend on how the device role in Fibaro is selected. For devices like Switch, Double Switch, Smart Implant, Wall Plug etc. you can change how it will display in Homekit - in the Fibaro panel go to this device and check field Role (or What controls the device). Selecting Light should set device as Light, selecting Other Device should set the device as Switch, selecting Sprinkler or Valve should set device as Valve, and any other case will be Outlet. WARNING: Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). It is recommended to turn off Apple hubs during changes. If device displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).",
+        "description": "Enable this if you want the device type in Homekit to depend on how the device role in Fibaro is selected. Details can be found on Homepage (link in footer). Be sure to read the page BEFORE ENABLING this feature! Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled) until removed from cache in Homebridge Settings - unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).",
         "title": "Advanced control",
         "type": "number",
         "default": "0",
