@@ -35,10 +35,13 @@ Remember to configure the plugin in config.json in your home directory inside th
 + Advanced Control: [Advanced Control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/advcontrol.md)
 + Wiki: [Wiki](https://github.com/ilcato/homebridge-Fibaro-home-center/wiki)
 
-# Warning / Troubleshooting
+# Troubleshooting
 + Use different device names within the same room in Home Center.
 + Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). It is recommended to turn off Apple hubs during changes.
 + If device displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
++ If you want new device to be supported open new Issue and write: what is this product, as what should it be displayed, and attach the API response for this product (see below).
++ How to get API response for device. Open in browser: http://FIBARO-IP/api/devices/ID (replace FIBARO-IP with your Home Center IP and ID with device ID) and login.
++ If You want to exclude one or more devices: use a specific user (not an admin one) and grant access to only the needed devices or rename the device you want to exclude with an initial _ character. Warning: If you exclude the device, adding it again will require reconfiguration (assignment to a room, automations, etc.).
 
 # Latest release notes
 Version 1.5.0
