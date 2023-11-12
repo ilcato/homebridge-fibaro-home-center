@@ -9,7 +9,7 @@
     "description": "This is an example configuration file. You can use this as a template for creating your own configuration file.",
 
     "platforms": [
-            {
+        {
             "platform": "FibaroHC",
             "name": "FibaroHC",
             "host": "PUT IP ADDRESS OF YOUR HOME CENTER HERE. IF URL IS PRESENT THIS PARAMETER IS IGNORED",
@@ -24,10 +24,9 @@
             "securitysystem": "PUT enabled OR disabled IN ORDER TO MANAGE THE AVAILABILITY OF THE SECURITY SYSTEM",
             "addRoomNameToDeviceName" : "PUT enabled OR disabled IN ORDER TO ADD THE ROOM NAME TO DEVICE NAME. DEFAULT disabled",
             "doorbellDeviceId" : "PUT HOME CENTER BINARY SENSOR DEVICE ID ACTING AS A DOORBELL",
-            "logsLevel": "PUT THE DESIRED LOG LEVEL: 0 DISABLED, 1 ONLY CHANGES, 2 ALL"
-
+            "logsLevel": "PUT THE DESIRED LOG LEVEL: 0 DISABLED, 1 ONLY CHANGES, 2 ALL",
+            "advControl": "0 - DISABLED, 1-ENABLED"
         }
-
     ],
 
     "accessories": [

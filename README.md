@@ -28,17 +28,17 @@ Remember to configure the plugin in config.json in your home directory inside th
 + "addRoomNameToDeviceName" : "PUT enabled OR disabled IN ORDER TO ADD THE ROOM NAME TO DEVICE NAME. DEFAULT disabled"
 + "doorbellDeviceId" : "PUT HOME CENTER BINARY SENSOR DEVICE ID ACTING AS A DOORBELL"
 + "logsLevel": "PUT THE DESIRED LOG LEVEL: 0 DISABLED, 1 ONLY CHANGES, 2 ALL"
-+ "advControl": "ENABLE IF YOU WANT THE DEVICE TYPE IN HOMEKIT TO DEPEND ON HOW THE DEVICE ROLE IN FIBARO IS SELECTED"
++ "advControl": "ENABLE IF YOU WANT THE DEVICE TYPE IN HOMEKIT TO DEPEND ON HOW THE DEVICE ROLE IN FIBARO IS SELECTED. 0-DISABLED, 1-ENABLED"
 
-Look for a sample config in [config.json example](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/config.json)
-
-Info about Advanced Control option: [Advanced Control page](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/advcontrol.md)
-
-Wiki: [Wiki page](https://github.com/ilcato/homebridge-Fibaro-home-center/wiki)
+# Links
++ Sample config: [config.json example](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/config.json)
++ Advanced Control: [Advanced Control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/advcontrol.md)
++ Wiki: [Wiki](https://github.com/ilcato/homebridge-Fibaro-home-center/wiki)
 
 # Warning / Troubleshooting
 + Use different device names within the same room in Home Center.
-+ Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). It is recommended to turn off Apple hubs during changes. If device displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
++ Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). It is recommended to turn off Apple hubs during changes.
++ If device displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
 
 # Latest release notes
 Version 1.5.0
