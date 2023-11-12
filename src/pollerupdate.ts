@@ -129,6 +129,12 @@ export class Poller {
                 } else if (subscription.characteristic.value === false || subscription.characteristic.value === 'turnOff') {
                   val1 = 'Off';
                 }
+              } else if (subscription.characteristic.displayName === 'Motion Detected') {
+                if (subscription.characteristic.value === true) {
+                  val1 = 'Motion detected';
+                } else if (subscription.characteristic.value === false) {
+                  val1 = 'No motion';
+                }
               } else {
                 val1 = subscription.characteristic.value;
               }
