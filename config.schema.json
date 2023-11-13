@@ -15,25 +15,25 @@
         "default": "FibaroHC"
       },
       "url": {
-        "description": "URL of the Fibaro Home Center machine. Must contain protocol and host name, e.g: https://hc-00000XXX.local",
+        "description": "e.g.: https://hc-00000XXX.local",
         "title": "Url",
         "type": "string",
         "required": false
       },
       "host": {
-        "description": "IP address (or hostname) of the Fibaro Home Center machine. Ignored if Url is present",
-        "title": "Host",
+        "description": "e.g.: 192.168.1.10",
+        "title": "Host (IP)",
         "type": "string",
         "required": false
       },
       "username": {
-        "description": "Username for accessing Fibaro Home Center machine.",
+        "description": "Username for Home Center.",
         "title": "Username",
         "type": "string",
         "required": true
       },
       "password": {
-        "description": "Password for accessing Fibaro Home Center machine.",
+        "description": "Password for Home Center.",
         "title": "Password",
         "type": "string",
         "required": true
@@ -167,6 +167,93 @@
       }
     }
   },
+  "layout": [  
+    {
+      "type": "fieldset",
+      "title": "Basic settings",
+      "description": "Enter Host (IP) or URL of the Fibaro HC. Host (IP) field is ignored if field Url is filled.",
+      "expandable": true,
+      "expanded": true,
+      "items": [
+        {
+          "type": "flex",
+          "flex-flow": "row wrap",
+          "items": ["host", "url"]
+        },
+        {
+          "type": "flex",
+          "flex-flow": "row wrap",
+          "items": ["username", "password"]
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Global variables",
+      "description": "",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "type": "flex",
+          "flex-flow": "row wrap",
+          "items": ["switchglobalvariables", "dimmerglobalvariables"]
+        },
+        {
+          "type": "flex",
+          "flex-flow": "row wrap",
+          "items": ["adminUsername", "adminPassword"]
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Advanced setting",
+      "description": "",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "type": "flex",
+          "flex-flow": "row wrap",
+          "items": ["pollerperiod", "securitysystem"]
+        },
+        {
+          "type": "flex",
+          "flex-flow": "row wrap",
+          "items": ["addRoomNameToDeviceName", "doorbellDeviceId"]
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Advanced control",
+      "description": "",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "type": "flex",
+          "flex-flow": "row wrap",
+          "items": ["advControl"]
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Logs",
+      "description": "",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "type": "flex",
+          "flex-flow": "row wrap",
+          "items": ["name", "logsLevel"]
+        }
+      ]
+    }
+  ],
   "form": null,
   "display": null
 }
