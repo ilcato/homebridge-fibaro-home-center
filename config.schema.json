@@ -208,7 +208,7 @@
     },
     {
       "type": "fieldset",
-      "title": "Advanced setting",
+      "title": "Advanced settings",
       "description": "",
       "expandable": true,
       "expanded": false,
