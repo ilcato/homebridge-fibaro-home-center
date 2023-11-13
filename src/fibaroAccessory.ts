@@ -184,6 +184,7 @@ export class FibaroAccessory {
       case 'com.fibaro.barrier':
       case 'com.fibaro.baseShutter': // only if favoritePositionsNativeSupport is true otherwise it's a garage door
         // it's a garage door
+        // case 57 - gate with positioning
         if (controlType === 56 || controlType === 57) {
           service = this.platform.Service.GarageDoorOpener;
           this.mainCharacteristics =
