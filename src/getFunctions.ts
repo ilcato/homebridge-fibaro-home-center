@@ -173,7 +173,7 @@ export class GetFunctions {
   }
 
   async getCurrentTemperature(characteristic, service, IDs, properties) {
-    if (service.isClimateZone) {
+    if (service.isClimateZone) { // used in new API (not in HC2 and HCL)
       try {
         const properties = (await this.platform.fibaroClient.getClimateZone(IDs[0])).body.properties;
         if (!Object.prototype.hasOwnProperty.call(properties, 'currentTemperatureHeating')) {
@@ -185,7 +185,7 @@ export class GetFunctions {
         this.platform.log('Error getting Current Temperature Climate Zone: ', `${service.IDs[0]} - Err: ${e}`);
         return;
       }
-    } else if (service.isHeatingZone) {
+    } else if (service.isHeatingZone) { // used in old API (HC2 and HCL)
       try {
         const properties = (await this.platform.fibaroClient.getHeatingZone(IDs[0])).body.properties;
         if (!Object.prototype.hasOwnProperty.call(properties, 'currentTemperature')) {
