@@ -177,24 +177,24 @@ export class GetFunctions {
       try {
         const properties = (await this.platform.fibaroClient.getClimateZone(IDs[0])).body.properties;
         if (!Object.prototype.hasOwnProperty.call(properties, 'currentTemperatureHeating')) {
-          this.platform.log('No value for Temperature.', '');
+          this.platform.log('No value for Temperature (Current - Climate zone).', '');
           return;
         }
         characteristic.updateValue(properties.currentTemperatureHeating);
       } catch (e) {
-        this.platform.log('There was a problem getting value from Climate Zone: ', `${service.IDs[0]} - Err: ${e}`);
+        this.platform.log('Error getting Current Temperature Climate Zone: ', `${service.IDs[0]} - Err: ${e}`);
         return;
       }
     } else if (service.isHeatingZone) {
       try {
         const properties = (await this.platform.fibaroClient.getHeatingZone(IDs[0])).body.properties;
         if (!Object.prototype.hasOwnProperty.call(properties, 'currentTemperature')) {
-          this.platform.log('No value for Temperature.', '');
+          this.platform.log('No value for Temperature (Current - Heating zone).', '');
           return;
         }
         characteristic.updateValue(properties.currentTemperature);
       } catch (e) {
-        this.platform.log('There was a problem getting value from Heating zone: ', `${service.IDs[0]} - Err: ${e}`);
+        this.platform.log('Error getting Current Temperature Heating Zone: ', `${service.IDs[0]} - Err: ${e}`);
         return
       }
     } else {
@@ -208,24 +208,24 @@ export class GetFunctions {
       try {
         const properties = (await this.platform.fibaroClient.getClimateZone(IDs[0])).body.properties;
         if (!properties.currentTemperatureHeating) {
-          this.platform.log('No value for Temperature.', '');
+          this.platform.log('No value for Temperature (Target - Climate zone).', '');
           return;
         }
         characteristic.updateValue(properties.currentTemperatureHeating);
       } catch (e) {
-        this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
+        this.platform.log('Error getting Target Temperature Climate Zone: ', `${service.IDs[0]} - Err: ${e}`);
         return;
       }
     } else if (service.isHeatingZone) {
       try {
         const properties = (await this.platform.fibaroClient.getHeatingZone(IDs[0])).body.properties;
         if (!Object.prototype.hasOwnProperty.call(properties, 'currentTemperature')) {
-          this.platform.log('No value for Temperature.', '');
+          this.platform.log('No value for Temperature (Target - Heating zone).', '');
           return;
         }
         characteristic.updateValue(properties.currentTemperature);
       } catch (e) {
-        this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
+        this.platform.log('Error getting Target Temperature Heating Zone: ', `${service.IDs[0]} - Err: ${e}`);
         return
       }
     } else {
