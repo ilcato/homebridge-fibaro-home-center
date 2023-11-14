@@ -12,7 +12,8 @@ assignees: ''
 - what is this product: 
 - as what should it be displayed, 
 - whether it does not display at all or displays incorrectly (as what device?),
-- what version of this plugin, 
+- what version of this plugin,
+- what Home Center:
 
 - API response for this product:
 ```
