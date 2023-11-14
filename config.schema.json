@@ -43,6 +43,7 @@
         "title": "Poller period",
         "type": "integer",
         "required": false,
+        "default": 2,
         "placeholder": 2,
         "minimum": 0
       },
