@@ -182,7 +182,7 @@ export class GetFunctions {
         }
         characteristic.updateValue(properties.currentTemperatureHeating);
       } catch (e) {
-        this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
+        this.platform.log('There was a problem getting value from Climate Zone: ', `${service.IDs[0]} - Err: ${e}`);
         return;
       }
     } else if (service.isHeatingZone) {
@@ -194,7 +194,7 @@ export class GetFunctions {
         }
         characteristic.updateValue(properties.currentTemperature);
       } catch (e) {
-        this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
+        this.platform.log('There was a problem getting value from Heating zone: ', `${service.IDs[0]} - Err: ${e}`);
         return
       }
     } else {
