@@ -210,6 +210,7 @@ export class FibaroAccessory {
             subtype = device.id + '--OPENCLOSEONLY';
           }
           break;
+        }
       case 'com.fibaro.baseShutter':
       case 'com.fibaro.barrier':
         service = this.platform.Service.GarageDoorOpener;
