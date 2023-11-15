@@ -107,7 +107,8 @@ export class Poller {
           const getFunction = this.platform.getFunctions.getFunctionsMapping.get(subscription.characteristic.UUID);
           if (getFunction && getFunction.function) {
 
-            getFunction.function.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
+            const IDs = subscription.service.subtype.split('-');
+            getFunction.function.call(this.platform.getFunctions, subscription.characteristic, subscription.service, IDs, change);
 
             if (this.platform.config.logsLevel >= 1) {
               let val1 = '', val2 = '';
