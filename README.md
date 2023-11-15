@@ -47,3 +47,4 @@ Remember to configure the plugin in config.json in your home directory inside th
 Version 1.5.0
 
 + New option to enable in plugin settings: Advanced Control. Enable it if you want the device type in Homekit to depend on how the device role in Fibaro is selected. Details: [Advanced Control page](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/advcontrol.md).
++ New settings view: divided into sections.
