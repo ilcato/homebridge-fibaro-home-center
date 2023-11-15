@@ -130,7 +130,7 @@ export class FibaroAccessory {
               break;
           }
           break;
-        } 
+        }
       case 'com.fibaro.FGWP101':
       case 'com.fibaro.FGWP102':
       case 'com.fibaro.FGWPG111':
@@ -211,6 +211,7 @@ export class FibaroAccessory {
           }
           break;
         }
+      // eslint-disable-next-line no-duplicate-case, no-fallthrough
       case 'com.fibaro.baseShutter':
       case 'com.fibaro.barrier':
         service = this.platform.Service.GarageDoorOpener;
