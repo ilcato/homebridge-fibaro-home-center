@@ -181,7 +181,6 @@ export class FibaroAccessory {
       case 'com.fibaro.rollerShutter':
       case 'com.fibaro.FGWR111':
       case 'com.fibaro.remoteBaseShutter':
-      case 'com.fibaro.barrier':
       case 'com.fibaro.baseShutter': // only if favoritePositionsNativeSupport is true otherwise it's a garage door
         // it's a garage door
         // case 57 - gate with positioning
