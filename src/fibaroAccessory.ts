@@ -62,7 +62,20 @@ export class FibaroAccessory {
             break;
         }
         break;
+      // Lightbulb
+      case 'com.fibaro.FGRGBW441M':
+      case 'com.fibaro.colorController':
+      case 'com.fibaro.FGRGBW442':
+      case 'com.fibaro.FGRGBW442CC':
+        service = this.platform.Service.Lightbulb;
+        this.mainCharacteristics =
+          [this.platform.Characteristic.On,
+            this.platform.Characteristic.Brightness,
+            this.platform.Characteristic.Hue,
+            this.platform.Characteristic.Saturation];
+        break;
       // Light / Switch / Outlet / Valve
+      // for Switch / Double Switch / Smart Implant / etc. 
       case 'com.fibaro.binarySwitch':
       case 'com.fibaro.developer.bxs.virtualBinarySwitch':
       case 'com.fibaro.satelOutput':
@@ -134,6 +147,7 @@ export class FibaroAccessory {
           break;
         }
       // Light / Switch / Outlet / Valve
+      // for Wall Plug etc. 
       case 'com.fibaro.FGWP101':
       case 'com.fibaro.FGWP102':
       case 'com.fibaro.FGWPG111':
@@ -232,7 +246,7 @@ export class FibaroAccessory {
         service = this.platform.Service.MotionSensor;
         this.mainCharacteristics = [this.platform.Characteristic.MotionDetected];
         break;
-      //Temperature sensor
+      // Temperature sensor
       case 'com.fibaro.temperatureSensor':
         service = this.platform.Service.TemperatureSensor;
         this.mainCharacteristics = [this.platform.Characteristic.CurrentTemperature];
@@ -241,6 +255,32 @@ export class FibaroAccessory {
       case 'com.fibaro.humiditySensor':
         service = this.platform.Service.HumiditySensor;
         this.mainCharacteristics = [this.platform.Characteristic.CurrentRelativeHumidity];
+        break;
+      // Light sensor
+      case 'com.fibaro.lightSensor':
+        service = this.platform.Service.LightSensor;
+        this.mainCharacteristics = [this.platform.Characteristic.CurrentAmbientLightLevel];
+        break;
+      // Temperature sensor / Humidity sensor / Light sensor
+      case 'com.fibaro.multilevelSensor':
+        switch (properties.deviceRole) {
+          case 'TemperatureSensor':
+            service = this.platform.Service.TemperatureSensor;
+            this.mainCharacteristics = [this.platform.Characteristic.CurrentTemperature];
+            break;
+          case 'HumiditySensor':
+            service = this.platform.Service.HumiditySensor;
+            this.mainCharacteristics = [this.platform.Characteristic.CurrentRelativeHumidity];
+            break;
+          case 'LightSensor':
+          case 'MultilevelSensor':
+            service = this.platform.Service.LightSensor;
+            this.mainCharacteristics = [this.platform.Characteristic.CurrentAmbientLightLevel];
+            break;
+          default:
+            this.isValid = false;
+            return;
+        }
         break;
       // Doorbell / Contact sensor
       case 'com.fibaro.binarySensor':
@@ -278,49 +318,11 @@ export class FibaroAccessory {
             this.platform.Characteristic.CarbonMonoxideLevel,
             this.platform.Characteristic.CarbonMonoxidePeakLevel, this.platform.Characteristic.BatteryLevel];
         break;
-      // Light sensor
-      case 'com.fibaro.lightSensor':
-        service = this.platform.Service.LightSensor;
-        this.mainCharacteristics = [this.platform.Characteristic.CurrentAmbientLightLevel];
-        break;
-      // Temperature sensor / Humidity sensor / Light sensor
-      case 'com.fibaro.multilevelSensor':
-        switch (properties.deviceRole) {
-          case 'TemperatureSensor':
-            service = this.platform.Service.TemperatureSensor;
-            this.mainCharacteristics = [this.platform.Characteristic.CurrentTemperature];
-            break;
-          case 'HumiditySensor':
-            service = this.platform.Service.HumiditySensor;
-            this.mainCharacteristics = [this.platform.Characteristic.CurrentRelativeHumidity];
-            break;
-          case 'LightSensor':
-          case 'MultilevelSensor':
-            service = this.platform.Service.LightSensor;
-            this.mainCharacteristics = [this.platform.Characteristic.CurrentAmbientLightLevel];
-            break;
-          default:
-            this.isValid = false;
-            return;
-        }
-        break;
       // Lock Mechanism
       case 'com.fibaro.doorLock':
       case 'com.fibaro.gerda':
         service = this.platform.Service.LockMechanism;
         this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
-        break;
-      // Lightbulb
-      case 'com.fibaro.FGRGBW441M':
-      case 'com.fibaro.colorController':
-      case 'com.fibaro.FGRGBW442':
-      case 'com.fibaro.FGRGBW442CC':
-        service = this.platform.Service.Lightbulb;
-        this.mainCharacteristics =
-          [this.platform.Characteristic.On,
-            this.platform.Characteristic.Brightness,
-            this.platform.Characteristic.Hue,
-            this.platform.Characteristic.Saturation];
         break;
       // Security system
       case 'securitySystem':
