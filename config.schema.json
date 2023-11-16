@@ -3,7 +3,7 @@
   "pluginType": "platform",
   "singular": true,
   "headerDisplay": "Homebridge plugin for Fibaro Home Center.",
-  "footerDisplay": "For additonal information see [Homepage](https://github.com/ilcato/homebridge-fibaro-home-center), [Wiki](https://github.com/ilcato/homebridge-Fibaro-home-center/wiki).",
+  "footerDisplay": "For additonal information see [Plugin Homepage](https://github.com/ilcato/homebridge-fibaro-home-center).",
   "schema": {
     "type": "object",
     "properties": {
