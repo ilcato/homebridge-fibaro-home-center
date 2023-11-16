@@ -239,13 +239,6 @@ export class FibaroAccessory {
             this.platform.Characteristic.TargetDoorState,
             this.platform.Characteristic.ObstructionDetected];
         break;
-      // Motion sensor
-      case 'com.fibaro.FGMS001':
-      case 'com.fibaro.FGMS001v2':
-      case 'com.fibaro.motionSensor':
-        service = this.platform.Service.MotionSensor;
-        this.mainCharacteristics = [this.platform.Characteristic.MotionDetected];
-        break;
       // Temperature sensor
       case 'com.fibaro.temperatureSensor':
         service = this.platform.Service.TemperatureSensor;
@@ -281,6 +274,13 @@ export class FibaroAccessory {
             this.isValid = false;
             return;
         }
+        break;
+      // Motion sensor
+      case 'com.fibaro.FGMS001':
+      case 'com.fibaro.FGMS001v2':
+      case 'com.fibaro.motionSensor':
+        service = this.platform.Service.MotionSensor;
+        this.mainCharacteristics = [this.platform.Characteristic.MotionDetected];
         break;
       // Doorbell / Contact sensor
       case 'com.fibaro.binarySensor':
