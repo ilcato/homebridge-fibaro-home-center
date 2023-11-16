@@ -37,8 +37,7 @@ Remember to configure the plugin in config.json in your home directory inside th
 
 # Troubleshooting
 ### The device is displayed incorrectly or doesn't display at all
-+ For some devices, the Role field is responsible for the display method (for a given device in the Fibaro Panel).
-+ Check [Advanced Control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/advcontrol.md)
++ For some devices, responsible for the display method is field Role (for a given device in the Fibaro Panel). Check [Advanced Control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/advcontrol.md).
 + If device still displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
 + Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). It is recommended to turn off Apple hubs during changes.
 + If you want new device to be supported (or if it displays incorrectly despite the recommendation above) open new Issue and write: what is this product, as what should it be displayed, whether it does not display at all or displays incorrectly (as what device?), what version of this plugin, what Home Center, and attach the API response for this product (see below).
