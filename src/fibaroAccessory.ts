@@ -62,7 +62,7 @@ export class FibaroAccessory {
             break;
         }
         break;
-      // Lightbulb
+      // Light RGBW
       case 'com.fibaro.FGRGBW441M':
       case 'com.fibaro.colorController':
       case 'com.fibaro.FGRGBW442':
