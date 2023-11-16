@@ -358,11 +358,13 @@ export class FibaroAccessory {
             this.platform.Characteristic.TemperatureDisplayUnits];
         subtype = device.id + '--HZ';
         break;
+      // Global variables
       case 'G':
         service = this.platform.Service.Switch;
         this.mainCharacteristics = [this.platform.Characteristic.On];
         subtype = this.device.type + '-' + this.device.name + '-';
         break;
+      // Dimmer global variables
       case 'D':
         service = this.platform.Service.Lightbulb;
         this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.Brightness];
