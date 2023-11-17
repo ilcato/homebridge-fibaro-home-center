@@ -46,6 +46,7 @@ export class FibaroAccessory {
     const controlType = parseInt(properties.deviceControlType);
 
     switch (this.device.type) {
+      // Light / Dimmer
       case 'com.fibaro.multilevelSwitch':
       case 'com.fibaro.FGD212':
       case 'com.fibaro.FGWD111':
@@ -61,6 +62,20 @@ export class FibaroAccessory {
             break;
         }
         break;
+      // Light RGBW
+      case 'com.fibaro.FGRGBW441M':
+      case 'com.fibaro.colorController':
+      case 'com.fibaro.FGRGBW442':
+      case 'com.fibaro.FGRGBW442CC':
+        service = this.platform.Service.Lightbulb;
+        this.mainCharacteristics =
+          [this.platform.Characteristic.On,
+            this.platform.Characteristic.Brightness,
+            this.platform.Characteristic.Hue,
+            this.platform.Characteristic.Saturation];
+        break;
+      // Light / Switch / Outlet / Valve
+      // for Switch / Double Switch / Smart Implant / etc. 
       case 'com.fibaro.binarySwitch':
       case 'com.fibaro.developer.bxs.virtualBinarySwitch':
       case 'com.fibaro.satelOutput':
@@ -131,6 +146,8 @@ export class FibaroAccessory {
           }
           break;
         }
+      // Light / Switch / Outlet / Valve
+      // for Wall Plug etc. 
       case 'com.fibaro.FGWP101':
       case 'com.fibaro.FGWP102':
       case 'com.fibaro.FGWPG111':
@@ -175,6 +192,7 @@ export class FibaroAccessory {
           this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
           break;
         }
+      // Window Covering / Garage door
       case 'com.fibaro.FGR221':
       case 'com.fibaro.FGRM222':
       case 'com.fibaro.FGR223':
@@ -211,6 +229,7 @@ export class FibaroAccessory {
           }
           break;
         }
+      // Garage door
       // eslint-disable-next-line no-duplicate-case, no-fallthrough
       case 'com.fibaro.baseShutter':
       case 'com.fibaro.barrier':
@@ -220,56 +239,22 @@ export class FibaroAccessory {
             this.platform.Characteristic.TargetDoorState,
             this.platform.Characteristic.ObstructionDetected];
         break;
-      case 'com.fibaro.FGMS001':
-      case 'com.fibaro.FGMS001v2':
-      case 'com.fibaro.motionSensor':
-        service = this.platform.Service.MotionSensor;
-        this.mainCharacteristics = [this.platform.Characteristic.MotionDetected];
-        break;
+      // Temperature sensor
       case 'com.fibaro.temperatureSensor':
         service = this.platform.Service.TemperatureSensor;
         this.mainCharacteristics = [this.platform.Characteristic.CurrentTemperature];
         break;
+      // Humidity sensor
       case 'com.fibaro.humiditySensor':
         service = this.platform.Service.HumiditySensor;
         this.mainCharacteristics = [this.platform.Characteristic.CurrentRelativeHumidity];
         break;
-      case 'com.fibaro.binarySensor':
-      case 'com.fibaro.doorSensor':
-      case 'com.fibaro.FGDW002':
-      case 'com.fibaro.windowSensor':
-      case 'com.fibaro.satelZone':
-      case 'com.fibaro.doorWindowSensor':
-        if (this.device.id === this.platform.config.doorbellDeviceId) {
-          service = this.platform.Service.Doorbell;
-          this.mainCharacteristics = [this.platform.Characteristic.ProgrammableSwitchEvent];
-        } else {
-          service = this.platform.Service.ContactSensor;
-          this.mainCharacteristics = [this.platform.Characteristic.ContactSensorState];
-        }
-        break;
-      case 'com.fibaro.FGFS101':
-      case 'com.fibaro.floodSensor':
-        service = this.platform.Service.LeakSensor;
-        this.mainCharacteristics = [this.platform.Characteristic.LeakDetected];
-        break;
-      case 'com.fibaro.FGSS001':
-      case 'com.fibaro.smokeSensor':
-      case 'com.fibaro.gasDetector':
-        service = this.platform.Service.SmokeSensor;
-        this.mainCharacteristics = [this.platform.Characteristic.SmokeDetected];
-        break;
-      case 'com.fibaro.FGCD001':
-        service = this.platform.Service.CarbonMonoxideSensor;
-        this.mainCharacteristics =
-          [this.platform.Characteristic.CarbonMonoxideDetected,
-            this.platform.Characteristic.CarbonMonoxideLevel,
-            this.platform.Characteristic.CarbonMonoxidePeakLevel, this.platform.Characteristic.BatteryLevel];
-        break;
+      // Light sensor
       case 'com.fibaro.lightSensor':
         service = this.platform.Service.LightSensor;
         this.mainCharacteristics = [this.platform.Characteristic.CurrentAmbientLightLevel];
         break;
+      // Temperature sensor / Humidity sensor / Light sensor
       case 'com.fibaro.multilevelSensor':
         switch (properties.deviceRole) {
           case 'TemperatureSensor':
@@ -290,22 +275,56 @@ export class FibaroAccessory {
             return;
         }
         break;
+      // Motion sensor
+      case 'com.fibaro.FGMS001':
+      case 'com.fibaro.FGMS001v2':
+      case 'com.fibaro.motionSensor':
+        service = this.platform.Service.MotionSensor;
+        this.mainCharacteristics = [this.platform.Characteristic.MotionDetected];
+        break;
+      // Doorbell / Contact sensor
+      case 'com.fibaro.binarySensor':
+      case 'com.fibaro.doorSensor':
+      case 'com.fibaro.FGDW002':
+      case 'com.fibaro.windowSensor':
+      case 'com.fibaro.satelZone':
+      case 'com.fibaro.doorWindowSensor':
+        if (this.device.id === this.platform.config.doorbellDeviceId) {
+          service = this.platform.Service.Doorbell;
+          this.mainCharacteristics = [this.platform.Characteristic.ProgrammableSwitchEvent];
+        } else {
+          service = this.platform.Service.ContactSensor;
+          this.mainCharacteristics = [this.platform.Characteristic.ContactSensorState];
+        }
+        break;
+      // Leak sensor
+      case 'com.fibaro.FGFS101':
+      case 'com.fibaro.floodSensor':
+        service = this.platform.Service.LeakSensor;
+        this.mainCharacteristics = [this.platform.Characteristic.LeakDetected];
+        break;
+      // Smoke sensor
+      case 'com.fibaro.FGSS001':
+      case 'com.fibaro.smokeSensor':
+      case 'com.fibaro.gasDetector':
+        service = this.platform.Service.SmokeSensor;
+        this.mainCharacteristics = [this.platform.Characteristic.SmokeDetected];
+        break;
+      // Carbon Monoxide Sensor
+      case 'com.fibaro.FGCD001':
+        service = this.platform.Service.CarbonMonoxideSensor;
+        this.mainCharacteristics =
+          [this.platform.Characteristic.CarbonMonoxideDetected,
+            this.platform.Characteristic.CarbonMonoxideLevel,
+            this.platform.Characteristic.CarbonMonoxidePeakLevel, this.platform.Characteristic.BatteryLevel];
+        break;
+      // Lock Mechanism
       case 'com.fibaro.doorLock':
       case 'com.fibaro.gerda':
         service = this.platform.Service.LockMechanism;
         this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
         break;
-      case 'com.fibaro.FGRGBW441M':
-      case 'com.fibaro.colorController':
-      case 'com.fibaro.FGRGBW442':
-      case 'com.fibaro.FGRGBW442CC':
-        service = this.platform.Service.Lightbulb;
-        this.mainCharacteristics =
-          [this.platform.Characteristic.On,
-            this.platform.Characteristic.Brightness,
-            this.platform.Characteristic.Hue,
-            this.platform.Characteristic.Saturation];
-        break;
+      // Security system
       case 'securitySystem':
         service = this.platform.Service.SecuritySystem;
         this.mainCharacteristics =
@@ -313,11 +332,13 @@ export class FibaroAccessory {
             this.platform.Characteristic.SecuritySystemTargetState];
         subtype = '0--';
         break;
+      // Scene
       case 'scene':
         service = this.platform.Service.Switch;
         this.mainCharacteristics = [this.platform.Characteristic.On];
         subtype = device.id + '--SC';
         break;
+      // Climate zone (HC3)
       case 'climateZone':
         service = this.platform.Service.Thermostat;
         this.mainCharacteristics =
@@ -328,6 +349,7 @@ export class FibaroAccessory {
             this.platform.Characteristic.TemperatureDisplayUnits];
         subtype = device.id + '--CZ';
         break;
+      // Heating zone (HC2 and HCL)
       case 'heatingZone':
         service = this.platform.Service.Thermostat;
         this.mainCharacteristics =
@@ -338,11 +360,13 @@ export class FibaroAccessory {
             this.platform.Characteristic.TemperatureDisplayUnits];
         subtype = device.id + '--HZ';
         break;
+      // Global variables
       case 'G':
         service = this.platform.Service.Switch;
         this.mainCharacteristics = [this.platform.Characteristic.On];
         subtype = this.device.type + '-' + this.device.name + '-';
         break;
+      // Dimmer global variables
       case 'D':
         service = this.platform.Service.Lightbulb;
         this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.Brightness];
