@@ -63,6 +63,7 @@ export class FibaroAccessory {
               this.mainCharacteristics = [this.platform.Characteristic.On];
               break;
           }
+          break;
         } else {
           switch (controlType) {
             case 2: // Lighting
@@ -76,6 +77,7 @@ export class FibaroAccessory {
               break;
           }
         break;
+        }
       // Light RGBW
       case 'com.fibaro.FGRGBW441M':
       case 'com.fibaro.colorController':
