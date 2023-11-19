@@ -50,17 +50,31 @@ export class FibaroAccessory {
       case 'com.fibaro.multilevelSwitch':
       case 'com.fibaro.FGD212':
       case 'com.fibaro.FGWD111':
-        switch (controlType) {
-          case 2: // Lighting
-          case 23: // Lighting
-            service = this.platform.Service.Lightbulb;
-            this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.Brightness];
-            break;
-          default:
-            service = this.platform.Service.Switch;
-            this.mainCharacteristics = [this.platform.Characteristic.On];
-            break;
-        }
+        if (this.platform.config.advControl === 1) {
+          switch (controlType) {
+            case 1: // Lighting
+            case 2: // Lighting
+            case 23: // Lighting
+              service = this.platform.Service.Lightbulb;
+              this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.Brightness];
+              break;
+            default:
+              service = this.platform.Service.Switch;
+              this.mainCharacteristics = [this.platform.Characteristic.On];
+              break;
+          }
+        } else {
+          switch (controlType) {
+            case 2: // Lighting
+            case 23: // Lighting
+              service = this.platform.Service.Lightbulb;
+              this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.Brightness];
+              break;
+            default:
+              service = this.platform.Service.Switch;
+              this.mainCharacteristics = [this.platform.Characteristic.On];
+              break;
+          }
         break;
       // Light RGBW
       case 'com.fibaro.FGRGBW441M':
