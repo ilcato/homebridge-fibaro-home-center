@@ -158,7 +158,6 @@ export class FibaroHC implements DynamicPlatformPlugin {
         this.LoadAccessories(devices, rooms);
       } catch (e) {
         this.log.error('Error getting data from Home Center: ', e);
-        throw e;
       }
     });
   }
