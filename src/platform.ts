@@ -158,6 +158,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
         this.LoadAccessories(devices, rooms);
       } catch (e) {
         this.log.error('Error getting data from Home Center: ', e);
+        this.log.error('Restart Homebridge when Home Center / Youbii Home will be available again.');
       }
     });
   }
