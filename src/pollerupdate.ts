@@ -69,6 +69,7 @@ export class Poller {
       }
       this.pollingUpdateRunning = false;
       this.restartPoll(this.pollerPeriod * 1000);
+      this.platform.log.debug('Restarting poller...');
     } catch (e) {
       this.platform.log.error('Error fetching updates: ', e);
       if (e === 400) {
@@ -76,11 +77,11 @@ export class Poller {
       }
       this.pollingUpdateRunning = false;
       this.restartPoll(60 * 1000);
+      this.platform.log.error('Next try in 1 minute');
     }
   }
 
   restartPoll(delay) {
-    this.platform.log.debug('Restarting poller... Next try [seconds]:', delay/1000);
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
       this.poll();
