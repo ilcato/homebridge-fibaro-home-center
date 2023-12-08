@@ -76,8 +76,8 @@ export class Poller {
         this.lastPoll = 0;
       }
       this.pollingUpdateRunning = false;
-      this.platform.log.error('Next try in 5 minutes');
-      this.restartPoll(300 * 1000);
+      this.platform.log.error('Next try in 1 minute');
+      this.restartPoll(60 * 1000);
     }
   }
 
