@@ -67,6 +67,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
     this.climateZones = {};
     this.mutex = new Mutex();
     this.info = {};
+    this.timeout = null;
 
     if (!config) {
       this.log.error('Fibaro HC configuration: cannot find configuration for the plugin');
@@ -124,45 +125,54 @@ export class FibaroHC implements DynamicPlatformPlugin {
         return;
       }
 
-      try {
-        this.info = (await this.fibaroClient.getInfo()).body;
-        const scenes = (await this.fibaroClient.getScenes()).body;
-        scenes.map((s) => {
-          this.scenes[s.name] = s.id;
-          if (s.name.startsWith('_')) {
-            const device = { name: s.name.substring(1), roomID: 0, id: s.id, type: 'scene' };
-            this.addAccessory(device);
-          }
-        });
-        if (this.isOldApi()) {
-          const heatingZones = (await this.fibaroClient.getHeatingZones()).body;
-          heatingZones.map((s) => {
-            this.climateZones[s.name] = s.id;
-            const device = { name: s.name, roomID: 0, id: s.id, type: 'heatingZone', properties: s.properties };
-            this.addAccessory(device);
-          });
-        } else {
-          const climateZones = (await this.fibaroClient.getClimateZones()).body;
-          climateZones.map((s) => {
-            this.climateZones[s.name] = s.id;
-            const device = { name: s.name, roomID: 0, id: s.id, type: 'climateZone', properties: s.properties };
-            this.addAccessory(device);
-          });
-        }
-        this.setFunctions = new SetFunctions(this);	// There's a dependency in setFunction to Scene Mapping
-        const devices = this.fibaroClient ? (await this.fibaroClient.getDevices()).body : {};
-        let rooms = null;
-        if (this.config.addRoomNameToDeviceName === 'enabled' && this.fibaroClient) {
-          rooms = (await this.fibaroClient.getRooms()).body;
-        }
-        this.LoadAccessories(devices, rooms);
-      } catch (e) {
-        this.log.error('Error getting data from Home Center: ', e);
-        this.log.error('Restart Homebridge when Home Center / Youbii Home will be available again.');
-      }
+      this.login()
     });
   }
 
+  async login() {
+    try {
+      this.info = (await this.fibaroClient.getInfo()).body;
+      const scenes = (await this.fibaroClient.getScenes()).body;
+      scenes.map((s) => {
+        this.scenes[s.name] = s.id;
+        if (s.name.startsWith('_')) {
+          const device = { name: s.name.substring(1), roomID: 0, id: s.id, type: 'scene' };
+          this.addAccessory(device);
+        }
+      });
+      if (this.isOldApi()) {
+        const heatingZones = (await this.fibaroClient.getHeatingZones()).body;
+        heatingZones.map((s) => {
+          this.climateZones[s.name] = s.id;
+          const device = { name: s.name, roomID: 0, id: s.id, type: 'heatingZone', properties: s.properties };
+          this.addAccessory(device);
+        });
+      } else {
+        const climateZones = (await this.fibaroClient.getClimateZones()).body;
+        climateZones.map((s) => {
+          this.climateZones[s.name] = s.id;
+          const device = { name: s.name, roomID: 0, id: s.id, type: 'climateZone', properties: s.properties };
+          this.addAccessory(device);
+        });
+      }
+      this.setFunctions = new SetFunctions(this);	// There's a dependency in setFunction to Scene Mapping
+      const devices = this.fibaroClient ? (await this.fibaroClient.getDevices()).body : {};
+      let rooms = null;
+      if (this.config.addRoomNameToDeviceName === 'enabled' && this.fibaroClient) {
+        rooms = (await this.fibaroClient.getRooms()).body;
+      }
+      this.LoadAccessories(devices, rooms);
+    } catch (e) {
+      this.log.error('Error getting data from Home Center: ', e);
+      this.log.error('Next try in 5 minutes');
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
+        this.login();
+      }, 30000);
+    }
+  }
+
+  
   /**
    * This function is invoked when homebridge restores cached accessories from disk at startup.
    * It should be used to setup event handlers for characteristics and update respective values.
