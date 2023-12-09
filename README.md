@@ -52,7 +52,8 @@ Remember to configure the plugin in config.json in your home directory inside th
 
 ### Version 1.5.1
 + Fix bug causing endless rastarting Homebridge when unable to connect to Home Center / Yubii Home
-+ Adding a delay (1 minute) in the next attempt to read data in case of failure
++ Adding a delay (1 minute) in the next attempt to read data (in case of failure)
++ Adding a delay (5 minutes) in the next attempt to first login (in case of failure)
 
 ### Version 1.5.0
 
