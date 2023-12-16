@@ -95,7 +95,6 @@ export class SetFunctions {
     if (service.isGlobalVariableDimmer) {
       await this.setGlobalVariable(IDs[1], value.toString());
     } else {
-      service.isNotTurnOn = (value > 0);
       await this.command('setValue', [value], service, IDs);
     }
   }
