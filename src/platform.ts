@@ -138,7 +138,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
   async login() {
     try {
       this.info = (await this.fibaroClient?.getInfo()).body;
-      const scenes = (await this.fibaroClient.getScenes()).body;
+      const scenes = (await this.fibaroClient?.getScenes()).body;
       scenes.map((s) => {
         this.scenes[s.name] = s.id;
         if (s.name.startsWith('_')) {
