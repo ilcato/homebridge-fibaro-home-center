@@ -55,6 +55,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
   public setFunctions?: SetFunctions;
   public getFunctions?: GetFunctions;
   public mutex;
+  public timeout;
 
 
   constructor(
