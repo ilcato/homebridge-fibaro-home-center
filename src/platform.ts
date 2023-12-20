@@ -131,7 +131,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
         return;
       }
 
-      this.login()
+      this.login();
     });
   }
 
@@ -178,7 +178,6 @@ export class FibaroHC implements DynamicPlatformPlugin {
     }
   }
 
-  
   /**
    * This function is invoked when homebridge restores cached accessories from disk at startup.
    * It should be used to setup event handlers for characteristics and update respective values.
