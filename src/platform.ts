@@ -147,14 +147,14 @@ export class FibaroHC implements DynamicPlatformPlugin {
         }
       });
       if (this.isOldApi()) {
-        const heatingZones = (await this.fibaroClient.getHeatingZones()).body;
+        const heatingZones = (await this.fibaroClient?.getHeatingZones()).body;
         heatingZones.map((s) => {
           this.climateZones[s.name] = s.id;
           const device = { name: s.name, roomID: 0, id: s.id, type: 'heatingZone', properties: s.properties };
           this.addAccessory(device);
         });
       } else {
-        const climateZones = (await this.fibaroClient.getClimateZones()).body;
+        const climateZones = (await this.fibaroClient?.getClimateZones()).body;
         climateZones.map((s) => {
           this.climateZones[s.name] = s.id;
           const device = { name: s.name, roomID: 0, id: s.id, type: 'climateZone', properties: s.properties };
