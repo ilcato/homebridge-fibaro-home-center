@@ -77,7 +77,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
     if (isNaN(pollerPeriod) || pollerPeriod < 0 || pollerPeriod > 100) {
       pollerPeriod = defaultPollerPeriod;
     }
-    let thermostatMaxTemp = this.config.thermostatmaxtemperature ? parseInt(this.config.thermostatmaxtemperature) : defaultThermostatMaxTemp
+    let thermostatMaxTemp = this.config.thermostatmaxtemperature ? parseInt(this.config.thermostatmaxtemperature) : defaultThermostatMaxTemp;
     if (isNaN(thermostatMaxTemp) || thermostatMaxTemp < 0 || thermostatMaxTemp > defaultThermostatMaxTemp) {
       this.config.thermostatmaxtemperature = defaultThermostatMaxTemp;
     }
