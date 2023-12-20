@@ -1,4 +1,3 @@
-{test lint compile
 //    Copyright 2023 ilcato
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
