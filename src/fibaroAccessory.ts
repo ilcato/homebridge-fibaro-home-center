@@ -426,7 +426,7 @@ export class FibaroAccessory {
         characteristic.props.minValue = -50;
       }
       if (characteristic.UUID === this.platform.Characteristic.TargetTemperature.UUID) {
-        characteristic.props.maxValue = 100;
+        characteristic.props.maxValue = this.platform.config.thermostatmaxtemperature;
       }
       if (characteristic.UUID === this.platform.Characteristic.ValveType.UUID) {
         characteristic.value = this.platform.Characteristic.ValveType.GENERIC_VALVE;

@@ -87,11 +87,7 @@ export class SetFunctions {
       }
       this.setGlobalVariable(IDs[1], value === true ? '100' : '0');
     } else {
-      if (!service.isNotTurnOn) {
-        await this.command(value ? 'turnOn' : 'turnOff', null, service, IDs);
-      } else {
-        service.isNotTurnOn = false;
-      }
+      await this.command(value ? 'turnOn' : 'turnOff', null, service, IDs);
     }
   }
 
@@ -99,7 +95,6 @@ export class SetFunctions {
     if (service.isGlobalVariableDimmer) {
       await this.setGlobalVariable(IDs[1], value.toString());
     } else {
-      service.isNotTurnOn = (value > 0);
       await this.command('setValue', [value], service, IDs);
     }
   }

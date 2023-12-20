@@ -32,6 +32,7 @@ import { Poller } from './pollerupdate';
 import { Mutex } from 'async-mutex';
 
 const defaultPollerPeriod = 5;
+const defaultThermostatMaxTemp = 100;
 const timeOffset = 2 * 3600;
 
 /**
@@ -77,6 +78,10 @@ export class FibaroHC implements DynamicPlatformPlugin {
     let pollerPeriod = this.config.pollerperiod ? parseInt(this.config.pollerperiod) : defaultPollerPeriod;
     if (isNaN(pollerPeriod) || pollerPeriod < 0 || pollerPeriod > 100) {
       pollerPeriod = defaultPollerPeriod;
+    }
+    let thermostatMaxTemp = this.config.thermostatmaxtemperature ? parseInt(this.config.thermostatmaxtemperature) : defaultThermostatMaxTemp;
+    if (isNaN(thermostatMaxTemp) || thermostatMaxTemp < 0 || thermostatMaxTemp > defaultThermostatMaxTemp) {
+      this.config.thermostatmaxtemperature = defaultThermostatMaxTemp;
     }
     if (this.config.thermostattimeout === undefined) {
       this.config.thermostattimeout = timeOffset.toString();

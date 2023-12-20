@@ -47,6 +47,15 @@
         "placeholder": 2,
         "minimum": 0
       },
+      "thermostatmaxtemperature": {
+        "description": "Set the maximum allowed temperature in celcius for the thermostatic controls (defaults to 100 degrees celcius)",
+        "title": "Themostat Max Temperature",
+        "type": "integer",
+        "required": false,
+        "default": 100,
+        "placeholder": 100,
+        "minimum": 0
+      },
       "switchglobalvariables": {
         "description": "A comma separeted list of Fibaro Home Center global variables acting like a bistable switch.",
         "title": "Global variables switches",
@@ -94,7 +103,7 @@
       },
       "addRoomNameToDeviceName": {
         "description": "Enable or disable adding the Room name to the device name.",
-        "title": "Add room name to devices",
+        "title": "Add room name to devices. Important: Use different device names within the same room in Home Center.",
         "type": "string",
         "oneOf": [
           {
@@ -223,6 +232,11 @@
           "type": "flex",
           "flex-flow": "row wrap",
           "items": ["addRoomNameToDeviceName", "doorbellDeviceId"]
+        },
+        {
+          "type": "flex",
+          "flex-flow": "row wrap",
+          "items": ["thermostatmaxtemperature"]
         }
       ]
     },
