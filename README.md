@@ -54,6 +54,8 @@ Remember to configure the plugin in config.json in your home directory inside th
 + Fix bug causing endless rastarting Homebridge when unable to connect to Home Center / Yubii Home
 + Adding a delay (1 minute) in the next attempt to read data (in case of failure)
 + Adding a delay (5 minutes) in the next attempt to first login (in case of failure)
++ Fix bug in the dimmers
++ Added the ability to select in the config thermostat max temperature
 
 ### Version 1.5.0
 
