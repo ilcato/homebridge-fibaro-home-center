@@ -37,6 +37,8 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
         # upgrade npm version in package.json to the tag used in the release.
         - run: npm version ${{ github.event.release.tag_name }}
+        # install packages
+        - run: npm ci 
         # build the project
         - run: npm run build
         # run tests just in case
@@ -52,6 +54,8 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
         # upgrade npm version in package.json to the tag used in the release.
         - run: npm version ${{ github.event.release.tag_name }}
+        # install packages
+        - run: npm ci 
         # build the project
         - run: npm run build
         # run tests just in case
