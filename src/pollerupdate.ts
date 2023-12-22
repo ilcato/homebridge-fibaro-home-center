@@ -67,7 +67,7 @@ export class Poller {
       if (this.platform.config.securitysystem === 'enabled') {
         await this.manageSecuritySystem();
       }
-      
+
       this.pollingUpdateRunning = false;
       this.restartPoll(this.pollerPeriod * 1000);
       this.platform.log.debug('Restarting poller...');
@@ -79,7 +79,7 @@ export class Poller {
       }
       this.restartPoll(60 * 1000);
       this.platform.log.error('Next try in 1 minute');
-    } 
+    }
   }
 
   restartPoll(delay) {
