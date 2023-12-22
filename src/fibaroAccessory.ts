@@ -75,7 +75,7 @@ export class FibaroAccessory {
             this.platform.Characteristic.Saturation];
         break;
       // Light / Switch / Outlet / Valve
-      // for Switch / Double Switch / Smart Implant / etc. 
+      // for Switch / Double Switch / Smart Implant / etc.
       case 'com.fibaro.binarySwitch':
       case 'com.fibaro.developer.bxs.virtualBinarySwitch':
       case 'com.fibaro.satelOutput':
@@ -147,7 +147,7 @@ export class FibaroAccessory {
           break;
         }
       // Light / Switch / Outlet / Valve
-      // for Wall Plug etc. 
+      // for Wall Plug etc.
       case 'com.fibaro.FGWP101':
       case 'com.fibaro.FGWP102':
       case 'com.fibaro.FGWPG111':
