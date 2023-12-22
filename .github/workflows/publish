@@ -1,6 +1,6 @@
-# Creates a new latest / beta release and publis it to npm.
+# Creates a new latest / beta release and publish it to npm.
 
-name: Create and publish latest /  beta release
+name: Create and publish latest / beta release
 
 on:
   release:
