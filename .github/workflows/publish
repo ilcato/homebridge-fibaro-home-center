@@ -1,0 +1,61 @@
+# Creates a new latest / beta release and publis it to npm.
+
+name: Create and publish latest /  beta release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  create-release:
+    
+    name: Create latest / release
+    runs-on: ubuntu-latest
+
+    steps:
+      
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Show summary
+        env:
+          GITHUB_TOKEN: ${{secrets.GH_CLI_TOKEN}}
+        run: |
+          echo "The release version will be: ${{ github.event.release.tag_name }}"
+      
+# LATEST
+
+      - name: Publish to npm
+        if: "!github.event.release.prerelease"
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+        # upgrade npm version in package.json to the tag used in the release.
+        - run: npm version ${{ github.event.release.tag_name }}
+        # build the project
+        - run: npm run build
+        # run tests just in case
+        - run: npm test
+        # publish to NPM
+        - run: npm publish --tag latest
+
+ # BETA
+
+      - name: Publish to npm - beta
+        if: "github.event.release.prerelease"
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+        # upgrade npm version in package.json to the tag used in the release.
+        - run: npm version ${{ github.event.release.tag_name }}
+        # build the project
+        - run: npm run build
+        # run tests just in case
+        - run: npm test
+        # publish to NPM
+        - run: npm publish --tag beta
+     
