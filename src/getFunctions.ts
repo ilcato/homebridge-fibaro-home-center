@@ -102,7 +102,7 @@ export class GetFunctions {
   }
 
   // Float getter
-  getFloat(characteristic, service, IDs, properties) {
+  getFloat(characteristic, _service, _IDs, properties) {
     if (isNaN(properties.value)) {
       return;
     }
@@ -110,7 +110,7 @@ export class GetFunctions {
     characteristic.updateValue(r);
   }
 
-  getBrightness(characteristic, service, IDs, properties) {
+  getBrightness(characteristic, service, _IDs, properties) {
     if (isNaN(properties.value)) {
       return;
     }
@@ -129,11 +129,11 @@ export class GetFunctions {
     characteristic.updateValue(r);
   }
 
-  getPositionState(characteristic, service, IDs, properties) {
+  getPositionState(characteristic, _service, _IDs, _properties) {
     characteristic.updateValue(this.platform.Characteristic.PositionState.STOPPED);
   }
 
-  getCurrentPosition(characteristic, service, IDs, properties) {
+  getCurrentPosition(characteristic, _service, _IDs, properties) {
     let r = 0;
 
     if (isNaN(properties.value)) {
@@ -157,7 +157,7 @@ export class GetFunctions {
     characteristic.updateValue(r);
   }
 
-  getCurrentTiltAngle(characteristic, service, IDs, properties) {
+  getCurrentTiltAngle(characteristic, _service, _IDs, properties) {
     let value2 = parseInt(properties.value2);
     if (value2 >= 0 && value2 <= 100) {
       if (value2 === 99) {
@@ -234,45 +234,45 @@ export class GetFunctions {
     }
   }
 
-  getContactSensorState(characteristic, service, IDs, properties) {
+  getContactSensorState(characteristic, _service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
     characteristic.updateValue(v === false ?
       this.platform.Characteristic.ContactSensorState.CONTACT_DETECTED :
       this.platform.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
   }
 
-  getLeakDetected(characteristic, service, IDs, properties) {
+  getLeakDetected(characteristic, _service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
     characteristic.updateValue(v === true ?
       this.platform.Characteristic.LeakDetected.LEAK_DETECTED :
       this.platform.Characteristic.LeakDetected.LEAK_NOT_DETECTED);
   }
 
-  getSmokeDetected(characteristic, service, IDs, properties) {
+  getSmokeDetected(characteristic, _service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
     characteristic.updateValue(v === true ?
       this.platform.Characteristic.SmokeDetected.SMOKE_DETECTED :
       this.platform.Characteristic.SmokeDetected.SMOKE_NOT_DETECTED);
   }
 
-  getCarbonMonoxideDetected(characteristic, service, IDs, properties) {
+  getCarbonMonoxideDetected(characteristic, _service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
     characteristic.updateValue(v === true ?
       this.platform.Characteristic.CarbonMonoxideDetected.CO_LEVELS_ABNORMAL :
       this.platform.Characteristic.CarbonMonoxideDetected.CO_LEVELS_NORMAL);
   }
 
-  getCarbonMonoxideLevel(characteristic, service, IDs, properties) {
+  getCarbonMonoxideLevel(characteristic, _service, _IDs, properties) {
     const r = parseFloat(properties.concentration);
     characteristic.updateValue(r);
   }
 
-  getCarbonMonoxidePeakLevel(characteristic, service, IDs, properties) {
+  getCarbonMonoxidePeakLevel(characteristic, _service, _IDs, properties) {
     const r = parseFloat(properties.maxConcentration);
     characteristic.updateValue(r);
   }
 
-  getOutletInUse(characteristic, service, IDs, properties) {
+  getOutletInUse(characteristic, _service, _IDs, properties) {
     if (isNaN(properties.power)) {
       this.platform.log('power is not a number.', '');
       return;
@@ -280,7 +280,7 @@ export class GetFunctions {
     characteristic.updateValue(parseFloat(properties.power) > 1.0 ? true : false);
   }
 
-  getLockCurrentState(characteristic, service, IDs, properties) {
+  getLockCurrentState(characteristic, service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
     if (service.isLockSwitch) {
       characteristic.updateValue(v === false ?
@@ -293,7 +293,7 @@ export class GetFunctions {
       this.platform.Characteristic.LockCurrentState.UNSECURED);
   }
 
-  async getCurrentHeatingCoolingState(characteristic, service, IDs, properties) {
+  async getCurrentHeatingCoolingState(characteristic, service, IDs, _properties) {
     if (service.isClimateZone) {
       try {
         const properties = (await this.platform.fibaroClient.getClimateZone(IDs[0])).body.properties;
@@ -323,7 +323,7 @@ export class GetFunctions {
     }
   }
 
-  async getTargetHeatingCoolingState(characteristic, service, IDs, properties) {
+  async getTargetHeatingCoolingState(characteristic, service, IDs, _properties) {
     if (service.isClimateZone) {
       try {
         const properties = (await this.platform.fibaroClient.getClimateZone(IDs[0])).body.properties;
@@ -353,19 +353,19 @@ export class GetFunctions {
     }
   }
 
-  getTemperatureDisplayUnits(characteristic, service, IDs, properties) {
+  getTemperatureDisplayUnits(characteristic, _service, _IDs, _properties) {
     characteristic.updateValue(this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS);
   }
 
-  getHue(characteristic, service, IDs, properties) {
+  getHue(characteristic, service, _IDs, properties) {
     characteristic.updateValue(Math.round(this.updateHomeKitColorFromHomeCenter(properties.color, service).h));
   }
 
-  getSaturation(characteristic, service, IDs, properties) {
+  getSaturation(characteristic, service, _IDs, properties) {
     characteristic.updateValue(Math.round(this.updateHomeKitColorFromHomeCenter(properties.color, service).s));
   }
 
-  getCurrentDoorState(characteristic, service, IDs, properties) {
+  getCurrentDoorState(characteristic, _service, _IDs, properties) {
     const v = parseInt(properties.value);
     this.platform.log('getCurrentDoorState value:', v);
     switch (properties.state) {
@@ -397,7 +397,7 @@ export class GetFunctions {
     }
   }
 
-  getTargetDoorState(characteristic, service, IDs, properties) {
+  getTargetDoorState(characteristic, _service, _IDs, properties) {
     const v = parseInt(properties.value);
     this.platform.log('getTargetDoorState value:', v);
     switch (properties.state) {
@@ -429,11 +429,11 @@ export class GetFunctions {
     }
   }
 
-  getObstructionDetected(characteristic, service, IDs, properties) {
+  getObstructionDetected(characteristic, _service, _IDs, _properties) {
     characteristic.updateValue(0);
   }
 
-  getBatteryLevel(characteristic, service, IDs, properties) {
+  getBatteryLevel(characteristic, _service, _IDs, properties) {
     if (isNaN(properties.batteryLevel)) {
       this.platform.log('batteryLevel is not a number.', '');
       return;
@@ -445,11 +445,11 @@ export class GetFunctions {
     characteristic.updateValue(r);
   }
 
-  getChargingState(characteristic, service, IDs, properties) {
+  getChargingState(characteristic, _service, _IDs, _properties) {
     characteristic.updateValue(0);
   }
 
-  getStatusLowBattery(characteristic, service, IDs, properties) {
+  getStatusLowBattery(characteristic, _service, _IDs, properties) {
     if (isNaN(properties.batteryLevel)) {
       this.platform.log('batteryLevel is not a number.', '');
       return;
@@ -459,7 +459,7 @@ export class GetFunctions {
     characteristic.updateValue(r);
   }
 
-  getSecuritySystemState(characteristic, service, IDs, securitySystemStatus) {
+  getSecuritySystemState(characteristic, _service, _IDs, securitySystemStatus) {
     let r = this.platform.Characteristic.SecuritySystemTargetState.DISARMED;
     if (characteristic.UUID === (new this.platform.Characteristic.SecuritySystemCurrentState()).UUID) {
       r = this.getCurrentSecuritySystemStateMapping.get(securitySystemStatus.value);
@@ -471,28 +471,28 @@ export class GetFunctions {
     }
   }
 
-  getActive(characteristic, service, IDs, properties) {
+  getActive(characteristic, _service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
     characteristic.updateValue(v === false ?
       this.platform.Characteristic.Active.INACTIVE :
       this.platform.Characteristic.Active.ACTIVE);
   }
 
-  getInUse(characteristic, service, IDs, properties) {
+  getInUse(characteristic, _service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
     characteristic.updateValue(v === false ?
       this.platform.Characteristic.InUse.NOT_IN_USE :
       this.platform.Characteristic.InUse.IN_USE);
   }
 
-  getProgrammableSwitchEvent(characteristic, service, IDs, properties) {
+  getProgrammableSwitchEvent(characteristic, _service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
     if (v) {
       characteristic.updateValue(this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
     }
   }
 
-  updateHomeKitColorFromHomeCenter(color, service) {
+  updateHomeKitColorFromHomeCenter(color, _service) {
     const colors = color.split(',');
     const r = parseInt(colors[0]);
     const g = parseInt(colors[1]);
