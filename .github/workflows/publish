@@ -8,8 +8,8 @@
 # When a Github Release is marked as a Pre-release it will publish to NPM as beta.
 
 # Get version from the Github Release tag. 
-# For latest version it should be like: 1.2.3 
-# For beta version it should be like: 1.2.3-beta.0 
+# For latest version it should be like: 1.2.3 , 1.2.4 , 1.3.0 , etc.
+# For beta version it should be like: 1.2.3-beta.0 , 1.2.3-beta.1 , 1.2.3-beta.2 , etc.
 
 # Github Release description for Pre-releases (beta) is not required.
 
