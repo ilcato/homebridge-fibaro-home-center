@@ -68,19 +68,22 @@ export class Poller {
         await this.manageSecuritySystem();
       }
 
+      this.pollingUpdateRunning = false;
+      this.restartPoll(this.pollerPeriod * 1000);
+      this.platform.log.debug('Restarting poller...');
+
     } catch (e) {
       this.platform.log.error('Error fetching updates: ', e);
       if (e === 400) {
         this.lastPoll = 0;
       }
-    } finally {
-      this.pollingUpdateRunning = false;
-      this.restartPoll(this.pollerPeriod * 1000);
-      this.platform.log.debug('Restarting poller...');
+      this.restartPoll(60 * 1000);
+      this.platform.log.error('Next try in 1 minute');
     }
   }
 
   restartPoll(delay) {
+    clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
       this.poll();
     }, delay);
