@@ -37,7 +37,7 @@ export class FibaroClient {
   url: string;
   host: string;
   auth: string;
-  adminAuth : any;
+  adminAuth : string;
   https: boolean;
   ca: unknown;
   status: boolean;
@@ -48,34 +48,38 @@ export class FibaroClient {
     this.auth = 'Basic ' + new Buffer.from(username + ':' + password).toString('base64');
     if (adminUsername) {
       this.adminAuth = 'Basic ' + new Buffer(adminUsername + ':' + adminPassword).toString('base64');
+    } else {
+      this.adminAuth = '';
     }
     this.https = (this.url) ? this.url.indexOf('https:') !== -1 : false;
     this.ca = null;
 
     if (this.url && this.https) {
 
-      const configPath = '/homebridge';
-      try {
-        this.ca = fs.readFileSync(configPath + '/ca.cer');
-      } catch (e: any) {
-        if (e.code === 'ENOENT') {
-          let configPath = process.env.UIX_CONFIG_PATH;
-          if (configPath) {
-            configPath = configPath.substring(0, configPath.lastIndexOf('/config.json'));
-          } else {
-            configPath = path.resolve(os.homedir(), '.homebridge');
-          }
-          try {
-            this.ca = fs.readFileSync(configPath + '/ca.cer');
-          } catch (e: any) {
-            if (e.code !== 'ENOENT') {
-              log('Error reading ca.cer: ', e);
-            } else {
-              log('Cannot find ca.cer in: ', configPath);
-            }
-          }
+      const localConfigPath = '/homebridge';
+      const localFile = localConfigPath + '/ca.cer';
+      // Check that the file exists locally
+      if(fs.existsSync(localFile)) {
+        try {
+          this.ca = fs.readFileSync(localFile);
+        } catch (e) {
+          log('Error reading ca.cer from /homebridge: ', e);
+        }
+      } else {
+        // Check if the file exists in the config.json folder
+        let configPath = process.env.UIX_CONFIG_PATH;
+        if (configPath) {
+          configPath = configPath.substring(0, configPath.lastIndexOf('/config.json'));
         } else {
-          log('Error reading ca.cer: ', e);
+          configPath = path.resolve(os.homedir(), '.homebridge');
+        }
+        const file = configPath + '/ca.cer';
+        if(fs.existsSync(file)) {
+          try {
+            this.ca = fs.readFileSync(file);
+          } catch (e) {
+            log('Error reading ca.cer from config.json folder: ', e);
+          }
         }
       }
     }
