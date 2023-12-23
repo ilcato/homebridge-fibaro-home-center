@@ -50,7 +50,14 @@ Remember to configure the plugin in config.json in your home directory inside th
 + Use different device names within the same room in Home Center.
 
 # Latest release notes
-Version 1.5.0
 
+### Version 1.5.1
++ Fix bug causing endless rastarting Homebridge when unable to connect to Home Center / Yubii Home
++ Adding a delay (1 minute) in the next attempt to read data (in case of failure)
++ Adding a delay (5 minutes) in the next attempt to first login (in case of failure)
++ Fix bug in the dimmers
++ Added the ability to select in the config thermostat max temperature
+
+### Version 1.5.0
 + New option to enable in plugin settings: Advanced Control. Enable it if you want the device type in Homekit to depend on how the device role in Fibaro is selected. Details: [Advanced Control page](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/advcontrol.md).
 + New settings view: divided into sections.
