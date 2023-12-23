@@ -195,7 +195,7 @@ export class GetFunctions {
         characteristic.updateValue(properties.currentTemperature);
       } catch (e) {
         this.platform.log('Error getting Current Temperature Heating Zone: ', `${service.IDs[0]} - Err: ${e}`);
-        return
+        return;
       }
     } else {
       const value = properties.value;
@@ -226,7 +226,7 @@ export class GetFunctions {
         characteristic.updateValue(properties.currentTemperature);
       } catch (e) {
         this.platform.log('Error getting Target Temperature Heating Zone: ', `${service.IDs[0]} - Err: ${e}`);
-        return
+        return;
       }
     } else {
       const value = properties.value;
