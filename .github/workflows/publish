@@ -1,14 +1,18 @@
-# Workflow to publish to npm.
+# Workflow to publish to NPM.
 
-# It starts automatically every time when a new Github Release is published
-# (or change from draft to public).
+# It starts automatically when a new Github Release is published
+# or the draft is changed to a public version
 
-# Automatically detects if there should be a latest or beta version:
-# when a Github Release is marked as a pre-release it will publish as beta.
+# Automatically detects if there should be a latest or beta version.
+# When a Github Release is marked as a Pre-release it will publish to NPM as beta.
 
 # Get the version from the Github Release tag. 
-# For the latest version it should be in the style of 1.2.3 
-# and for the beta version in the style of 1.2.3-beta.0 .
+# For the latest version it should be like: 1.2.3 
+# and for the beta version like: 1.2.3-beta.0 .
+
+# Github Release description for Pre-releases (beta) is not required.
+
+
 
 name: Create and publish latest / beta release
 
