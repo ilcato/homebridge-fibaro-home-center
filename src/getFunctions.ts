@@ -129,6 +129,7 @@ export class GetFunctions {
     characteristic.updateValue(r);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getPositionState(characteristic, _service, _IDs, _properties) {
     characteristic.updateValue(this.platform.Characteristic.PositionState.STOPPED);
   }
@@ -293,6 +294,7 @@ export class GetFunctions {
       this.platform.Characteristic.LockCurrentState.UNSECURED);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getCurrentHeatingCoolingState(characteristic, service, IDs, _properties) {
     if (service.isClimateZone) {
       try {
@@ -323,6 +325,7 @@ export class GetFunctions {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getTargetHeatingCoolingState(characteristic, service, IDs, _properties) {
     if (service.isClimateZone) {
       try {
@@ -353,6 +356,7 @@ export class GetFunctions {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getTemperatureDisplayUnits(characteristic, _service, _IDs, _properties) {
     characteristic.updateValue(this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS);
   }
@@ -429,6 +433,7 @@ export class GetFunctions {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getObstructionDetected(characteristic, _service, _IDs, _properties) {
     characteristic.updateValue(0);
   }
@@ -445,6 +450,7 @@ export class GetFunctions {
     characteristic.updateValue(r);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getChargingState(characteristic, _service, _IDs, _properties) {
     characteristic.updateValue(0);
   }
@@ -492,6 +498,7 @@ export class GetFunctions {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   updateHomeKitColorFromHomeCenter(color, _service) {
     const colors = color.split(',');
     const r = parseInt(colors[0]);

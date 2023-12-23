@@ -79,7 +79,9 @@ export class FibaroHC implements DynamicPlatformPlugin {
     if (isNaN(pollerPeriod) || pollerPeriod < 0 || pollerPeriod > 100) {
       pollerPeriod = defaultPollerPeriod;
     }
-    const thermostatMaxTemp = this.config.thermostatmaxtemperature ? parseInt(this.config.thermostatmaxtemperature) : defaultThermostatMaxTemp;
+    const thermostatMaxTemp = this.config.thermostatmaxtemperature ?
+      parseInt(this.config.thermostatmaxtemperature) :
+      defaultThermostatMaxTemp;
     if (isNaN(thermostatMaxTemp) || thermostatMaxTemp < 0 || thermostatMaxTemp > defaultThermostatMaxTemp) {
       this.config.thermostatmaxtemperature = defaultThermostatMaxTemp;
     }
@@ -174,7 +176,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
       clearTimeout(this.timeout);
       this.timeout = setTimeout(() => {
         this.login();
-      },  300000);
+      }, 300000);
     }
   }
 
@@ -194,7 +196,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
 
   LoadAccessories(devices, rooms) {
     this.log.info('Loading accessories');
-    devices.map((s, i, a) => {
+    devices.map((s) => {
       if (s.visible === true && !s.name.startsWith('_')) {
         if (rooms !== null) {
           // patch device name

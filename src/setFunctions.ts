@@ -220,6 +220,7 @@ export class SetFunctions {
     this.updateHomeCenterColorFromHomeKit(null, value, service, IDs);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async setSecuritySystemTargetState(value, context, characteristic, service, IDs) {
     const sceneID = this.getTargetSecuritySystemSceneMapping.get(value);
     if (value === this.platform.Characteristic.SecuritySystemTargetState.DISARM) {
