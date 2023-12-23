@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ilcato/homebridge-fibaro-home-center.git"
+    "url": "git+https://github.com/ilcato/homebridge-fibaro-home-center.git"
   },
   "bugs": {
     "url": "https://github.com/ilcato/homebridge-fibaro-home-center/issues"
