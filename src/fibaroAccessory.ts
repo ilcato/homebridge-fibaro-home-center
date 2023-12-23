@@ -477,7 +477,7 @@ export class FibaroAccessory {
       }
       this.subscribeUpdate(service, characteristic, propertyChanged);
     }
-    characteristic.on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback, context: any) => {
+    characteristic.on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback, context) => {
       this.setCharacteristicValue(value, context, characteristic, service, IDs);
       callback();
     });
