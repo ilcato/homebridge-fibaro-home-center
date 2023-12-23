@@ -174,7 +174,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
       clearTimeout(this.timeout);
       this.timeout = setTimeout(() => {
         this.login();
-      }, 30000);
+      },  300000);
     }
   }
 
