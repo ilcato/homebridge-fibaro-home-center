@@ -1,4 +1,14 @@
-# Creates a new latest / beta release and publish it to npm.
+# Workflow to publish to npm.
+
+# It starts automatically every time when a new Github Release is published
+# (or change from draft to public).
+
+# Automatically detects if there should be a latest or beta version:
+# when a Github Release is marked as a pre-release it will publish as beta.
+
+# Get the version from the Github Release tag. 
+# For the latest version it should be in the style of 1.2.3 
+# and for the beta version in the style of 1.2.3-beta.0 .
 
 name: Create and publish latest / beta release
 
