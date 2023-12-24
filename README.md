@@ -37,7 +37,7 @@ Remember to configure the plugin in config.json in your home directory inside th
 + Wiki: [Wiki](https://github.com/ilcato/homebridge-Fibaro-home-center/wiki)
 
 # Troubleshooting
-### The device is displayed incorrectly or doesn't display at all
+## The device is displayed incorrectly or doesn't display at all
 + For some devices, responsible for the display method is field Role (for a given device in the Fibaro Panel). Check [Advanced Control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/advcontrol.md).
 + If device still displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
 + Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). It is recommended to turn off Apple hubs during changes.
@@ -51,13 +51,13 @@ Remember to configure the plugin in config.json in your home directory inside th
 
 # Latest release notes
 
-### Version 1.5.1
+## Version 1.5.1
 + Fix bug causing endless rastarting Homebridge when unable to connect to Home Center / Yubii Home
 + Adding a delay (1 minute) in the next attempt to read data (in case of failure)
 + Adding a delay (5 minutes) in the next attempt to first login (in case of failure)
 + Fix bug in the dimmers
 + Added the ability to select in the config thermostat max temperature
 
-### Version 1.5.0
+## Version 1.5.0
 + New option to enable in plugin settings: Advanced Control. Enable it if you want the device type in Homekit to depend on how the device role in Fibaro is selected. Details: [Advanced Control page](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/advcontrol.md).
 + New settings view: divided into sections.
