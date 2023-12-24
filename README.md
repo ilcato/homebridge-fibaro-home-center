@@ -15,21 +15,25 @@ The plugin is published through [NPM](https://www.npmjs.com/package/homebridge-f
     npm install -g homebridge-fibaro-home-center
     
 # Configuration
-Remember to configure the plugin in config.json in your home directory inside the .homebridge directory. Configuration parameters:
-+ "url": "PUT URL OF YOUR HOME CENTER HERE CONTAINING PROTOCOL AND NAME, E.G.: https://hc-00000XXX.local, ca.cer file in the same folder as config.json"
-+ "host": "PUT IP ADDRESS OF YOUR HOME CENTER HERE. IF URL PARAMETER IS PRESENT THIS PARAMETER IS IGNORED"
-+ "username": "PUT USERNAME OF YOUR HOME CENTER HERE"
-+ "password": "PUT PASSWORD OF YOUR HOME CENTER HERE"
-+ "pollerperiod": "PUT 0 FOR DISABLING POLLING, 1 - 100 INTERVAL IN SECONDS. 2 SECONDS IS THE DEFAULT"
-+ "thermostatmaxtemperature": "SET MAX TEMPERATURE FOR THERMOSTATIC DEVICES (DEFAULT 100C)"
-+ "thermostattimeout": "PUT THE NUMBER OF SECONDS FOR THE THERMOSTAT TIMEOUT, DEFAULT: 7200 (2 HOURS)
-+ "switchglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A BISTABLE SWITCH"
-+ "dimmerglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A DIMMER"
-+ "securitysystem": "PUT enabled OR disabled IN ORDER TO MANAGE THE AVAILABILITY OF THE SECURITY SYSTEM"
-+ "addRoomNameToDeviceName" : "PUT enabled OR disabled IN ORDER TO ADD THE ROOM NAME TO DEVICE NAME. DEFAULT disabled"
-+ "doorbellDeviceId" : "PUT HOME CENTER BINARY SENSOR DEVICE ID ACTING AS A DOORBELL"
-+ "logsLevel": "PUT THE DESIRED LOG LEVEL: 0 DISABLED, 1 ONLY CHANGES, 2 ALL"
-+ "advControl": "ENABLE IF YOU WANT THE DEVICE TYPE IN HOMEKIT TO DEPEND ON HOW THE DEVICE ROLE IN FIBARO IS SELECTED. 0-DISABLED, 1-ENABLED"
+Configure the plugin through the settings UI or directly in the JSON editor.
+
+#### Required:
++ `url` : url of your Home Center / Yubii Home, containing protocon and name, E.G.: https://hc-00000XXX.local
++ `host` : IP address of your Home Center / Yubii Home. Host field is ignored if field `url` is filled
++ `username` : username of your Home Center / Yubii Home
++ `password` : password of your Home Center / Yubii Home
+
+#### Optional:
++ `pollerperiod` : 0 for disabling polling, 1 - 100 interval in seconds, 2 seconds is the default
++ `thermostatmaxtemperature` : set max temperature for thermostatic devices (default 100 C)
++ `thermostattimeout` : number of seconds for the thermostat timeout, default: 7200 (2 hours)
++ `switchglobalvariables` : comma separated list of home center global variables acting like a bistable switch
++ `dimmerglobalvariables` : comma separated list of home center global variables acting like a dimmer
++ `securitysystem` : enabled or disabled in order to manage the availability of the security system
++ `addroomnametodevicename` : enabled or disabled in order to add the room name to device name. default disabled
++ `doorbelldeviceid` : home center binary sensor device id acting as a doorbell
++ `logslevel` : desired log level: 0 disabled, 1 only changes, 2 all
++ `advcontrol` : enable if you want the device type in homekit to depend on how the device role in fibaro is selected. 0-disabled, 1-enabled
 
 # Links
 + Sample config: [config.json example](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/config.json)
@@ -37,7 +41,7 @@ Remember to configure the plugin in config.json in your home directory inside th
 + Wiki: [Wiki](https://github.com/ilcato/homebridge-Fibaro-home-center/wiki)
 
 # Troubleshooting
-## The device is displayed incorrectly or doesn't display at all
+### The device is displayed incorrectly or doesn't display at all
 + For some devices, responsible for the display method is field Role (for a given device in the Fibaro Panel). Check [Advanced Control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/advcontrol.md).
 + If device still displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
 + Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). It is recommended to turn off Apple hubs during changes.
