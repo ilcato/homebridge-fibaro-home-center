@@ -18,7 +18,7 @@ The plugin is published through [NPM](https://www.npmjs.com/package/homebridge-f
 Configure the plugin through the settings UI or directly in the JSON editor.
 
 #### Required:
-+ `url` : url of your Home Center / Yubii Home, containing protocon and name, E.G.: https://hc-00000XXX.local
++ `url` : url of your Home Center / Yubii Home, containing protocol and name, E.G.: https://hc-00000XXX.local
 + `host` : IP address of your Home Center / Yubii Home. Host field is ignored if field `url` is filled
 + `username` : username of your Home Center / Yubii Home
 + `password` : password of your Home Center / Yubii Home
@@ -36,8 +36,8 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 + `advcontrol` : enable if you want the device type in homekit to depend on how the device role in fibaro is selected. 0-disabled, 1-enabled
 
 # Links
-+ Sample config: [config.json example](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/config.json)
-+ Advanced Control: [Advanced Control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/advcontrol.md)
++ Sample config: [config.json example](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/config.json)
++ Advanced Control: [Advanced Control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/advcontrol.md)
 + Wiki: [Wiki](https://github.com/ilcato/homebridge-Fibaro-home-center/wiki)
 
 # Troubleshooting
