@@ -15,13 +15,13 @@
         "default": "FibaroHC"
       },
       "url": {
-        "description": "e.g.: https://hc-00000XXX.local",
+        "description": "e.g.: https://hc-00000XXX.local or 192.168.1.100 .",
         "title": "Url",
         "type": "string",
-        "required": false
+        "required": true
       },
       "host": {
-        "description": "e.g.: 192.168.1.10",
+        "description": "This field will be removed in one of the future releases - use field url instead.",
         "title": "Host (IP)",
         "type": "string",
         "required": false
