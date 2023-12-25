@@ -95,10 +95,10 @@ export class FibaroClient {
     // if url is filled and starts with http:// or https://
     if (this.url.startsWith('http') ) {
       return this.url + service;
-    // if url is filled and it is a host address
+    // if url is filled
     } else if (this.url) {
       return 'http://' + this.url + service;
-    // if url is not filled try host field
+    // if url is not filled try host field - host field is now removed
     } else {
       return 'http://' + this.host + service;
     }
