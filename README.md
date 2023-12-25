@@ -34,15 +34,13 @@ Required: url or host, username and password
 + `switchglobalvariables` : comma separated list of home center global variables acting like a bistable switch
 + `dimmerglobalvariables` : comma separated list of home center global variables acting like a dimmer
 + `securitysystem` : enabled or disabled in order to manage the availability of the security system
-+ `addroomnametodevicename` : enabled or disabled in order to add the room name to device name. default disabled
++ `addroomnametodevicename` : enabled or disabled in order to add the room name to device name. default disabled, use different device names within the same room
 + `doorbelldeviceid` : home center binary sensor device id acting as a doorbell
 + `logslevel` : desired log level: 0 disabled, 1 only changes, 2 all
 + `advcontrol` : enable if you want the device type in homekit to depend on how the device role in fibaro is selected. 0-disabled, 1-enabled
 
-# Links
-+ Sample config: [config.json example](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/config.json)
-+ Advanced Control: [Advanced Control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/advcontrol.md)
-+ Wiki: [Wiki](https://github.com/ilcato/homebridge-Fibaro-home-center/wiki)
+### Example: [config.json](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/config.json)
+
 
 # Troubleshooting
 ### The device is displayed incorrectly or doesn't display at all
@@ -54,8 +52,18 @@ Required: url or host, username and password
 + How to get API response for device. Open in browser: http://FIBARO-IP/api/devices/ID (replace FIBARO-IP with your Home Center IP and ID with device ID) and login.
 ### Exclude devices
 + If You want to exclude one or more devices: use a specific user (not an admin one) and grant access to only the needed devices or rename the device you want to exclude with an initial _ character. Warning: If you exclude the device, adding it again will require reconfiguration (assignment to a room, automations, etc.).
-### Important
-+ Use different device names within the same room in Home Center.
+### Important - Add room name to device name 
++ Use different device names within the same room.
+### Adding scenes as momentary switches
++ Any scenes with a name that start with _ will be added to HomeKit as a momentary switch with the same name without the _.
+### Switch accessories mapped on Home Center global variables
++ It is possible to create Switch accessories on HomeKit with a toggle behaviour by:
+  + creating global variables (one for each switch) with 2 possible values: "true" and "false"
+  + configuring a new parameter ("switchglobalvariables") in config.json that contains a comma separated list of the variable names you defined.
++ You can use these variable to trigger Home Center scenes.
++ Known issue: you need to configure homebridge in config.json with a user with superuser privileges because normal users cannot set global variable from the outside of Home Center.
+### Fibaro Security System configuration for HomeKit
+
 
 # Latest release notes
 
