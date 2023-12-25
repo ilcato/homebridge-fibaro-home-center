@@ -10,8 +10,8 @@
 Homebridge plugin for Fibaro Home Center (2, 2 Lite, 3, 3 Lite, Yubii Home)
 
 # Installation
-Follow the instruction in [homebridge](https://www.npmjs.com/package/homebridge) for the homebridge server installation.
-The plugin is published through [NPM](https://www.npmjs.com/package/homebridge-fibaro-home-center) and should be installed "globally" by typing:
+
+This plugin can be easily installed and configured through Homebridge UI or via [NPM](https://www.npmjs.com/package/homebridge-fibaro-home-center) "globally" by typing:
 
     npm install -g homebridge-fibaro-home-center
     
