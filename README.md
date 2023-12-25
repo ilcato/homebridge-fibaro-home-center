@@ -20,11 +20,10 @@ This plugin can be easily installed and configured through Homebridge UI or via 
 Configure the plugin through the settings UI or directly in the JSON editor.
 
 #### Required:
-Required: url or host, username and password
-+ `url` : url of your Home Center / Yubii Home, examples:
++ `url` : url or IP of your Home Center / Yubii Home, examples:
+  + `192.168.1.100`
   + `https://hc-00000XXX.local` (put ca.cer file in the same folder as config.json)
   + `http://hc-00000XXX.local`
-+ `host` : IP address of your Home Center / Yubii Home, E.G.: 192.168.1.100 , host field is ignored if field `url` is filled
 + `username` : username of your Home Center / Yubii Home
 + `password` : password of your Home Center / Yubii Home
 
@@ -110,6 +109,9 @@ See: [security system](https://github.com/ilcato/homebridge-Fibaro-home-center/b
 </details>
 
 # Latest release notes
+
+### Version 1.5.2
++ Now you can enter Home Center / Yubii Home IP directly in url field in config
 
 ### Version 1.5.1
 + Fix bug causing endless rastarting Homebridge when unable to connect to Home Center / Yubii Home
