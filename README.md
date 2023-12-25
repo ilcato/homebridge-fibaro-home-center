@@ -1,5 +1,6 @@
 <img src="https://raw.githubusercontent.com/homebridge/verified/latest/icons/homebridge-fibaro-home-center.png" width="100px"></img>
 # homebridge-fibaro-home-center
+
 [![npm version](https://badge.fury.io/js/homebridge-fibaro-home-center.svg)](https://badge.fury.io/js/homebridge-fibaro-home-center)
 [![Downloads](https://img.shields.io/npm/dt/homebridge-fibaro-home-center)](https://www.npmjs.com/package/homebridge-fibaro-home-center)
 [![Homebridge Discord](https://img.shields.io/discord/432663330281226270?color=728ED5&logo=discord&label=discord)](https://discord.gg/38Dpux)
@@ -7,7 +8,7 @@
 
 [![Buy me a cofee](https://cdn.buymeacoffee.com/buttons/default-orange.png)](https://www.buymeacoffee.com/ilcato)
 
-Homebridge plugin for Fibaro Home Center (2, 2 Lite, 3, 3 Lite, Yubii Home)
+### Homebridge plugin for Fibaro Home Center (2, 2 Lite, 3, 3 Lite, Yubii Home).
 
 # Installation
 
@@ -39,7 +40,7 @@ Required: url or host, username and password
 + `logslevel` : desired log level: 0 disabled, 1 only changes, 2 all
 + `advcontrol` : enable if you want the device type in homekit to depend on how the device role in fibaro is selected. 0-disabled, 1-enabled
 
-### Example: [config.json](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/config.json)
+#### Example: [config.json](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/config.json)
 
 
 # Troubleshooting
@@ -51,6 +52,13 @@ Required: url or host, username and password
 + If device still displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
 + Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). It is recommended to turn off Apple hubs during changes.
 + If you want new device to be supported (or if it displays incorrectly despite the recommendation above) open new Issue and write: what is this product, as what should it be displayed, whether it does not display at all or displays incorrectly (as what device?), what version of this plugin, what Home Center, and attach the API response for this product (see below).
+
+</details>
+
+<details>
+<summary><b>Advanced Control</b></summary>
+
++ Now you can enable new option in plugin settings if you want the device type in Homekit to depend on how the device role in Fibaro is selected. See details: [advanced control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/advcontrol.md)
 
 </details>
 
