@@ -63,7 +63,7 @@ Required: url or host, username and password
 + You can use these variable to trigger Home Center scenes.
 + Known issue: you need to configure homebridge in config.json with a user with superuser privileges because normal users cannot set global variable from the outside of Home Center.
 ### Fibaro Security System configuration for HomeKit
-
+See: [security system](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/security-system.md)
 
 # Latest release notes
 
