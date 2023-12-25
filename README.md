@@ -1,4 +1,6 @@
+<img src="https://raw.githubusercontent.com/homebridge/verified/latest/icons/homebridge-fibaro-home-center.png" width="100px"></img>
 # homebridge-fibaro-home-center
+
 [![npm version](https://badge.fury.io/js/homebridge-fibaro-home-center.svg)](https://badge.fury.io/js/homebridge-fibaro-home-center)
 [![Downloads](https://img.shields.io/npm/dt/homebridge-fibaro-home-center)](https://www.npmjs.com/package/homebridge-fibaro-home-center)
 [![Homebridge Discord](https://img.shields.io/discord/432663330281226270?color=728ED5&logo=discord&label=discord)](https://discord.gg/38Dpux)
@@ -6,58 +8,116 @@
 
 [![Buy me a cofee](https://cdn.buymeacoffee.com/buttons/default-orange.png)](https://www.buymeacoffee.com/ilcato)
 
-Homebridge plugin for Fibaro Home Center (2, 2 Lite, 3, 3 Lite, Yubii Home)
+### Homebridge plugin for Fibaro Home Center (2, 2 Lite, 3, 3 Lite, Yubii Home).
 
 # Installation
-Follow the instruction in [homebridge](https://www.npmjs.com/package/homebridge) for the homebridge server installation.
-The plugin is published through [NPM](https://www.npmjs.com/package/homebridge-fibaro-home-center) and should be installed "globally" by typing:
+
+This plugin can be easily installed and configured through Homebridge UI or via [NPM](https://www.npmjs.com/package/homebridge-fibaro-home-center) "globally" by typing:
 
     npm install -g homebridge-fibaro-home-center
     
 # Configuration
-Remember to configure the plugin in config.json in your home directory inside the .homebridge directory. Configuration parameters:
-+ "url": "PUT URL OF YOUR HOME CENTER HERE CONTAINING PROTOCOL AND NAME, E.G.: https://hc-00000XXX.local, ca.cer file in the same folder as config.json"
-+ "host": "PUT IP ADDRESS OF YOUR HOME CENTER HERE. IF URL PARAMETER IS PRESENT THIS PARAMETER IS IGNORED"
-+ "username": "PUT USERNAME OF YOUR HOME CENTER HERE"
-+ "password": "PUT PASSWORD OF YOUR HOME CENTER HERE"
-+ "pollerperiod": "PUT 0 FOR DISABLING POLLING, 1 - 100 INTERVAL IN SECONDS. 2 SECONDS IS THE DEFAULT"
-+ "thermostatmaxtemperature": "SET MAX TEMPERATURE FOR THERMOSTATIC DEVICES (DEFAULT 100C)"
-+ "thermostattimeout": "PUT THE NUMBER OF SECONDS FOR THE THERMOSTAT TIMEOUT, DEFAULT: 7200 (2 HOURS)
-+ "switchglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A BISTABLE SWITCH"
-+ "dimmerglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A DIMMER"
-+ "securitysystem": "PUT enabled OR disabled IN ORDER TO MANAGE THE AVAILABILITY OF THE SECURITY SYSTEM"
-+ "addRoomNameToDeviceName" : "PUT enabled OR disabled IN ORDER TO ADD THE ROOM NAME TO DEVICE NAME. DEFAULT disabled"
-+ "doorbellDeviceId" : "PUT HOME CENTER BINARY SENSOR DEVICE ID ACTING AS A DOORBELL"
-+ "logsLevel": "PUT THE DESIRED LOG LEVEL: 0 DISABLED, 1 ONLY CHANGES, 2 ALL"
-+ "advControl": "ENABLE IF YOU WANT THE DEVICE TYPE IN HOMEKIT TO DEPEND ON HOW THE DEVICE ROLE IN FIBARO IS SELECTED. 0-DISABLED, 1-ENABLED"
+Configure the plugin through the settings UI or directly in the JSON editor.
 
-# Links
-+ Sample config: [config.json example](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/config.json)
-+ Advanced Control: [Advanced Control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/advcontrol.md)
-+ Wiki: [Wiki](https://github.com/ilcato/homebridge-Fibaro-home-center/wiki)
+#### Required:
+Required: url or host, username and password
++ `url` : url of your Home Center / Yubii Home, examples:
+  + `https://hc-00000XXX.local` (put ca.cer file in the same folder as config.json)
+  + `http://hc-00000XXX.local`
++ `host` : IP address of your Home Center / Yubii Home, E.G.: 192.168.1.100 , host field is ignored if field `url` is filled
++ `username` : username of your Home Center / Yubii Home
++ `password` : password of your Home Center / Yubii Home
+
+#### Optional:
++ `pollerperiod` : 0 for disabling polling, 1 - 100 interval in seconds, 2 seconds is the default
++ `thermostatmaxtemperature` : set max temperature for thermostatic devices (default 100 C)
++ `thermostattimeout` : number of seconds for the thermostat timeout, default: 7200 (2 hours)
++ `switchglobalvariables` : comma separated list of home center global variables acting like a bistable switch
++ `dimmerglobalvariables` : comma separated list of home center global variables acting like a dimmer
++ `securitysystem` : enabled or disabled in order to manage the availability of the security system
++ `addroomnametodevicename` : enabled or disabled in order to add the room name to device name. default disabled, use different device names within the same room
++ `doorbelldeviceid` : home center binary sensor device id acting as a doorbell
++ `logslevel` : desired log level: 0 disabled, 1 only changes, 2 all
++ `advcontrol` : enable if you want the device type in homekit to depend on how the device role in fibaro is selected. 0-disabled, 1-enabled
+
+#### Example: [config.json](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/config.json)
+
 
 # Troubleshooting
-## The device is displayed incorrectly or doesn't display at all
+
+<details>
+<summary><b>The device is displayed incorrectly or doesn't display at all</b></summary>
+    
 + For some devices, responsible for the display method is field Role (for a given device in the Fibaro Panel). Check [Advanced Control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/advcontrol.md).
 + If device still displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
 + Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). It is recommended to turn off Apple hubs during changes.
 + If you want new device to be supported (or if it displays incorrectly despite the recommendation above) open new Issue and write: what is this product, as what should it be displayed, whether it does not display at all or displays incorrectly (as what device?), what version of this plugin, what Home Center, and attach the API response for this product (see below).
-### Get API response for device
+
+</details>
+
+<details>
+<summary><b>Advanced Control</b></summary>
+
++ Now you can enable new option in plugin settings if you want the device type in Homekit to depend on how the device role in Fibaro is selected. See details: [advanced control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/advcontrol.md)
+
+</details>
+
+<details>
+<summary><b>Get API response for device</b></summary>
+
 + How to get API response for device. Open in browser: http://FIBARO-IP/api/devices/ID (replace FIBARO-IP with your Home Center IP and ID with device ID) and login.
-### Exclude devices
-+ If You want to exclude one or more devices: use a specific user (not an admin one) and grant access to only the needed devices or rename the device you want to exclude with an initial _ character. Warning: If you exclude the device, adding it again will require reconfiguration (assignment to a room, automations, etc.).
-### Important
-+ Use different device names within the same room in Home Center.
+
+</details>
+
+<details>
+<summary><b>Exclude devices</b></summary>
+
++ If You want to exclude one or more devices: use a specific user (not an admin one) and grant access to only the needed devices or rename the device you want to exclude with an initial _ character.
++ Warning: If you exclude the device, adding it again will require reconfiguration (assignment to a room, automations, etc.).
+
+</details>
+
+<details>
+<summary><b>Add room name to device name</b></summary>
+
++ Use different device names within the same room.
+
+</details>
+
+<details>
+<summary><b>Adding scenes as momentary switches</b></summary>
+
++ Any scenes with a name that start with _ will be added to HomeKit as a momentary switch with the same name without the _.
+
+</details>
+
+<details>
+<summary><b>Switch accessories mapped on Home Center global variables</b></summary>
+
++ It is possible to create Switch accessories on HomeKit with a toggle behaviour by:
+  + creating global variables (one for each switch) with 2 possible values: "true" and "false"
+  + configuring a new parameter ("switchglobalvariables") in config.json that contains a comma separated list of the variable names you defined.
++ You can use these variable to trigger Home Center scenes.
++ Known issue: you need to configure homebridge in config.json with a user with superuser privileges because normal users cannot set global variable from the outside of Home Center.
+
+</details>
+
+<details>
+<summary><b>Fibaro Security System configuration for HomeKit</b></summary>
+
+See: [security system](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/security-system.md)
+
+</details>
 
 # Latest release notes
 
-## Version 1.5.1
+### Version 1.5.1
 + Fix bug causing endless rastarting Homebridge when unable to connect to Home Center / Yubii Home
 + Adding a delay (1 minute) in the next attempt to read data (in case of failure)
 + Adding a delay (5 minutes) in the next attempt to first login (in case of failure)
 + Fix bug in the dimmers
 + Added the ability to select in the config thermostat max temperature
 
-## Version 1.5.0
+### Version 1.5.0
 + New option to enable in plugin settings: Advanced Control. Enable it if you want the device type in Homekit to depend on how the device role in Fibaro is selected. Details: [Advanced Control page](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/advcontrol.md).
 + New settings view: divided into sections.
