@@ -181,7 +181,7 @@
     {
       "type": "fieldset",
       "title": "Basic settings",
-      "description": "Enter Host (IP) or URL of the Fibaro HC. Host (IP) field is ignored if field Url is filled.",
+      "description": "Enter Host (IP) or URL of the Fibaro HC, username and password.",
       "expandable": true,
       "expanded": true,
       "items": [
