@@ -92,7 +92,7 @@ export class FibaroClient {
   }
 
   composeURL(service) {
-    if (validUrl(this.url)) {
+    if (this.validUrl(this.url)) {
       // if url is filled and starts with http (or https)
       if (this.url.startsWith('http') ) {
         return this.url + service;
@@ -103,8 +103,6 @@ export class FibaroClient {
       } else {
         return 'http://' + this.host + service;
       }
-    } else {
-      log('Wrong URL. Must be IP like: 192.168.1.100 or url like: https://hc-00000XXX.local or http://hc-00000XXX.local');
     }
   }
 
