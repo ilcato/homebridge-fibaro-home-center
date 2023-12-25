@@ -20,7 +20,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 #### Required:
 Required: url or host, username and password
 + `url` : url of your Home Center / Yubii Home, containing protocol and name, E.G.: https://hc-00000XXX.local, if starts with https:// put ca.cer file in the same folder as config.json
-+ `host` : IP address of your Home Center / Yubii Home. Host field is ignored if field `url` is filled
++ `host` : IP address of your Home Center / Yubii Home, E.G.: 192.168.1.100 , host field is ignored if field `url` is filled
 + `username` : username of your Home Center / Yubii Home
 + `password` : password of your Home Center / Yubii Home
 
