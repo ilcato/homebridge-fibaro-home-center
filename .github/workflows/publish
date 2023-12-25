@@ -28,6 +28,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Summary
+        run: |
+          echo "The release version will be: ${{ github.event.release.tag_name }}"
       
       - name: Check out repository
         uses: actions/checkout@v4
@@ -38,43 +42,24 @@ jobs:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Show summary
-        env:
-          GITHUB_TOKEN: ${{secrets.GH_CLI_TOKEN}}
-        run: |
-          echo "The release version will be: ${{ github.event.release.tag_name }}"
-      
-# LATEST
+      - name: Upgrade version ⬆
+        run: npm version ${{ github.event.release.tag_name }}
+        
+      - name: Install dependencies and build 🔧
+        run: npm ci && npm run build
 
-      - name: Publish to npm
+      - name: Test 👍
+        run: npm test
+        
+      - name: Publish package on NPM - LATEST 📦
         if: "!github.event.release.prerelease"
+        run: npm publish --tag latest
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-        # upgrade npm version in package.json to the tag used in the release.
-        - run: npm version ${{ github.event.release.tag_name }}
-        # install packages
-        - run: npm ci 
-        # build the project
-        - run: npm run build
-        # run tests just in case
-        - run: npm test
-        # publish to NPM
-        - run: npm publish --tag latest
-
- # BETA
-
-      - name: Publish to npm - beta
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Publish package on NPM - BETA 📦
         if: "github.event.release.prerelease"
+        run: npm publish --tag beta
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-        # upgrade npm version in package.json to the tag used in the release.
-        - run: npm version ${{ github.event.release.tag_name }}
-        # install packages
-        - run: npm ci 
-        # build the project
-        - run: npm run build
-        # run tests just in case
-        - run: npm test
-        # publish to NPM
-        - run: npm publish --tag beta
-     
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
