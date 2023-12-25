@@ -24,7 +24,7 @@ on:
 jobs:
   create-release:
     
-    name: Create latest / release
+    name: Create latest / beta release
     runs-on: ubuntu-latest
 
     steps:
