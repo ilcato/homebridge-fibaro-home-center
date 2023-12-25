@@ -99,7 +99,7 @@ export class FibaroClient {
       } else {
         return 'http://' + this.url + service;
       }
-    } else if (this.host) {
+    } else if (this.validUrl(this.host)) {
       if (this.host.startsWith('http')) {
         return this.host + service;
       } else {
