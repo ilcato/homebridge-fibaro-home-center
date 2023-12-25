@@ -92,16 +92,33 @@ export class FibaroClient {
   }
 
   composeURL(service) {
-    // if url is filled and starts with http:// or https://
-    if (this.url.startsWith('http') ) {
-      return this.url + service;
-    // if url is filled
-    } else if (this.url) {
-      return 'http://' + this.url + service;
-    // if url is not filled try host field - host field is now removed
+    if (validUrl(this.url)) {
+      // if url is filled and starts with http (or https)
+      if (this.url.startsWith('http') ) {
+        return this.url + service;
+      // if url is filled but without http
+      } else if (this.url) {
+        return 'http://' + this.url + service;
+      // if url is not filled try host field - host field is now removed
+      } else {
+        return 'http://' + this.host + service;
+      }
     } else {
-      return 'http://' + this.host + service;
+      log('Wrong URL. Must be IP like: 192.168.1.100 or url like: https://hc-00000XXX.local or http://hc-00000XXX.local');
     }
+  }
+
+  validUrl(str) {
+    const pattern = new RegExp(
+      '^(https?:\\/\\/)?' + // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+        '(\\#[-a-z\\d_]*)?$', // fragment locator
+      'i'
+    );
+    return pattern.test(str);
   }
 
   async genericGet(service) {
