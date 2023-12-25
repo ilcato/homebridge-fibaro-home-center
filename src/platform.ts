@@ -107,6 +107,9 @@ export class FibaroHC implements DynamicPlatformPlugin {
     if (this.config.logsLevel === undefined) {
       this.config.logsLevel = '1';
     }
+    if (!this.config.url && this.config.host) {
+      this.config.url = this.config.host;
+    }
 
     this.fibaroClient = new FibaroClient(this.config.url, this.config.host, this.config.username, this.config.password, this.log,
       this.config.adminUsername, this.config.adminPassword);
