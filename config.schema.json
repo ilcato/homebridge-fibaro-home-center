@@ -16,7 +16,7 @@
       },
       "url": {
         "description": "e.g.: https://hc-00000XXX.local or 192.168.1.100 .",
-        "title": "Url",
+        "title": "Url or IP",
         "type": "string",
         "required": true
       },
