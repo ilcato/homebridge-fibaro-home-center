@@ -93,16 +93,20 @@ export class FibaroClient {
 
   composeURL(service) {
     if (this.validUrl(this.url)) {
-      // if url is filled and starts with http (or https)
+      // if starts with http (or https)
       if (this.url.startsWith('http') ) {
         return this.url + service;
-      // if url is filled but without http
-      } else if (this.url) {
+      } else {
         return 'http://' + this.url + service;
-      // if url is not filled try host field - host field is now removed
+      } 
+    } else if (this.host) {
+      if (this.host.startsWith('http')) {
+        return this.host + service;
       } else {
         return 'http://' + this.host + service;
       }
+    } else {
+      // log error here
     }
   }
 
