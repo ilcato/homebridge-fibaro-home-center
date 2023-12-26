@@ -60,13 +60,13 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish package on NPM - LATEST 📦
-        if: "!github.event.release.prerelease"
+        if: !github.event.release.prerelease
         run: npm publish --tag latest
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           
       - name: Publish package on NPM - BETA 📦
-        if: "github.event.release.prerelease"
+        if: github.event.release.prerelease
         run: npm publish --tag beta
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
