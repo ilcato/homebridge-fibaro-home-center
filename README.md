@@ -47,7 +47,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 <details>
 <summary><b>The device is displayed incorrectly or doesn't display at all</b></summary>
     
-+ For some devices, responsible for the display method is field Role (for a given device in the Fibaro Panel). Check [Advanced Control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/advcontrol.md).
++ For some devices, responsible for the display method is field Role (for a given device in the Fibaro Panel). Check [Advanced Control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/advcontrol.md).
 + If device still displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
 + Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). It is recommended to turn off Apple hubs during changes.
 + If you want new device to be supported (or if it displays incorrectly despite the recommendation above) open new Issue and write: what is this product, as what should it be displayed, whether it does not display at all or displays incorrectly (as what device?), what version of this plugin, what Home Center, and attach the API response for this product (see below).
@@ -119,7 +119,3 @@ See: [security system](https://github.com/ilcato/homebridge-Fibaro-home-center/b
 + Adding a delay (5 minutes) in the next attempt to first login (in case of failure)
 + Fix bug in the dimmers
 + Added the ability to select in the config thermostat max temperature
-
-### Version 1.5.0
-+ New option to enable in plugin settings: Advanced Control. Enable it if you want the device type in Homekit to depend on how the device role in Fibaro is selected. Details: [Advanced Control page](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/master/advcontrol.md).
-+ New settings view: divided into sections.
