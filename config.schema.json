@@ -21,7 +21,7 @@
         "required": true
       },
       "host": {
-        "description": "This field will be removed in one of the future releases - use field url instead.",
+        "description": "Field 'host' is depreciated and will be removed in the future. Use field 'url' instead.",
         "title": "Host (IP)",
         "type": "string",
         "required": false
