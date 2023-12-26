@@ -45,7 +45,7 @@ jobs:
       # Configure Git
       - name: Git configuration
         run: |
-          git config --global user.email "82271669+github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "1111+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Actions"
           
       - name: Upgrade version ⬆
