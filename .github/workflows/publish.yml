@@ -13,8 +13,6 @@
 
 # Github Release description for Pre-releases (beta) is not required.
 
-
-
 name: Create and publish latest / beta release
 
 on:
