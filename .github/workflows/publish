@@ -41,16 +41,24 @@ jobs:
         with:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
-
-      - name: Upgrade version ⬆
-        run: npm version ${{ github.event.release.tag_name }}
-        
+          
       - name: Install dependencies and build 🔧
         run: npm ci && npm run build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Test 👍
-        run: npm test
-        
+      # Configure Git
+      - name: Git configuration
+        run: |
+          git config --global user.email "11111111+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions"
+          
+      - name: Upgrade version ⬆
+        run: npm version ${{ github.event.release.tag_name }}
+        # run: npm version minor
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
       - name: Publish package on NPM - LATEST 📦
         if: "!github.event.release.prerelease"
         run: npm publish --tag latest
