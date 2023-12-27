@@ -64,7 +64,7 @@
       },
       "dimmerglobalvariables": {
         "description": "A comma separeted list of Fibaro Home Center global variables acting like a dimmer.",
-        "title": "Global variables switches",
+        "title": "Global variables dimmers",
         "type": "string",
         "required": false
       },
