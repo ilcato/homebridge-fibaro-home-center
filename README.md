@@ -34,10 +34,10 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 + `switchglobalvariables` : comma separated list of home center global variables acting like a bistable switch
 + `dimmerglobalvariables` : comma separated list of home center global variables acting like a dimmer
 + `securitysystem` : enabled or disabled in order to manage the availability of the security system
-+ `addroomnametodevicename` : enabled or disabled in order to add the room name to device name. default disabled, use different device names within the same room
-+ `doorbelldeviceid` : home center binary sensor device id acting as a doorbell
-+ `logslevel` : desired log level: 0 disabled, 1 only changes, 2 all
-+ `advcontrol` : enable if you want the device type in homekit to depend on how the device role in fibaro is selected. 0-disabled, 1-enabled
++ `addRoomNameToDeviceName` : enabled or disabled in order to add the room name to device name. default disabled, use different device names within the same room
++ `doorbellDeviceId` : home center binary sensor device id acting as a doorbell
++ `logsLevel` : desired log level: 0 disabled, 1 only changes, 2 all
++ `advControl` : enable if you want the device type in homekit to depend on how the device role in fibaro is selected. 0-disabled, 1-enabled
 
 #### Example: [config.json](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/config.json)
 
