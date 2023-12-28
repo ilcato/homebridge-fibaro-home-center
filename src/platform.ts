@@ -119,14 +119,14 @@ export class FibaroHC implements DynamicPlatformPlugin {
         this.config.url = 'http://' + this.config.host;
       }
     } else {
-      this.log.error('Fibaro HC configuration: cannot find valid url or host in configuration file.');
+      this.log.error('Fibaro HC configuration: cannot find valid url in configuration file.');
       return;
     }
 
     this.fibaroClient = new FibaroClient(this.config.url, this.config.username, this.config.password, this.log,
       this.config.adminUsername, this.config.adminPassword);
     if (this.fibaroClient.status === false) {
-      this.log.error('Cannot connect to Fibaro Home Center. Check credentials, url/host or ca.cer file');
+      this.log.error('Cannot connect to Fibaro Home Center. Check credentials, url or ca.cer file');
       return;
     }
     if (pollerPeriod !== 0) {
