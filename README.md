@@ -38,7 +38,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 + `adminUsername`: admin username of your home center, needed only to set global variables,
 + `adminPassword`: admin password of your home center, needed only to set global variables,
 + `securitysystem` : enabled or disabled in order to manage the availability of the security system
-+ `addRoomNameToDeviceName` : enabled or disabled in order to add the room name to device name. default disabled, use different device names within the same room
++ `addRoomNameToDeviceName` : enabled or disabled in order to add the room name to device name. default disabled
 + `doorbellDeviceId` : home center binary sensor device id acting as a doorbell
 + `logsLevel` : desired log level: 0 disabled, 1 only changes, 2 all
 + `advControl` : enable if you want the device type in homekit to depend on how the device role in fibaro is selected. 0-disabled, 1-enabled
@@ -81,13 +81,6 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 </details>
 
 <details>
-<summary><b>Add room name to device name</b></summary>
-
-+ Use different device names within the same room.
-
-</details>
-
-<details>
 <summary><b>Adding scenes as momentary switches</b></summary>
 
 + Any scenes with a name that start with _ will be added to HomeKit as a momentary switch with the same name without the _.
@@ -115,6 +108,7 @@ See: [security system](https://github.com/ilcato/homebridge-Fibaro-home-center/b
 # Latest release notes
 
 ### Version 1.5.2
++ Added the ability to have device with the same name in the same room (in the Fibaro configuration). It doesn't break compatibility with automation.
 + Now you can enter Home Center / Yubii Home IP directly in "url" field in config. Field "host" is deprecated and will be removed in the future.
 
 ### Version 1.5.1
