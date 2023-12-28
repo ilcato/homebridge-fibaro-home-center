@@ -216,7 +216,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
     // Add room name to device name if addRoomNameToDeviceName = enabled
     this.log.info('Loading accessories');
     const filteredDevices: { name: string; roomID: string }[] = [];
-    devices.map((s: { name: string; roomID: string }) => {
+    devices.map((s) => {
       if (s.visible === true && !s.name.startsWith('_')) {
         const f = filteredDevices.find((d) => d.name === s.name && d.roomID === s.roomID);
         if (f === undefined) {
