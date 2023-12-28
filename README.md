@@ -33,6 +33,8 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 + `thermostattimeout` : number of seconds for the thermostat timeout, default: 7200 (2 hours)
 + `switchglobalvariables` : comma separated list of home center global variables acting like a bistable switch
 + `dimmerglobalvariables` : comma separated list of home center global variables acting like a dimmer
++ `adminUsername`: admin username of your home center, needed only to set global variables,
++ `adminPassword`: admin password of your home center, needed only to set global variables,
 + `securitysystem` : enabled or disabled in order to manage the availability of the security system
 + `addRoomNameToDeviceName` : enabled or disabled in order to add the room name to device name. default disabled, use different device names within the same room
 + `doorbellDeviceId` : home center binary sensor device id acting as a doorbell
