@@ -108,8 +108,8 @@ See: [security system](https://github.com/ilcato/homebridge-Fibaro-home-center/b
 # Latest release notes
 
 ### Version 1.5.2
-+ Added the ability to have device with the same name in the same room (in the Fibaro configuration). It doesn't break compatibility with automation.
-+ Now you can enter Home Center / Yubii Home IP directly in "url" field in config. Field "host" is deprecated and will be removed in the future.
++ Added the ability to have devices with the same name in the same room (in Fibaro configuration). This applies to newly added devices or devices with updated name or room. For existing devices, changing the name of the device or assigning it to another room will give a new uuid and thus it may break the automation, but it will also cause the transition to a new api and thus the absence of such problems in the future.
++ One address field - the URL field now supports both: URL and IP. Field "host" is deprecated and will be removed in the future.
 
 ### Version 1.5.1
 + Fix bug causing endless rastarting Homebridge when unable to connect to Home Center / Yubii Home
