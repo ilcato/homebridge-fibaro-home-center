@@ -188,7 +188,7 @@
         {
           "type": "flex",
           "flex-flow": "row wrap",
-          "items": ["host", "url"]
+          "items": ["url", "host"]
         },
         {
           "type": "flex",
