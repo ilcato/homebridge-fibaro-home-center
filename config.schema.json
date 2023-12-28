@@ -15,13 +15,13 @@
         "default": "FibaroHC"
       },
       "url": {
-        "description": "e.g.: https://hc-00000XXX.local",
-        "title": "Url",
+        "description": "e.g.: https://hc-00000XXX.local or 192.168.1.100 .",
+        "title": "Url or IP",
         "type": "string",
-        "required": false
+        "required": true
       },
       "host": {
-        "description": "e.g.: 192.168.1.10",
+        "description": "Field 'host' is depreciated and will be removed in the future. Use field 'url' instead.",
         "title": "Host (IP)",
         "type": "string",
         "required": false
@@ -64,7 +64,7 @@
       },
       "dimmerglobalvariables": {
         "description": "A comma separeted list of Fibaro Home Center global variables acting like a dimmer.",
-        "title": "Global variables switches",
+        "title": "Global variables dimmers",
         "type": "string",
         "required": false
       },
@@ -181,7 +181,7 @@
     {
       "type": "fieldset",
       "title": "Basic settings",
-      "description": "Enter Host (IP) or URL of the Fibaro HC. Host (IP) field is ignored if field Url is filled.",
+      "description": "Enter Host (IP) or URL of the Fibaro HC, username and password.",
       "expandable": true,
       "expanded": true,
       "items": [

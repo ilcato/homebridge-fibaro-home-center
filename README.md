@@ -20,11 +20,10 @@ This plugin can be easily installed and configured through Homebridge UI or via 
 Configure the plugin through the settings UI or directly in the JSON editor.
 
 #### Required:
-Required: url or host, username and password
-+ `url` : url of your Home Center / Yubii Home, examples:
++ `url` : url or IP of your Home Center / Yubii Home, examples:
+  + `192.168.1.100`
   + `https://hc-00000XXX.local` (put ca.cer file in the same folder as config.json)
   + `http://hc-00000XXX.local`
-+ `host` : IP address of your Home Center / Yubii Home, E.G.: 192.168.1.100 , host field is ignored if field `url` is filled
 + `username` : username of your Home Center / Yubii Home
 + `password` : password of your Home Center / Yubii Home
 
@@ -35,10 +34,10 @@ Required: url or host, username and password
 + `switchglobalvariables` : comma separated list of home center global variables acting like a bistable switch
 + `dimmerglobalvariables` : comma separated list of home center global variables acting like a dimmer
 + `securitysystem` : enabled or disabled in order to manage the availability of the security system
-+ `addroomnametodevicename` : enabled or disabled in order to add the room name to device name. default disabled, use different device names within the same room
-+ `doorbelldeviceid` : home center binary sensor device id acting as a doorbell
-+ `logslevel` : desired log level: 0 disabled, 1 only changes, 2 all
-+ `advcontrol` : enable if you want the device type in homekit to depend on how the device role in fibaro is selected. 0-disabled, 1-enabled
++ `addRoomNameToDeviceName` : enabled or disabled in order to add the room name to device name. default disabled, use different device names within the same room
++ `doorbellDeviceId` : home center binary sensor device id acting as a doorbell
++ `logsLevel` : desired log level: 0 disabled, 1 only changes, 2 all
++ `advControl` : enable if you want the device type in homekit to depend on how the device role in fibaro is selected. 0-disabled, 1-enabled
 
 #### Example: [config.json](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/config.json)
 
@@ -111,13 +110,12 @@ See: [security system](https://github.com/ilcato/homebridge-Fibaro-home-center/b
 
 # Latest release notes
 
+### Version 1.5.2
++ Now you can enter Home Center / Yubii Home IP directly in "url" field in config. Field "host" is depreciated and will be removed in the future.
+
 ### Version 1.5.1
 + Fix bug causing endless rastarting Homebridge when unable to connect to Home Center / Yubii Home
 + Adding a delay (1 minute) in the next attempt to read data (in case of failure)
 + Adding a delay (5 minutes) in the next attempt to first login (in case of failure)
 + Fix bug in the dimmers
 + Added the ability to select in the config thermostat max temperature
-
-### Version 1.5.0
-+ New option to enable in plugin settings: Advanced Control. Enable it if you want the device type in Homekit to depend on how the device role in Fibaro is selected. Details: [Advanced Control page](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/advcontrol.md).
-+ New settings view: divided into sections.

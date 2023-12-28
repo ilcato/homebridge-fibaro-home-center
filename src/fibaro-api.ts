@@ -92,11 +92,35 @@ export class FibaroClient {
   }
 
   composeURL(service) {
-    if (this.url) {
-      return this.url + service;
+    if (this.validUrl(this.url)) {
+      // if starts with http (or https)
+      if (this.url.startsWith('http') ) {
+        return this.url + service;
+      } else {
+        return 'http://' + this.url + service;
+      }
+    } else if (this.validUrl(this.host)) {
+      if (this.host.startsWith('http')) {
+        return this.host + service;
+      } else {
+        return 'http://' + this.host + service;
+      }
     } else {
-      return 'http://' + this.host + service;
+      // log error here
     }
+  }
+
+  validUrl(str) {
+    const pattern = new RegExp(
+      '^(https?:\\/\\/)?' + // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+        '(\\#[-a-z\\d_]*)?$', // fragment locator
+      'i',
+    );
+    return pattern.test(str);
   }
 
   async genericGet(service) {
