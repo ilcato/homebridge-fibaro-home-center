@@ -210,15 +210,27 @@ export class FibaroHC implements DynamicPlatformPlugin {
   }
 
   LoadAccessories(devices, rooms) {
+    // Add accessory for each device
+    // Filter out devices with visible = false and devices with name starting with _
+    // Filter out devices with the same name in the same room (keep only the first one found)
+    // Add room name to device name if addRoomNameToDeviceName = enabled
     this.log.info('Loading accessories');
-    devices.map((s) => {
+    const filteredDevices: { name: string; roomID: string }[] = [];
+    devices.map((s: { name: string; roomID: string }) => {
       if (s.visible === true && !s.name.startsWith('_')) {
-        if (rooms !== null) {
-          // patch device name
-          const room = rooms.find(r => r.id === s.roomID);
-          s.name = s.name + ' - ' + (room !== null ? room.name : 'no-room');
+        const f = filteredDevices.find((d) => d.name === s.name && d.roomID === s.roomID);
+        if (f === undefined) {
+          filteredDevices.push(s);
+          if (rooms !== null) {
+            // patch device name
+            const room = rooms.find(r => r.id === s.roomID);
+            s.name = s.name + ' - ' + (room !== null ? room.name : 'no-room');
+          }
+          this.addAccessory(s);
+        } else {
+          this.log.warn('A device with name ' + s.name + ' is already present in the same room. Ignoring it.');
         }
-        this.addAccessory(s);
+
       }
     });
 
