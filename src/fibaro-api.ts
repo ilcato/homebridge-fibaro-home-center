@@ -34,27 +34,25 @@ const throttle = new Throttle({
 
 export class FibaroClient {
 
-  url: string;
-  host: string;
+  baseUrl: string;
   auth: string;
   adminAuth : string;
   https: boolean;
   ca: unknown;
   status: boolean;
 
-  constructor(url, host, username, password, log, adminUsername, adminPassword) {
-    this.url = url;
-    this.host = host;
+  constructor(baseUrl, username, password, log, adminUsername, adminPassword) {
+    this.baseUrl = baseUrl;
     this.auth = 'Basic ' + new Buffer.from(username + ':' + password).toString('base64');
     if (adminUsername) {
       this.adminAuth = 'Basic ' + new Buffer(adminUsername + ':' + adminPassword).toString('base64');
     } else {
       this.adminAuth = '';
     }
-    this.https = (this.url) ? this.url.indexOf('https:') !== -1 : false;
+    this.https = (this.baseUrl) ? this.baseUrl.indexOf('https:') !== -1 : false;
     this.ca = null;
 
-    if (this.url && this.https) {
+    if (this.baseUrl && this.https) {
 
       const localConfigPath = '/homebridge';
       const localFile = localConfigPath + '/ca.cer';
@@ -83,7 +81,7 @@ export class FibaroClient {
         }
       }
     }
-    if (this.url && this.https && !this.ca) {
+    if (this.baseUrl && this.https && !this.ca) {
       log('Put a valid ca.cer file in config.json folder.');
       this.status = false;
     } else {
@@ -92,35 +90,7 @@ export class FibaroClient {
   }
 
   composeURL(service) {
-    if (this.validUrl(this.url)) {
-      // if starts with http (or https)
-      if (this.url.startsWith('http') ) {
-        return this.url + service;
-      } else {
-        return 'http://' + this.url + service;
-      }
-    } else if (this.validUrl(this.host)) {
-      if (this.host.startsWith('http')) {
-        return this.host + service;
-      } else {
-        return 'http://' + this.host + service;
-      }
-    } else {
-      // log error here
-    }
-  }
-
-  validUrl(str) {
-    const pattern = new RegExp(
-      '^(https?:\\/\\/)?' + // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-        '(\\#[-a-z\\d_]*)?$', // fragment locator
-      'i',
-    );
-    return pattern.test(str);
+    return this.baseUrl + service;
   }
 
   async genericGet(service) {

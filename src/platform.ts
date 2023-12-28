@@ -107,11 +107,23 @@ export class FibaroHC implements DynamicPlatformPlugin {
     if (this.config.logsLevel === undefined) {
       this.config.logsLevel = '1';
     }
-    if (!this.config.url && this.config.host) {
-      this.config.url = this.config.host;
+    if (validUrl(this.config.url)) {
+      if (!this.config.url.startsWith('http') ) {
+        // add http if no protocol specified
+        this.config.url = 'http://' + this.config.url;
+      }
+    } else if (validUrl(this.config.host)) {
+      // if url is not specified or not valid, try to use host
+      if (!this.config.host.startsWith('http')) {
+        // add http if no protocol specified
+        this.config.url = 'http://' + this.config.host;
+      }
+    } else {
+      this.log.error('Fibaro HC configuration: cannot find valid url or host in configuration file.');
+      return;
     }
 
-    this.fibaroClient = new FibaroClient(this.config.url, this.config.host, this.config.username, this.config.password, this.log,
+    this.fibaroClient = new FibaroClient(this.config.url, this.config.username, this.config.password, this.log,
       this.config.adminUsername, this.config.adminPassword);
     if (this.fibaroClient.status === false) {
       this.log.error('Cannot connect to Fibaro Home Center. Check credentials, url/host or ca.cer file');
@@ -316,3 +328,17 @@ export class FibaroHC implements DynamicPlatformPlugin {
   }
 
 }
+
+function validUrl(str) {
+  const pattern = new RegExp(
+    '^(https?:\\/\\/)?' + // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+      '(\\#[-a-z\\d_]*)?$', // fragment locator
+    'i',
+  );
+  return pattern.test(str);
+}
+
