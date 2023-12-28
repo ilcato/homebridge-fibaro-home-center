@@ -116,6 +116,7 @@ See: [security system](https://github.com/ilcato/homebridge-Fibaro-home-center/b
 
 ### Version 1.5.2
 + Now you can enter Home Center / Yubii Home IP directly in "url" field in config. Field "host" is deprecated and will be removed in the future.
++ Filter out devices with the same name in the same room.
 
 ### Version 1.5.1
 + Fix bug causing endless rastarting Homebridge when unable to connect to Home Center / Yubii Home
