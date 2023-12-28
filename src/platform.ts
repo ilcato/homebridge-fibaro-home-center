@@ -259,8 +259,16 @@ export class FibaroHC implements DynamicPlatformPlugin {
     if (device === undefined) {
       return;
     }
-    const uuid = this.api.hap.uuid.generate(device.name + device.roomID);
-    const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
+    const uuidV1 = this.api.hap.uuid.generate(device.name + device.roomID);
+    // add a new seed for uuidV2 to avoid conflicts with devices with same name in same room
+    const uuidV2 = this.api.hap.uuid.generate(device.id);
+    // check if the accessory already exists based on old uuid seed (device.name + device.roomID)
+    // if yes, keep it to preserve compatibility with HomeKit automations
+    // if not, check if the accessory already exists based on new uuid seed (device.id)
+    // if not, create a new accessory with new uuid seed (device.id)
+    const existingAccessoryV1 = this.accessories.find(accessory => accessory.UUID === uuidV1);
+    const existingAccessoryV2 = this.accessories.find(accessory => accessory.UUID === uuidV2);
+    const existingAccessory = existingAccessoryV1 ? existingAccessoryV1 : existingAccessoryV2;
     if (existingAccessory) {
       // the accessory already exists
       if (this.config.logsLevel === 2){
@@ -278,7 +286,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
 
     } else {
       // the accessory does not yet exist, so we need to create it
-      const accessory = new this.api.platformAccessory(device.name, uuid);
+      const accessory = new this.api.platformAccessory(device.name, uuidV2);
 
       // Create context
       accessory.context.device = device;
