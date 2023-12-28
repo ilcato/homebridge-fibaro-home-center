@@ -72,7 +72,7 @@ jobs:
       # Push git repository changes
       - name: Push changes to repository
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_PUSH }}
         run: |
           git push origin HEAD:main && git push --tags
       
