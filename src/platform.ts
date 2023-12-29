@@ -218,6 +218,8 @@ export class FibaroHC implements DynamicPlatformPlugin {
           const room = rooms.find(r => r.id === s.roomID);
           if (room !== undefined && room.name !== undefined && room.name !== '') {
             s.name = s.name + ' - ' + room.name;
+          } else {
+            s.name = s.name + ' - ' + 'no-room';
           }
         }
         this.addAccessory(s);
