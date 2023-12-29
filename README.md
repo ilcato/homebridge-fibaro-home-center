@@ -12,6 +12,14 @@
 
 ### Homebridge plugin for Fibaro Home Center (2, 2 Lite, 3, 3 Lite, Yubii Home).
 
+Supports devices, scenes, global variables, security systems, heating / comfort zones.
+
+# How it works
+
+This plugin comunicates with Fibaro HC / Yubii Home located on the same network, by the official Fibaro API.
+
+You must have an account in HC / Yubii Home. The main account has access to all devices, scenes, etc., for additional accounts you can select what to share.
+
 # Installation
 
 This plugin can be easily installed and configured through Homebridge UI or via [NPM](https://www.npmjs.com/package/homebridge-fibaro-home-center) "globally" by typing:
@@ -30,7 +38,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 + `password` : password of your Home Center / Yubii Home
 
 #### Optional:
-+ `pollerperiod` : 0 for disabling polling, 1 - 100 interval in seconds, 2 seconds is the default
++ `pollerperiod` : Polling interval for querying Fibaro Home Center machine (0: disabled, recomended: 2, 1 second allows for a more responsive update of the Home app when changes appear outside the HomeKit environment). If it is disabled the Home app is not updated automatically when such a change happen but only when you close a panel and reopen it.
 + `thermostatmaxtemperature` : set max temperature for thermostatic devices (default 100 C)
 + `thermostattimeout` : number of seconds for the thermostat timeout, default: 7200 (2 hours)
 + `switchglobalvariables` : comma separated list of home center global variables acting like a bistable switch
@@ -38,7 +46,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 + `adminUsername`: admin username of your home center, needed only to set global variables,
 + `adminPassword`: admin password of your home center, needed only to set global variables,
 + `securitysystem` : enabled or disabled in order to manage the availability of the security system
-+ `addRoomNameToDeviceName` : enabled or disabled in order to add the room name to device name. default disabled
++ `addRoomNameToDeviceName` : If enabled, to each device name will be added the name of the room in which it is located. Default: disabled.
 + `doorbellDeviceId` : home center binary sensor device id acting as a doorbell
 + `logsLevel` : desired log level: 0 disabled, 1 only changes, 2 all
 + `advControl` : enable if you want the device type in homekit to depend on how the device role in fibaro is selected. 0-disabled, 1-enabled
@@ -46,7 +54,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 #### Example: [config.json](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/config.json)
 
 
-# Troubleshooting
+# Troubleshooting and manuals
 
 <details>
 <summary><b>The device is displayed incorrectly or doesn't display at all</b></summary>
@@ -105,6 +113,20 @@ See: [security system](https://github.com/ilcato/homebridge-Fibaro-home-center/b
 
 </details>
 
+<details>
+<summary><b>Child bridge mode</b></summary>
+You can run this plugin as child bridge, that is an isolated process. There are several reasons/benefits of doing this. Details: https://github.com/homebridge/homebridge/wiki/Child-Bridges.
+</details>
+
+<details>
+<summary><b>More logs</b></summary>
+If you have any issues with this plugin, enable all logs in plugin config and the debug mode in the homebridge settings and restart the homebridge / child bridge. This will print additional information to the log.
+</details>
+
+# Contributing and support
+
+- Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-center/issues) or [Pull Request](https://github.com/ilcato/homebridge-fibaro-home-center/pulls)
+
 # Latest release notes
 
 ### Version 1.5.2
@@ -117,3 +139,5 @@ See: [security system](https://github.com/ilcato/homebridge-Fibaro-home-center/b
 + Adding a delay (5 minutes) in the next attempt to first login (in case of failure)
 + Fix bug in the dimmers
 + Added the ability to select in the config thermostat max temperature
+
+#### See all: [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)
