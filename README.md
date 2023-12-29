@@ -123,9 +123,9 @@ You can run this plugin as child bridge, that is an isolated process. There are 
 If you have any issues with this plugin, enable all logs in plugin config and the debug mode in the homebridge settings and restart the homebridge / child bridge. This will print additional information to the log.
 </details>
 
-# Contribution and support
+# Contributing and support
 
-- Feel free to create a [Issue](https://github.com/ilcato/homebridge-fibaro-home-center/issues) or [Pull Request](https://github.com/ilcato/homebridge-fibaro-home-center/pulls)
+- Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-center/issues) or [Pull Request](https://github.com/ilcato/homebridge-fibaro-home-center/pulls)
 
 # Latest release notes
 
