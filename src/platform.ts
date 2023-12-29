@@ -216,7 +216,9 @@ export class FibaroHC implements DynamicPlatformPlugin {
         if (rooms !== null) {
           // patch device name
           const room = rooms.find(r => r.id === s.roomID);
-          s.name = s.name + ' - ' + (room !== null ? room.name : 'no-room');
+          if (room !== undefined && room.name !== undefined && room.name !== '') {
+            s.name = s.name + ' - ' + room.name;
+          }
         }
         this.addAccessory(s);
       }
