@@ -12,6 +12,14 @@
 
 ### Homebridge plugin for Fibaro Home Center (2, 2 Lite, 3, 3 Lite, Yubii Home).
 
+Supports devices, scenes, global variables, security systems, heating / comfort zones.
+
+# How it works
+
+This plugin comunicates with Fibaro HC / Yubii Home located on the same network, by the official Fibaro API.
+
+You must have an account in HC / Yubii Home. The main account has access to all devices, scenes, etc., for additional accounts you can select what to share.
+
 # Installation
 
 This plugin can be easily installed and configured through Homebridge UI or via [NPM](https://www.npmjs.com/package/homebridge-fibaro-home-center) "globally" by typing:
@@ -46,7 +54,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 #### Example: [config.json](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/config.json)
 
 
-# Troubleshooting
+# Troubleshooting and manuals
 
 <details>
 <summary><b>The device is displayed incorrectly or doesn't display at all</b></summary>
