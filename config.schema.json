@@ -102,8 +102,8 @@
         "default": "disabled"
       },
       "addRoomNameToDeviceName": {
-        "description": "Enable or disable adding rooms names to the devices names.",
-        "title": "Add rooms names to devices names.",
+        "description": "If enabled, to each device name will be added the name of the room in which it is located. Default: disabled.",
+        "title": "Add room name to device name.",
         "type": "string",
         "oneOf": [
           {
