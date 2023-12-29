@@ -38,7 +38,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 + `password` : password of your Home Center / Yubii Home
 
 #### Optional:
-+ `pollerperiod` : 0 for disabling polling, 1 - 100 interval in seconds, 2 seconds is the default
++ `pollerperiod` : Polling interval for querying Fibaro Home Center machine (0: disabled, recomended: 2, 1 second allows for a more responsive update of the Home app when changes appear outside the HomeKit environment). If it is disabled the Home app is not updated automatically when such a change happen but only when you close a panel and reopen it.
 + `thermostatmaxtemperature` : set max temperature for thermostatic devices (default 100 C)
 + `thermostattimeout` : number of seconds for the thermostat timeout, default: 7200 (2 hours)
 + `switchglobalvariables` : comma separated list of home center global variables acting like a bistable switch
