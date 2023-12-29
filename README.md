@@ -113,6 +113,20 @@ See: [security system](https://github.com/ilcato/homebridge-Fibaro-home-center/b
 
 </details>
 
+<details>
+<summary><b>Child bridge mode</b></summary>
+You can run this plugin as child bridge, that is an isolated process. There are several reasons/benefits of doing this. Details: https://github.com/homebridge/homebridge/wiki/Child-Bridges.
+</details>
+
+<details>
+<summary><b>More logs</b></summary>
+If you have any issues with this plugin, enable all logs in plugin config and the debug mode in the homebridge settings and restart the homebridge / child bridge. This will print additional information to the log.
+</details>
+
+# Contribution and support
+
+- Feel free to create a [Issue](https://github.com/ilcato/homebridge-fibaro-home-center/issues) or [Pull Request](https://github.com/ilcato/homebridge-fibaro-home-center/pulls)
+
 # Latest release notes
 
 ### Version 1.5.2
@@ -125,3 +139,5 @@ See: [security system](https://github.com/ilcato/homebridge-Fibaro-home-center/b
 + Adding a delay (5 minutes) in the next attempt to first login (in case of failure)
 + Fix bug in the dimmers
 + Added the ability to select in the config thermostat max temperature
+
+#### All [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)
