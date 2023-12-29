@@ -46,7 +46,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 + `adminUsername`: admin username of your home center, needed only to set global variables,
 + `adminPassword`: admin password of your home center, needed only to set global variables,
 + `securitysystem` : enabled or disabled in order to manage the availability of the security system
-+ `addRoomNameToDeviceName` : enabled or disabled in order to add the room name to device name. default disabled
++ `addRoomNameToDeviceName` : If enabled, to each device name will be added the name of the room in which it is located. Default: disabled.
 + `doorbellDeviceId` : home center binary sensor device id acting as a doorbell
 + `logsLevel` : desired log level: 0 disabled, 1 only changes, 2 all
 + `advControl` : enable if you want the device type in homekit to depend on how the device role in fibaro is selected. 0-disabled, 1-enabled
