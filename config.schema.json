@@ -82,7 +82,7 @@
         "description": "If user provided above doesn't have admin rights in your Home Center, enter password of your Home Center to set global variables."
       },
       "securitysystem": {
-        "description": "Enable or disable the Security system, see wiki for detail.",
+        "description": "Enable or disable the Security system, see homepage for detail.",
         "title": "Security system",
         "type": "string",
         "oneOf": [
@@ -102,8 +102,8 @@
         "default": "disabled"
       },
       "addRoomNameToDeviceName": {
-        "description": "Enable or disable adding the Room name to the device name.",
-        "title": "Add room name to devices.",
+        "description": "Enable or disable adding rooms names to the devices names.",
+        "title": "Add rooms names to devices names.",
         "type": "string",
         "oneOf": [
           {
