@@ -140,4 +140,4 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 + Fix bug in the dimmers
 + Added the ability to select in the config thermostat max temperature
 
-#### All [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)
+#### See all: [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)
