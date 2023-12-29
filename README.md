@@ -12,13 +12,15 @@
 
 ### Homebridge plugin for Fibaro Home Center (2, 2 Lite, 3, 3 Lite, Yubii Home).
 
-Supports devices, scenes, global variables, security systems, heating / comfort zones.
+Supports devices, scenes, global variables, security systems, heating / comfort zones and exposes them to Homebridge and HomeKit (Apple Home and more).
 
 # How it works
 
 This plugin comunicates with Fibaro HC / Yubii Home located on the same network, by the official Fibaro API.
 
 You must have an account in HC / Yubii Home. The main account has access to all devices, scenes, etc., for additional accounts you can select what to share.
+
+Results will appear in Homebridge and via HomeKit in your Apple Home app (or other HomeKit app).
 
 # Installation
 
