@@ -55,8 +55,69 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 
 #### Example: [config.json](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/config.json)
 
+# Manuals
 
-# Troubleshooting and manuals
+<details>
+<summary><b>Advanced Control</b></summary>
+
+If you want the device type in Homekit to depend on how the device role in Fibaro is selected enable this option. See details: [advanced control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/advcontrol.md)
+
+</details>
+
+
+
+<details>
+<summary><b>Exclude device</b></summary>
+
+Exclude one or more devices:
++ use a specific user (not an admin one) and grant access to only the needed devices
++ or rename the device you want to exclude with an initial _ character.
+
+Warning: If you exclude the device, adding it again will require reconfiguration (assignment to a room, automations, etc.).
+
+</details>
+
+<details>
+<summary><b>Scenes</b></summary>
+
++ Any scene with a name that start with _ will be added to HomeKit as a momentary switch
++ Switch name will be same as scene name but without the _.
++ Momentary switch means that it will turn off itself after a while.
+
+</details>
+
+<details>
+<summary><b>Global variables</b></summary>
+
++ It is possible to create Switch in HomeKit with a toggle behaviour:
+  + creating global variables (one for each switch) with 2 possible values: "true" and "false"
+  + configuring a new parameter ("switchglobalvariables") in config.json that contains a comma separated list of the variable names you defined.
++ You can use these variable to trigger Home Center scenes.
++ Known issue: you need to configure homebridge in config.json with a user with superuser privileges because normal users cannot set global variable from the outside of Home Center.
+
+</details>
+
+<details>
+<summary><b>Security System</b></summary>
+
+See: [security system](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/security-system.md)
+
+</details>
+
+<details>
+<summary><b>Climate / Heating zones</b></summary>
+
+...
+
+</details>
+
+<details>
+<summary><b>Child bridge mode</b></summary>
+You can run this plugin as child bridge, that is an isolated process. There are several reasons/benefits of doing this. Details: https://github.com/homebridge/homebridge/wiki/Child-Bridges.
+</details>
+
+
+# Troubleshooting
 
 <details>
 <summary><b>The device is displayed incorrectly or doesn't display at all</b></summary>
@@ -69,60 +130,17 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 </details>
 
 <details>
-<summary><b>Advanced Control</b></summary>
-
-+ Now you can enable new option in plugin settings if you want the device type in Homekit to depend on how the device role in Fibaro is selected. See details: [advanced control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/advcontrol.md)
-
-</details>
-
-<details>
 <summary><b>Get API response for device</b></summary>
 
-+ How to get API response for device. Open in browser: http://FIBARO-IP/api/devices/ID (replace FIBARO-IP with your Home Center IP and ID with device ID) and login.
+Open in browser: http://FIBARO-IP/api/devices/DEVICE-ID (replace FIBARO-IP with your Home Center IP and DEVICE-ID with device ID) and login.
 
-</details>
-
-<details>
-<summary><b>Exclude devices</b></summary>
-
-+ If You want to exclude one or more devices: use a specific user (not an admin one) and grant access to only the needed devices or rename the device you want to exclude with an initial _ character.
-+ Warning: If you exclude the device, adding it again will require reconfiguration (assignment to a room, automations, etc.).
-
-</details>
-
-<details>
-<summary><b>Adding scenes as momentary switches</b></summary>
-
-+ Any scenes with a name that start with _ will be added to HomeKit as a momentary switch with the same name without the _.
-
-</details>
-
-<details>
-<summary><b>Switch accessories mapped on Home Center global variables</b></summary>
-
-+ It is possible to create Switch accessories on HomeKit with a toggle behaviour by:
-  + creating global variables (one for each switch) with 2 possible values: "true" and "false"
-  + configuring a new parameter ("switchglobalvariables") in config.json that contains a comma separated list of the variable names you defined.
-+ You can use these variable to trigger Home Center scenes.
-+ Known issue: you need to configure homebridge in config.json with a user with superuser privileges because normal users cannot set global variable from the outside of Home Center.
-
-</details>
-
-<details>
-<summary><b>Fibaro Security System configuration for HomeKit</b></summary>
-
-See: [security system](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/security-system.md)
-
-</details>
-
-<details>
-<summary><b>Child bridge mode</b></summary>
-You can run this plugin as child bridge, that is an isolated process. There are several reasons/benefits of doing this. Details: https://github.com/homebridge/homebridge/wiki/Child-Bridges.
 </details>
 
 <details>
 <summary><b>More logs</b></summary>
-If you have any issues with this plugin, enable all logs in plugin config and the debug mode in the homebridge settings and restart the homebridge / child bridge. This will print additional information to the log.
+
+If you have any issues with this plugin, enable all logs in plugin config and the debug mode in the homebridge settings and restart the homebridge / child bridge. This will show additional information in log.
+
 </details>
 
 # Contributing and support
@@ -133,8 +151,8 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 ### Version 1.6.0
 + Added the ability to have devices with the same name in the same room (in Fibaro configuration). This applies to newly added devices or devices with updated name or room. For existing devices, changing the name of the device or assigning it to another room will give a new uuid and thus it may break the automation in HomeKit (as before), but it will also cause the transition to a new internal mechanism that will not suffer for such a problems in the future. The update itself will not change anything - it will not break devices or automations.
-+ One address field - the URL field now supports both: URL and IP. Field "host" is deprecated and will be removed in the future.
 + Fix issue when there is room without name. 
++ One address field - the URL field now supports both: URL and IP. Field "host" is deprecated and will be removed in the future.
 + Upgraded some package dependencies.
 
 ### Version 1.5.1
