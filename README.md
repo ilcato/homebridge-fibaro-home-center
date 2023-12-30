@@ -12,7 +12,7 @@
 
 ### Homebridge plugin for Fibaro Home Center (2, 2 Lite, 3, 3 Lite, Yubii Home).
 
-Supports devices, scenes, global variables, security systems, heating / comfort zones and exposes them to Homebridge and HomeKit (Apple Home and more).
+Supports devices, scenes, global variables, security systems, comfort / heating zones and exposes them to Homebridge and HomeKit (Apple Home and more).
 
 # How it works
 
@@ -67,7 +67,7 @@ If you want the device type in Homekit to depend on how the device role in Fibar
 
 
 <details>
-<summary><b>Exclude device</b></summary>
+<summary><b>Exclude devices</b></summary>
 
 Exclude one or more devices:
 + use a specific user (not an admin one) and grant access to only the needed devices
@@ -107,10 +107,8 @@ See: [security system](https://github.com/ilcato/homebridge-Fibaro-home-center/b
 <details>
 <summary><b>Climate / Heating zones</b></summary>
     
-+ The Homebridge Fibaro Home Center plugin integrates climate/heating zones from the Home Center into HomeKit by creating Thermostat accessories for each zone. This mapping allows users to control and manage heating zones conveniently through the HomeKit interface.
-+ Thermostat Controls: once a climate/heating zone is created in the Home Center, a corresponding Thermostat accessory is generated in HomeKit. The Thermostat accessory provides intuitive controls within the HomeKit ecosystem.
-+ Manual Settings and Timeout: the controls available on the Thermostat activate a manual setting for the specified duration. This duration is set by the `thermostattimeout` parameter in the `config.json` file. During this period, the manual settings remain in effect for the zone.
-+ After the predefined timeout period expires, the normal schedule of the zone is automatically reactivated. This ensures that the zone reverts to its programmed schedule once the manual setting duration elapses.
++ Thermostat Controls: once a climate / heating zone is created in the Home Center / Yubii Home, a corresponding Thermostat accessory is generated in HomeKit. The Thermostat accessory provides intuitive controls within the HomeKit ecosystem.
++ Manual Settings and Timeout: the controls available on the Thermostat activate a manual setting for the specified duration. This duration is set by the `thermostattimeout` parameter in the `config.json` file. During this period, the manual settings remain in effect for the zone. After the predefined timeout period expires, the normal schedule of the zone is automatically reactivated. This ensures that the zone reverts to its programmed schedule once the manual setting duration elapses.
 
 </details>
 
@@ -154,7 +152,7 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 ### Version 1.6.0
 + Added the ability to have devices with the same name in the same room (in Fibaro configuration). This applies to newly added devices or devices with updated name or room. For existing devices, changing the name of the device or assigning it to another room will give a new uuid and thus it may break the automation in HomeKit (as before), but it will also cause the transition to a new internal mechanism that will not suffer for such a problems in the future. The update itself will not change anything - it will not break devices or automations.
-+ Fix issue when there is room without name. 
++ Fix an error that occurs when there is a room without a name.
 + One address field - the URL field now supports both: URL and IP. Field "host" is deprecated and will be removed in the future.
 + Upgraded some package dependencies.
 
