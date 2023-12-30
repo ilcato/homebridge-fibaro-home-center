@@ -12,7 +12,7 @@
 
 ### Homebridge plugin for Fibaro Home Center (2, 2 Lite, 3, 3 Lite, Yubii Home).
 
-Supports devices, scenes, global variables, security systems, comfort / heating zones and exposes them to Homebridge and HomeKit (Apple Home and more).
+Supports devices, scenes, global variables, security systems, climate / heating zones and exposes them to Homebridge and HomeKit (Apple Home and more).
 
 # How it works
 
