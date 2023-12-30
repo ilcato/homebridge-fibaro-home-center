@@ -106,8 +106,11 @@ See: [security system](https://github.com/ilcato/homebridge-Fibaro-home-center/b
 
 <details>
 <summary><b>Climate / Heating zones</b></summary>
-
-...
+    
++ The Homebridge Fibaro Home Center plugin integrates climate/heating zones from the Home Center into HomeKit by creating Thermostat accessories for each zone. This mapping allows users to control and manage heating zones conveniently through the HomeKit interface.
++ Thermostat Controls: once a climate/heating zone is created in the Home Center, a corresponding Thermostat accessory is generated in HomeKit. The Thermostat accessory provides intuitive controls within the HomeKit ecosystem.
++ Manual Settings and Timeout: the controls available on the Thermostat activate a manual setting for the specified duration. This duration is set by the `thermostattimeout` parameter in the `config.json` file. During this period, the manual settings remain in effect for the zone.
++ After the predefined timeout period expires, the normal schedule of the zone is automatically reactivated. This ensures that the zone reverts to its programmed schedule once the manual setting duration elapses.
 
 </details>
 
