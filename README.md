@@ -150,17 +150,13 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 # Latest release notes
 
+### Version 1.6.1
++ Upgraded to homebridge 1.7
+
 ### Version 1.6.0
 + Added the ability to have devices with the same name in the same room (in Fibaro configuration). This applies to newly added devices or devices with updated name or room. For existing devices, changing the name of the device or assigning it to another room will give a new uuid and thus it may break the automation in HomeKit (as before), but it will also cause the transition to a new internal mechanism that will not suffer for such a problems in the future. The update itself will not change anything - it will not break devices or automations.
 + Fix an error that occurs when there is a room without a name.
 + One address field - the URL field now supports both: URL and IP. Field "host" is deprecated and will be removed in the future.
 + Upgraded some package dependencies.
-
-### Version 1.5.1
-+ Fix bug causing endless rastarting Homebridge when unable to connect to Home Center / Yubii Home
-+ Adding a delay (1 minute) in the next attempt to read data (in case of failure)
-+ Adding a delay (5 minutes) in the next attempt to first login (in case of failure)
-+ Fix bug in the dimmers
-+ Added the ability to select in the config thermostat max temperature
 
 #### See all: [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)
