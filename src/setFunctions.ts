@@ -102,7 +102,7 @@ export class SetFunctions {
         service.isUpdating = true;
         await this.command('setValue', [value], service, IDs);
         this.platform.log('setValue ' + value);
-                
+
         clearTimeout(this.timeout);
         this.timeout = setTimeout(() => {
           service.isUpdating = false;
