@@ -89,7 +89,7 @@ export class SetFunctions {
       }
       this.setGlobalVariable(IDs[1], value === true ? '100' : '0');
     } else {
-      if (!service.isUpdating) { // see in setBrightness function
+      if (!this.timeouts[IDs]) { // see in setBrightness function
         await this.command(value ? 'turnOn' : 'turnOff', null, service, IDs);
       }
     }
@@ -99,11 +99,9 @@ export class SetFunctions {
     if (service.isGlobalVariableDimmer) {
       await this.setGlobalVariable(IDs[1], value.toString());
     } else {
-      service.isUpdating = true;
       clearTimeout(this.timeouts[IDs]);
       this.timeouts[IDs] = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
-        service.isUpdating = false;
       }, 500);
     }
   }
@@ -116,11 +114,9 @@ export class SetFunctions {
         await this.command('open', [0], service, IDs);
       }
     } else {
-      service.isUpdating = true;
       clearTimeout(this.timeouts[IDs]);
       this.timeouts[IDs] = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
-        service.isUpdating = false;
       }, 1500);
     }
   }
