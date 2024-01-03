@@ -99,24 +99,12 @@ export class SetFunctions {
     if (service.isGlobalVariableDimmer) {
       await this.setGlobalVariable(IDs[1], value.toString());
     } else {
-      // if this is first command
-      if (!service.isUpdating) {
-        // block other updates in this time
-        service.isUpdating = true;
+      service.isUpdating = true;
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
         await this.command('setValue', [value], service, IDs);
-        clearTimeout(this.timeout);
-        this.timeout = setTimeout(() => {
-          service.isUpdating = false;
-        }, 200);
-        // every command will extend timer
-        // execute only last command
-      } else {
-        clearTimeout(this.timeout);
-        this.timeout = setTimeout(async () => {
-          await this.command('setValue', [value], service, IDs);
-          service.isUpdating = false;
-        }, 200);
-      }
+        service.isUpdating = false;
+      }, 200);  
     }
   }
 
@@ -128,9 +116,11 @@ export class SetFunctions {
         await this.command('open', [0], service, IDs);
       }
     } else {
+      service.isUpdating = true;
       clearTimeout(this.timeout);
       this.timeout = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
+        service.isUpdating = false;
       }, 200);
     }
   }
