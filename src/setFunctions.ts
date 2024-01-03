@@ -102,7 +102,7 @@ export class SetFunctions {
       // if this is first command
       if (!service.isUpdating) {
         // block other updates in this time
-        service.isUpdating = true; 
+        service.isUpdating = true;
         await this.command('setValue', [value], service, IDs);
         clearTimeout(this.timeout);
         this.timeout = setTimeout(() => {
