@@ -104,7 +104,7 @@ export class SetFunctions {
       this.timeout = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
         service.isUpdating = false;
-      }, 200);
+      }, 500);
     }
   }
 
@@ -121,7 +121,7 @@ export class SetFunctions {
       this.timeout = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
         service.isUpdating = false;
-      }, 200);
+      }, 500);
     }
   }
 
