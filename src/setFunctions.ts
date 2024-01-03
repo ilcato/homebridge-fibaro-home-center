@@ -23,6 +23,7 @@ export class SetFunctions {
   setFunctionsMapping;
   getTargetSecuritySystemSceneMapping;
   platform;
+  timeout;
 
   constructor(platform) {
     this.platform = platform;
