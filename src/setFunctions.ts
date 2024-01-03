@@ -101,10 +101,10 @@ export class SetFunctions {
     } else {
       service.isUpdating = true;
       clearTimeout(this.timeout);
-      this.timeout = setTimeout(() => {
+      this.timeout = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
         service.isUpdating = false;
-      }, 200);  
+      }, 200);
     }
   }
 
