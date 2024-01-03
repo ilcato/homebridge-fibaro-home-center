@@ -151,7 +151,9 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 # Latest release notes
 
 ### Version 1.6.1
-+ Upgraded to homebridge 1.7
++ Fix dimmers (blinking) and roller shutters.
++ Upgraded to homebridge 1.7.
++ Upgraded dependencies.
 
 ### Version 1.6.0
 + Added the ability to have devices with the same name in the same room (in Fibaro configuration). This applies to newly added devices or devices with updated name or room. For existing devices, changing the name of the device or assigning it to another room will give a new uuid and thus it may break the automation in HomeKit (as before), but it will also cause the transition to a new internal mechanism that will not suffer for such a problems in the future. The update itself will not change anything - it will not break devices or automations.
