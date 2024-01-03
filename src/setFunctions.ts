@@ -121,7 +121,7 @@ export class SetFunctions {
       this.timeouts[IDs] = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
         service.isUpdating = false;
-      }, 500);
+      }, 1500);
     }
   }
 
