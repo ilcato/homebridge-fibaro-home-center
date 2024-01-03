@@ -23,11 +23,11 @@ export class SetFunctions {
   setFunctionsMapping;
   getTargetSecuritySystemSceneMapping;
   platform;
-  timeout;
+  timeouts;
 
   constructor(platform) {
     this.platform = platform;
-    this.timeout = null;
+    this.timeouts = {};
 
     const setCharacteristicFunctions = {
       On: this.setOn,
@@ -100,8 +100,8 @@ export class SetFunctions {
       await this.setGlobalVariable(IDs[1], value.toString());
     } else {
       service.isUpdating = true;
-      clearTimeout(this.timeout);
-      this.timeout = setTimeout(async () => {
+      clearTimeout(this.timeouts[IDs]);
+      this.timeouts[IDs] = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
         service.isUpdating = false;
       }, 500);
@@ -117,8 +117,8 @@ export class SetFunctions {
       }
     } else {
       service.isUpdating = true;
-      clearTimeout(this.timeout);
-      this.timeout = setTimeout(async () => {
+      clearTimeout(this.timeouts[IDs]);
+      this.timeouts[IDs] = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
         service.isUpdating = false;
       }, 500);
