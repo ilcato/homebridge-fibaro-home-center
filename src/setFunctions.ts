@@ -26,6 +26,7 @@ export class SetFunctions {
 
   constructor(platform) {
     this.platform = platform;
+    this.timeout = null;
 
     const setCharacteristicFunctions = {
       On: this.setOn,
