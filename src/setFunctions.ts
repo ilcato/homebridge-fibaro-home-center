@@ -107,7 +107,7 @@ export class SetFunctions {
         clearTimeout(this.timeout);
         this.timeout = setTimeout(() => {
           service.isUpdating = false;
-        }, 300);
+        }, 200);
         // every command will extend timer
         // execute only last command
       } else {
@@ -115,7 +115,7 @@ export class SetFunctions {
         this.timeout = setTimeout(async () => {
           await this.command('setValue', [value], service, IDs);
           service.isUpdating = false;
-        }, 300);
+        }, 200);
       }
     }
   }
@@ -128,7 +128,10 @@ export class SetFunctions {
         await this.command('open', [0], service, IDs);
       }
     } else {
-      await this.command('setValue', [value], service, IDs);
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(async () => {
+        await this.command('setValue', [value], service, IDs);
+      }, 200);
     }
   }
 
