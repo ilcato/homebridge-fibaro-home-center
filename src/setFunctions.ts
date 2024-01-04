@@ -23,11 +23,11 @@ export class SetFunctions {
   setFunctionsMapping;
   getTargetSecuritySystemSceneMapping;
   platform;
-  timeouts;
+  timeoutsUpdating;
 
   constructor(platform) {
     this.platform = platform;
-    this.timeouts = {};
+    this.timeoutsUpdating = {};
 
     const setCharacteristicFunctions = {
       On: this.setOn,
@@ -89,7 +89,7 @@ export class SetFunctions {
       }
       this.setGlobalVariable(IDs[1], value === true ? '100' : '0');
     } else {
-      if (!this.timeouts[IDs]) { // see in setBrightness function
+      if (!this.timeoutsUpdating[IDs]) { // see in setBrightness function
         await this.command(value ? 'turnOn' : 'turnOff', null, service, IDs);
       }
     }
@@ -99,10 +99,10 @@ export class SetFunctions {
     if (service.isGlobalVariableDimmer) {
       await this.setGlobalVariable(IDs[1], value.toString());
     } else {
-      clearTimeout(this.timeouts[IDs]);
-      this.timeouts[IDs] = setTimeout(async () => {
+      clearTimeout(this.timeoutsUpdating[IDs]);
+      this.timeoutsUpdating[IDs] = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
-        clearTimeout(this.timeouts[IDs]);
+        clearTimeout(this.timeoutsUpdating[IDs]);
       }, 500);
     }
   }
@@ -115,10 +115,10 @@ export class SetFunctions {
         await this.command('open', [0], service, IDs);
       }
     } else {
-      clearTimeout(this.timeouts[IDs]);
-      this.timeouts[IDs] = setTimeout(async () => {
+      clearTimeout(this.timeoutsUpdating[IDs]);
+      this.timeoutsUpdating[IDs] = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
-        clearTimeout(this.timeouts[IDs]);
+        clearTimeout(this.timeoutsUpdating[IDs]);
       }, 1500);
     }
   }
