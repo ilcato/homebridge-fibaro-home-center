@@ -100,9 +100,11 @@ export class SetFunctions {
       await this.setGlobalVariable(IDs[1], value.toString());
     } else {
       clearTimeout(this.timeoutsUpdating[IDs]);
+      this.timeoutsUpdating[IDs] = null;
       this.timeoutsUpdating[IDs] = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
         clearTimeout(this.timeoutsUpdating[IDs]);
+        this.timeoutsUpdating[IDs] = null;
       }, 500);
     }
   }
@@ -116,9 +118,11 @@ export class SetFunctions {
       }
     } else {
       clearTimeout(this.timeoutsUpdating[IDs]);
+      this.timeoutsUpdating[IDs] = null;
       this.timeoutsUpdating[IDs] = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
         clearTimeout(this.timeoutsUpdating[IDs]);
+        this.timeoutsUpdating[IDs] = null;
       }, 1500);
     }
   }
