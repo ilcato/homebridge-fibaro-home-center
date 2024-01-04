@@ -152,7 +152,7 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 ### Version 1.6.1
 + Fix dimmers (blinking) and roller shutters.
-+ Upgraded to homebridge 1.7.
++ Upgraded to homebridge 1.7.0.
 + Upgraded dependencies.
 
 ### Version 1.6.0
