@@ -102,6 +102,7 @@ export class SetFunctions {
       clearTimeout(this.timeouts[IDs]);
       this.timeouts[IDs] = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
+        clearTimeout(this.timeouts[IDs]);
       }, 500);
     }
   }
@@ -117,6 +118,7 @@ export class SetFunctions {
       clearTimeout(this.timeouts[IDs]);
       this.timeouts[IDs] = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
+        clearTimeout(this.timeouts[IDs]);
       }, 1500);
     }
   }
