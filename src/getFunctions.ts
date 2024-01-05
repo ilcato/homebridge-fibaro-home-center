@@ -128,7 +128,7 @@ export class GetFunctions {
     }
     // If "On" charatecreristic is false, brightness update is skipped
     const onCharacteristic = service.getCharacteristic(this.platform.Characteristic.On);
-    if (onCharacteristic.value === false) {
+    if (onCharacteristic && onCharacteristic.value === false) {
       return;
     }
     characteristic.updateValue(r);
