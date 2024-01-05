@@ -129,7 +129,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
       this.log.error('Cannot connect to Fibaro Home Center. Check credentials, url or ca.cer file');
       return;
     }
-    if (pollerPeriod !== 0) {
+    if (pollerPeriod > 0) {
       this.poller = new Poller(this, pollerPeriod);
     }
 
@@ -252,7 +252,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
     });
 
     // Start the poller update mechanism
-    if (this.poller) {
+    if (this.poller && pollerPeriod > 0) {
       this.poller.poll();
     }
   }
