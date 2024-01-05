@@ -126,6 +126,12 @@ export class GetFunctions {
         r = 100;
       }
     }
+    // If "On" charatecreristic is false, brightness update is skipped
+    const onCharacteristic = service.getCharacteristic(this.platform.Characteristic.On);
+    if (onCharacteristic.value === false) {
+      this.platform.log('On characteristic is false, brightness update is skipped.', '');
+      return;
+    }
     characteristic.updateValue(r);
   }
 
