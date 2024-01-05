@@ -85,9 +85,11 @@ export class Poller {
 
   restartPoll(delay) {
     clearTimeout(this.timeout);
-    this.timeout = setTimeout(() => {
-      this.poll();
-    }, delay);
+    if (delay > 0) {
+      this.timeout = setTimeout(() => {
+        this.poll();
+      }, delay);
+    }
   }
 
   cancelPoll() {
