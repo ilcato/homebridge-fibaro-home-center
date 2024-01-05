@@ -31,7 +31,7 @@ import { GetFunctions } from './getFunctions';
 import { Poller } from './pollerupdate';
 import { Mutex } from 'async-mutex';
 
-const defaultPollerPeriod = 5;
+const defaultPollerPeriod = 3;
 const defaultThermostatMaxTemp = 100;
 const timeOffset = 2 * 3600;
 
