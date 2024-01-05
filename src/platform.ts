@@ -252,7 +252,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
     });
 
     // Start the poller update mechanism
-    if (this.poller && pollerPeriod > 0) {
+    if (this.poller) {
       this.poller.poll();
     }
   }
