@@ -150,8 +150,10 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 # Latest release notes
 
-### Version 1.6.1
-+ Fix dimmers (blinking) and roller shutters (jamming). Now there could be slight delay in setting the value - unfortunately, Apple Home works in such a way that it sends multiple commands when you move the slider, not only one command when you finish and raise your finger. 
+### Version 1.7.0
++ Fix dimmers (blinking) and roller shutters (jamming). Now there could be slight delay in setting the value - unfortunately, Apple Home works in such a way that it sends multiple commands when you move the slider, not only one command when you finish and raise your finger.
++ Fixing an error with an incorrect reading of the dimmer value, which always set to 100%.
++ Fix error making it impossible to turn off poller update.
 + Upgraded to homebridge 1.7.0.
 + Upgraded dependencies.
 
