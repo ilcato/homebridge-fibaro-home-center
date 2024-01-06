@@ -150,6 +150,9 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 # Latest release notes
 
+### Version 1.7.1
++ As previously announced, the 'host' field is removed from the config plugin. From now on, one field is used to enter a url or IP.
+
 ### Version 1.7.0
 + Fix dimmers (blinking) and roller shutters (jamming). Now there could be slight delay in setting the value - unfortunately, Apple Home works in such a way that it sends multiple commands when you move the slider, not only one command when you finish and raise your finger.
 + Fixing an error with an incorrect reading of the dimmer value, which always set to 100%.
