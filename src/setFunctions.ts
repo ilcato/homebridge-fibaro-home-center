@@ -27,7 +27,7 @@ export class SetFunctions {
 
   constructor(platform) {
     this.platform = platform;
-    this.timeoutsUpdating = {};
+    this.timeoutsUpdating = [];
 
     const setCharacteristicFunctions = {
       On: this.setOn,
@@ -89,7 +89,7 @@ export class SetFunctions {
       }
       this.setGlobalVariable(IDs[1], value === true ? '100' : '0');
     } else {
-      if (!this.timeoutsUpdating[IDs]) { // see in setBrightness function
+      if (!this.timeoutsUpdating[IDs[0]]) { // see in setBrightness function
         await this.command(value ? 'turnOn' : 'turnOff', null, service, IDs);
       }
     }
@@ -99,12 +99,12 @@ export class SetFunctions {
     if (service.isGlobalVariableDimmer) {
       await this.setGlobalVariable(IDs[1], value.toString());
     } else {
-      clearTimeout(this.timeoutsUpdating[IDs]);
-      this.timeoutsUpdating[IDs] = null;
-      this.timeoutsUpdating[IDs] = setTimeout(async () => {
+      clearTimeout(this.timeoutsUpdating[IDs[0]]);
+      this.timeoutsUpdating[IDs[0]] = null;
+      this.timeoutsUpdating[IDs[0]] = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
-        clearTimeout(this.timeoutsUpdating[IDs]);
-        this.timeoutsUpdating[IDs] = null;
+        clearTimeout(this.timeoutsUpdating[IDs[0]]);
+        this.timeoutsUpdating[IDs[0]] = null;
       }, 500);
     }
   }
@@ -117,12 +117,12 @@ export class SetFunctions {
         await this.command('open', [0], service, IDs);
       }
     } else {
-      clearTimeout(this.timeoutsUpdating[IDs]);
-      this.timeoutsUpdating[IDs] = null;
-      this.timeoutsUpdating[IDs] = setTimeout(async () => {
+      clearTimeout(this.timeoutsUpdating[IDs[0]]);
+      this.timeoutsUpdating[IDs[0]] = null;
+      this.timeoutsUpdating[IDs[0]] = setTimeout(async () => {
         await this.command('setValue', [value], service, IDs);
-        clearTimeout(this.timeoutsUpdating[IDs]);
-        this.timeoutsUpdating[IDs] = null;
+        clearTimeout(this.timeoutsUpdating[IDs[0]]);
+        this.timeoutsUpdating[IDs[0]] = null;
       }, 1500);
     }
   }
