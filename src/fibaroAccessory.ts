@@ -501,13 +501,13 @@ export class FibaroAccessory {
       if (this.platform.setFunctions) {
         const setFunction = this.platform.setFunctions.setFunctionsMapping.get(characteristic.UUID);
         const platform = this.platform;
-        if (setFunction && platform.poller !== undefined) {
           await this.platform.mutex.runExclusive(async () => {
-            platform.poller?.cancelPoll();
-            setFunction.call(platform.setFunctions, value, context, characteristic, service, IDs);
-            platform.poller?.restartPoll(5000);
-          });
-        }
+            if (setFunction && platform.poller !== undefined) {
+              platform.poller.cancelPoll();
+              setFunction.call(platform.setFunctions, value, context, characteristic, service, IDs);
+              platform.poller.restartPoll(5000);
+            }
+        });
       }
     }
   }
