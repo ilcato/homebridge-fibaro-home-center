@@ -31,7 +31,7 @@ import { GetFunctions } from './getFunctions';
 import { Poller } from './pollerupdate';
 import { Mutex } from 'async-mutex';
 
-const defaultPollerPeriod = 5;
+const defaultPollerPeriod = 3;
 const defaultThermostatMaxTemp = 100;
 const timeOffset = 2 * 3600;
 
@@ -129,7 +129,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
       this.log.error('Cannot connect to Fibaro Home Center. Check credentials, url or ca.cer file');
       return;
     }
-    if (pollerPeriod !== 0) {
+    if (pollerPeriod > 0) {
       this.poller = new Poller(this, pollerPeriod);
     }
 

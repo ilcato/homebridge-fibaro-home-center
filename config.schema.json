@@ -39,12 +39,12 @@
         "required": true
       },
       "pollerperiod": {
-        "description": "Polling interval for querying Fibaro Home Center machine (0: disabled, recomended: 2, 1 second allows for a more responsive update of the Home app when changes appear outside the HomeKit environment). If it is disabled the Home app is not updated automatically when such a change happen but only when you close a panel and reopen it.",
-        "title": "Poller period",
+        "description": "Polling interval for querying Fibaro Home Center (0: disabled, recomended: 3, 1 or 2 seconds allows for a more responsive update of the Home app when changes appear outside the HomeKit environment). If it is disabled the Home app is not updated automatically when such a change happen but only when you close a panel and reopen it. Enabling this option is useful to read the new state when controlling devices outside HomeKit, E.G.: via Fibaro, physical buttons, scenes and automations.",
+        "title": "Poller period (refresh interval)",
         "type": "integer",
         "required": false,
-        "default": 2,
-        "placeholder": 2,
+        "default": 3,
+        "placeholder": 3,
         "minimum": 0
       },
       "thermostatmaxtemperature": {
