@@ -502,9 +502,15 @@ export class FibaroAccessory {
         const setFunction = this.platform.setFunctions.setFunctionsMapping.get(characteristic.UUID);
         const platform = this.platform;
         await this.platform.mutex.runExclusive(async () => {
-          if (platform.poller) {platform.poller.cancelPoll();}
-          if (setFunction) {setFunction.call(platform.setFunctions, value, context, characteristic, service, IDs);}
-          if (platform.poller) {platform.poller.restartPoll(5000);}
+          if (platform.poller) {
+            platform.poller.cancelPoll();
+          }
+          if (setFunction) {
+            setFunction.call(platform.setFunctions, value, context, characteristic, service, IDs);
+          }
+          if (platform.poller) {
+            platform.poller.restartPoll(5000);
+          }
         });
       }
     }
