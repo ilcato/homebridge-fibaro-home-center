@@ -41,6 +41,15 @@
         "placeholder": 3,
         "minimum": 0
       },
+      "thermostattimeout": {
+        "description": "Set the duration in seconds (60 - 1 minute, 3600 - 1 hour) of the manual setting for the thermostatic controls (defaults to 7200, 2 hours)",
+        "title": "Number of seconds for the thermostat timeout",
+        "type": "integer",
+        "required": false,
+        "default": 7200,
+        "placeholder": 7200,
+        "minimum": 60
+      },
       "thermostatmaxtemperature": {
         "description": "Set the maximum allowed temperature in celcius for the thermostatic controls (defaults to 100 degrees celcius)",
         "title": "Themostat Max Temperature",
@@ -230,7 +239,7 @@
         {
           "type": "flex",
           "flex-flow": "row wrap",
-          "items": ["thermostatmaxtemperature"]
+          "items": ["thermostattimeout", "thermostatmaxtemperature"]
         }
       ]
     },

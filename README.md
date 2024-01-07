@@ -152,6 +152,7 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 ### Version 1.7.1
 + As previously announced, the 'host' field is removed from the config plugin. From now on, one field is used to enter a url or IP.
++ Addedd `thermostattimeout` to configuration UI panel.
 
 ### Version 1.7.0
 + Fix dimmers (blinking) and roller shutters (jamming). Now there could be slight delay in setting the value - unfortunately, Apple Home works in such a way that it sends multiple commands when you move the slider, not only one command when you finish and raise your finger.
@@ -159,11 +160,5 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 + Fix error making it impossible to turn off poller update.
 + Upgraded to homebridge 1.7.0.
 + Upgraded dependencies.
-
-### Version 1.6.0
-+ Added the ability to have devices with the same name in the same room (in Fibaro configuration). This applies to newly added devices or devices with updated name or room. For existing devices, changing the name of the device or assigning it to another room will give a new uuid and thus it may break the automation in HomeKit (as before), but it will also cause the transition to a new internal mechanism that will not suffer for such a problems in the future. The update itself will not change anything - it will not break devices or automations.
-+ Fix an error that occurs when there is a room without a name.
-+ One address field - the URL field now supports both: URL and IP. Field "host" is deprecated and will be removed in the future.
-+ Upgraded some package dependencies.
 
 #### See all: [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)
