@@ -183,7 +183,7 @@
     {
       "type": "fieldset",
       "title": "Basic settings",
-      "description": "Enter Host (IP) or URL of the Fibaro HC, username and password.",
+      "description": "",
       "expandable": true,
       "expanded": true,
       "items": [
@@ -196,25 +196,6 @@
           "type": "flex",
           "flex-flow": "row wrap",
           "items": ["username", "password"]
-        }
-      ]
-    },
-    {
-      "type": "fieldset",
-      "title": "Global variables",
-      "description": "",
-      "expandable": true,
-      "expanded": false,
-      "items": [
-        {
-          "type": "flex",
-          "flex-flow": "row wrap",
-          "items": ["switchglobalvariables", "dimmerglobalvariables"]
-        },
-        {
-          "type": "flex",
-          "flex-flow": "row wrap",
-          "items": ["adminUsername", "adminPassword"]
         }
       ]
     },
@@ -253,6 +234,25 @@
           "type": "flex",
           "flex-flow": "row wrap",
           "items": ["advControl"]
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Global variables",
+      "description": "",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "type": "flex",
+          "flex-flow": "row wrap",
+          "items": ["switchglobalvariables", "dimmerglobalvariables"]
+        },
+        {
+          "type": "flex",
+          "flex-flow": "row wrap",
+          "items": ["adminUsername", "adminPassword"]
         }
       ]
     },
