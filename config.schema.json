@@ -201,25 +201,6 @@
     },
     {
       "type": "fieldset",
-      "title": "Global variables",
-      "description": "",
-      "expandable": true,
-      "expanded": false,
-      "items": [
-        {
-          "type": "flex",
-          "flex-flow": "row wrap",
-          "items": ["switchglobalvariables", "dimmerglobalvariables"]
-        },
-        {
-          "type": "flex",
-          "flex-flow": "row wrap",
-          "items": ["adminUsername", "adminPassword"]
-        }
-      ]
-    },
-    {
-      "type": "fieldset",
       "title": "Advanced settings",
       "description": "",
       "expandable": true,
@@ -253,6 +234,25 @@
           "type": "flex",
           "flex-flow": "row wrap",
           "items": ["advControl"]
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Global variables",
+      "description": "",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "type": "flex",
+          "flex-flow": "row wrap",
+          "items": ["switchglobalvariables", "dimmerglobalvariables"]
+        },
+        {
+          "type": "flex",
+          "flex-flow": "row wrap",
+          "items": ["adminUsername", "adminPassword"]
         }
       ]
     },
