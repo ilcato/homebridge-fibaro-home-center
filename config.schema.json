@@ -183,7 +183,7 @@
     {
       "type": "fieldset",
       "title": "Basic settings",
-      "description": "Enter Host (IP) or URL of the Fibaro HC, username and password.",
+      "description": "",
       "expandable": true,
       "expanded": true,
       "items": [
