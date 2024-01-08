@@ -16,7 +16,7 @@
       },
       "url": {
         "description": "e.g.: https://hc-00000XXX.local or 192.168.1.100 .",
-        "title": "Url or IP",
+        "title": "URL or IP",
         "type": "string",
         "required": true
       },
@@ -74,7 +74,6 @@
       "adminUsername": {
         "title": "Admin username for accessing Fibaro Home Center machine (only for setting global variables).",
         "type": "string",
-        "placeholder": "admin",
         "required": false,
         "description": "If user provided above doesn't have admin rights in your Home Center, enter admin username of your Home Center to set global variables."
       },
