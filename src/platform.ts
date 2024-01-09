@@ -185,6 +185,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
       this.LoadAccessories(devices, rooms);
     } catch (e) {
       this.log.error('Error getting data from Home Center: ', e);
+      this.log.error('Make sure you provide the correct data: URL or IP, username and password and that HC is enabled and available on the same network as Homebridge.');
       this.log.error('Next try in 5 minutes');
       clearTimeout(this.timeout);
       this.timeout = setTimeout(() => {
