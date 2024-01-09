@@ -32,10 +32,10 @@ This plugin can be easily installed and configured through Homebridge UI or via 
 Configure the plugin through the settings UI or directly in the JSON editor.
 
 #### Required:
-+ `url` : url or IP of your Home Center / Yubii Home, examples:
-  + `192.168.1.100`
-  + `https://hc-00000XXX.local` (put ca.cer file in the same folder as config.json)
-  + `http://hc-00000XXX.local`
++ `url` : url or IP of your Home Center / Yubii Home. https may be mandatory if you configured HC requiring it. Examples:
+  + `192.168.1.100` - replace with your IP
+  + `https://hc-00000XXX.local` - replace with your HC serial and put ca.cer file (get it in the HC panel) in the same folder as config.json
+  + `http://hc-00000XXX.local` - replace with your HC serial
 + `username` : username of your Home Center / Yubii Home
 + `password` : password of your Home Center / Yubii Home
 
