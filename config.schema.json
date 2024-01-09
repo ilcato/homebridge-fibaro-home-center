@@ -15,8 +15,8 @@
         "default": "FibaroHC"
       },
       "url": {
-        "description": "e.g.: https://hc-00000XXX.local or 192.168.1.100 .",
-        "title": "URL or IP",
+        "description": "E.G.: 192.168.1.100 (replace with Home Center IP) or https://hc-00000XXX.local (replace with your HC serial number, get ca.cer file from HC and put it in Homebridge in same folder as config.json) or http://hc-00000XXX.local (replace with your HC serial number). Using https may be mandatory if you configured HC to use it.",
+        "title": "Address: IP or URL",
         "type": "string",
         "required": true
       },
