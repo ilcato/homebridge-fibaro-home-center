@@ -15,7 +15,7 @@
         "default": "FibaroHC"
       },
       "url": {
-        "description": "E.G.: 192.168.1.100 (replace with Home Center IP) or https://hc-00000XXX.local (replace with your HC serial number, get ca.cer file from HC and put it in Homebridge in same folder as config.json) or http://hc-00000XXX.local (replace with your HC serial number). Using https may be mandatory if you configured HC to use it.",
+        "description": "E.G.: 192.168.1.100 (replace with Home Center IP) or https://hc-00000XXX.local (replace with your HC serial number, get ca.cer file from HC and put it in Homebridge in same folder as config.json) or http://hc-00000XXX.local (replace with your HC serial number). Using https may be mandatory if you configured HC to use it. Homebridge and HC / Yubii Home must be in the same local network and have IP addresses from the same range (E.G. 192.168.1.XXX).",
         "title": "Address: IP or URL",
         "type": "string",
         "required": true
