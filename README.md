@@ -16,7 +16,7 @@ Supports devices, scenes, global variables, security systems, climate / heating 
 
 # How it works
 
-This plugin comunicates with Fibaro HC / Yubii Home located on the same network, by the official Fibaro API.
+This plugin comunicates with Fibaro HC / Yubii Home by the official Fibaro API. Homebridge and HC / Yubii Home must be in the same local network and have IP addresses from the same range (E.G. 192.168.1.XXX). 
 
 You must have an account in HC / Yubii Home. The main account has access to all devices, scenes, etc., for additional accounts you can select what to share.
 
