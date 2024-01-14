@@ -232,7 +232,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
       if (param && param !== '') {
         const globalVariables = param.split(',');
         for (let i = 0; i < globalVariables.length; i++) {
-          const device = { name: globalVariables[i], roomID: 0, id: 0, type: type };
+          const device = { name: globalVariables[i], roomID: 0, id: globalVariables[i], type: type };
           this.addAccessory(device);
         }
       }
