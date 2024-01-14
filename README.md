@@ -89,11 +89,14 @@ Warning: If you exclude the device, adding it again will require reconfiguration
 <details>
 <summary><b>Global variables</b></summary>
 
-+ It is possible to create Switch in HomeKit with a toggle behaviour:
++ Switch global variables - It is possible to create Switch in HomeKit with a toggle behaviour:
   + creating global variables (one for each switch) with 2 possible values: "true" and "false"
   + configuring a new parameter ("switchglobalvariables") in config.json that contains a comma separated list of the variable names you defined.
++ Dimmer global variables - It is possible to create Dimmer in HomeKit with a toggle behaviour:
+  + creating global variables (one for each dimmer) with possible values from 0 to 100  
+  + configuring a new parameter ("dimmerglobalvariables") in config.json that contains a comma separated list of the variable names you defined.
 + You can use these variable to trigger Home Center scenes.
-+ Known issue: you need to configure homebridge in config.json with a user with superuser privileges because normal users cannot set global variable from the outside of Home Center.
++ Note: you need to configure homebridge in config.json with a user with superuser privileges because normal users cannot set global variable from the outside of Home Center.
 
 </details>
 
