@@ -574,26 +574,24 @@ export class FibaroAccessory {
         } else {
           properties = {};
         }
-        if (getFunction.function) {
-          if (this.platform.config.FibaroTemperatureUnit === 'F') {
-            if (Object.prototype.hasOwnProperty.call(properties, 'value') && characteristic.displayName === 'Current Temperature') {
-              properties.value = (properties.value - 32) * 5 / 9;
-            }
+        if (this.platform.config.FibaroTemperatureUnit === 'F') {
+          if (Object.prototype.hasOwnProperty.call(properties, 'value') && characteristic.displayName === 'Current Temperature') {
+            properties.value = (properties.value - 32) * 5 / 9;
           }
-          if (Object.prototype.hasOwnProperty.call(properties, 'dead') && properties.dead === 'true') {
-            service.dead = true;
-            this.platform.log.info('Device dead: ', `${IDs[0]}  parameter: ${characteristic.displayName}`);
-          } else {
-            service.dead = false;
-            getFunction.function.call(this.platform.getFunctions, characteristic, service, IDs, properties);
-          }
+        }
+        if (Object.prototype.hasOwnProperty.call(properties, 'dead') && properties.dead === 'true') {
+          service.dead = true;
+          this.platform.log.info('Device dead: ', `${IDs[0]}  parameter: ${characteristic.displayName}`);
         } else {
-          this.platform.log.error('No get function defined for: ', `${characteristic.displayName}`);
+          service.dead = false;
+          getFunction.call(this.platform.getFunctions, characteristic, service, IDs, properties);
         }
       } catch (e) {
         service.dead = true;
         this.platform.log.error('G1 - There was a problem getting value from: ', `${IDs[0]} - Err: ${e}`);
       }
+    } else {
+      this.platform.log.error('No get function defined for: ', `${characteristic.displayName}`);
     }
   }
 
