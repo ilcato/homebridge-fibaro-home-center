@@ -153,13 +153,11 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 # Latest release notes
 
+### Version 1.7.3
++ Small refactoring
+
 ### Version 1.7.2
 + Fix problem with global variable based accessories #265
 
-### Version 1.7.1
-+ As previously announced, the 'host' field is removed from the config plugin. From now on, one field is used to enter a url or IP.
-+ Addedd `thermostattimeout` to configuration UI panel.
-+ Optimize delays (dimmers and blinds).
-+ Dependencies updates.
 
 #### See all: [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)

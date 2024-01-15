@@ -27,50 +27,44 @@ export class GetFunctions {
   constructor(platform) {
     this.platform = platform;
 
-    const characteristicFunctions = {
-      On: this.getBool,
-      Brightness: this.getBrightness,
-      PositionState: this.getPositionState,
-      CurrentPosition: this.getCurrentPosition,
-      TargetPosition: this.getCurrentPosition,
-      CurrentHorizontalTiltAngle: this.getCurrentTiltAngle,
-      TargetHorizontalTiltAngle: this.getCurrentTiltAngle,
-      MotionDetected: this.getBool,
-      CurrentTemperature: this.getCurrentTemperature || 0,
-      TargetTemperature: this.getTargetTemperature || 0,
-      CurrentRelativeHumidity: this.getFloat,
-      ContactSensorState: this.getContactSensorState,
-      LeakDetected: this.getLeakDetected,
-      SmokeDetected: this.getSmokeDetected,
-      CarbonMonoxideDetected: this.getCarbonMonoxideDetected,
-      CarbonMonoxideLevel: this.getCarbonMonoxideLevel,
-      CarbonMonoxidePeakLevel: this.getCarbonMonoxidePeakLevel,
-      CurrentAmbientLightLevel: this.getFloat,
-      OutletInUse: this.getOutletInUse,
-      LockCurrentState: this.getLockCurrentState,
-      LockTargetState: this.getLockCurrentState,
-      CurrentHeatingCoolingState: this.getCurrentHeatingCoolingState,
-      TargetHeatingCoolingState: this.getTargetHeatingCoolingState,
-      TemperatureDisplayUnits: this.getTemperatureDisplayUnits,
-      Hue: this.getHue,
-      Saturation: this.getSaturation,
-      CurrentDoorState: this.getCurrentDoorState,
-      TargetDoorState: this.getTargetDoorState,
-      ObstructionDetected: this.getObstructionDetected,
-      BatteryLevel: this.getBatteryLevel,
-      ChargingState: this.getChargingState,
-      StatusLowBattery: this.getStatusLowBattery,
-      Active: this.getActive,
-      InUse: this.getInUse,
-      ProgrammableSwitchEvent: this.getProgrammableSwitchEvent,
-    };
-
-    this.getFunctionsMapping = new Map(
-      Object.entries(characteristicFunctions).map(([key, value]) => {
-        const characteristic = new platform.Characteristic[key]();
-        return [characteristic.UUID, { function: value }];
-      }),
-    );
+    const Characteristic = this.platform.Characteristic;
+    this.getFunctionsMapping = new Map([
+      [Characteristic.On.UUID, this.getBool],
+      [Characteristic.Brightness.UUID, this.getBrightness],
+      [Characteristic.PositionState.UUID, this.getPositionState],
+      [Characteristic.CurrentPosition.UUID, this.getCurrentPosition],
+      [Characteristic.TargetPosition.UUID, this.getCurrentPosition],
+      [Characteristic.CurrentHorizontalTiltAngle.UUID, this.getCurrentTiltAngle],
+      [Characteristic.TargetHorizontalTiltAngle.UUID, this.getCurrentTiltAngle],
+      [Characteristic.MotionDetected.UUID, this.getBool],
+      [Characteristic.CurrentTemperature.UUID, this.getCurrentTemperature || 0],
+      [Characteristic.TargetTemperature.UUID, this.getTargetTemperature || 0],
+      [Characteristic.CurrentRelativeHumidity.UUID, this.getFloat],
+      [Characteristic.ContactSensorState.UUID, this.getContactSensorState],
+      [Characteristic.LeakDetected.UUID, this.getLeakDetected],
+      [Characteristic.SmokeDetected.UUID, this.getSmokeDetected],
+      [Characteristic.CarbonMonoxideDetected.UUID, this.getCarbonMonoxideDetected],
+      [Characteristic.CarbonMonoxideLevel.UUID, this.getCarbonMonoxideLevel],
+      [Characteristic.CarbonMonoxidePeakLevel.UUID, this.getCarbonMonoxidePeakLevel],
+      [Characteristic.CurrentAmbientLightLevel.UUID, this.getFloat],
+      [Characteristic.OutletInUse.UUID, this.getOutletInUse],
+      [Characteristic.LockCurrentState.UUID, this.getLockCurrentState],
+      [Characteristic.LockTargetState.UUID, this.getLockCurrentState],
+      [Characteristic.CurrentHeatingCoolingState.UUID, this.getCurrentHeatingCoolingState],
+      [Characteristic.TargetHeatingCoolingState.UUID, this.getTargetHeatingCoolingState],
+      [Characteristic.TemperatureDisplayUnits.UUID, this.getTemperatureDisplayUnits],
+      [Characteristic.Hue.UUID, this.getHue],
+      [Characteristic.Saturation.UUID, this.getSaturation],
+      [Characteristic.CurrentDoorState.UUID, this.getCurrentDoorState],
+      [Characteristic.TargetDoorState.UUID, this.getTargetDoorState],
+      [Characteristic.ObstructionDetected.UUID, this.getObstructionDetected],
+      [Characteristic.BatteryLevel.UUID, this.getBatteryLevel],
+      [Characteristic.ChargingState.UUID, this.getChargingState],
+      [Characteristic.StatusLowBattery.UUID, this.getStatusLowBattery],
+      [Characteristic.Active.UUID, this.getActive],
+      [Characteristic.InUse.UUID, this.getInUse],
+      [Characteristic.ProgrammableSwitchEvent.UUID, this.getProgrammableSwitchEvent],
+    ]);
 
     this.getCurrentSecuritySystemStateMapping = new Map([
       ['AwayArmed', this.platform.Characteristic.SecuritySystemCurrentState.AWAY_ARM],

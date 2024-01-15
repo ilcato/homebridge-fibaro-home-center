@@ -29,40 +29,29 @@ export class SetFunctions {
     this.platform = platform;
     this.timeoutsUpdating = [];
 
-    const setCharacteristicFunctions = {
-      On: this.setOn,
-      Brightness: this.setBrightness,
-      TargetPosition: this.setTargetPosition,
-      HoldPosition: this.setHoldPosition,
-      TargetHorizontalTiltAngle: this.setTargetTiltAngle,
-      LockTargetState: this.setLockTargetState,
-      TargetHeatingCoolingState: this.setTargetHeatingCoolingState,
-      TargetTemperature: this.setTargetTemperature,
-      TargetDoorState: this.setTargetDoorState,
-      Hue: this.setHue,
-      Saturation: this.setSaturation,
-      SecuritySystemTargetState: this.setSecuritySystemTargetState,
-      Active: this.setActive,
-    };
-    this.setFunctionsMapping = new Map(
-      Object.entries(setCharacteristicFunctions).map(([key, value]) => {
-        const characteristic = new this.platform.Characteristic[key]();
-        return [characteristic.UUID, value];
-      }),
-    );
+    const Characteristic = this.platform.Characteristic;
+    this.setFunctionsMapping = new Map([
+      [Characteristic.On.UUID, this.setOn],
+      [Characteristic.Brightness.UUID, this.setBrightness],
+      [Characteristic.TargetPosition.UUID, this.setTargetPosition],
+      [Characteristic.HoldPosition.UUID, this.setHoldPosition],
+      [Characteristic.TargetHorizontalTiltAngle.UUID, this.setTargetTiltAngle],
+      [Characteristic.LockTargetState.UUID, this.setLockTargetState],
+      [Characteristic.TargetHeatingCoolingState.UUID, this.setTargetHeatingCoolingState],
+      [Characteristic.TargetTemperature.UUID, this.setTargetTemperature],
+      [Characteristic.TargetDoorState.UUID, this.setTargetDoorState],
+      [Characteristic.Hue.UUID, this.setHue],
+      [Characteristic.Saturation.UUID, this.setSaturation],
+      [Characteristic.SecuritySystemTargetState.UUID, this.setSecuritySystemTargetState],
+      [Characteristic.Active.UUID, this.setActive],
+    ]);
 
-    const targetSecuritySystemSceneFunctions = {
-      AWAY_ARM: this.platform.scenes.SetAwayArmed,
-      DISARM: this.platform.scenes.SetDisarmed,
-      NIGHT_ARM: this.platform.scenes.SetNightArmed,
-      STAY_ARM: this.platform.scenes.SetStayArmed,
-    };
-    this.getTargetSecuritySystemSceneMapping = new Map(
-      Object.entries(targetSecuritySystemSceneFunctions).map(([key, value]) => {
-        const targetState = this.platform.Characteristic.SecuritySystemTargetState[key];
-        return [targetState, value];
-      }),
-    );
+    this.getTargetSecuritySystemSceneMapping = new Map([
+      [Characteristic.SecuritySystemTargetState.AWAY_ARM, this.platform.scenes.SetAwayArmed],
+      [Characteristic.SecuritySystemTargetState.DISARM, this.platform.scenes.SetDisarmed],
+      [Characteristic.SecuritySystemTargetState.NIGHT_ARM, this.platform.scenes.SetNightArmed],
+      [Characteristic.SecuritySystemTargetState.STAY_ARM, this.platform.scenes.SetStayArmed],
+    ]);
   }
 
   async setOn(value, context, characteristic, service, IDs) {
