@@ -111,10 +111,10 @@ export class Poller {
             }
           }
           const getFunction = this.platform.getFunctions.getFunctionsMapping.get(subscription.characteristic.UUID);
-          if (getFunction && getFunction.function) {
+          if (getFunction) {
 
             const IDs = subscription.service.subtype.split('-');
-            getFunction.function.call(this.platform.getFunctions, subscription.characteristic, subscription.service, IDs, change);
+            getFunction.call(this.platform.getFunctions, subscription.characteristic, subscription.service, IDs, change);
 
             if (this.platform.config.logsLevel >= 1) {
               let val1 = '', val2 = '';
@@ -224,8 +224,8 @@ export class Poller {
         this.platform.log.info('Updating value for device: ',
           `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.thermostatMode}`);
         const getFunction = this.platform.getFunctions.getFunctionsMapping.get(subscription.characteristic.UUID);
-        if (getFunction.function) {
-          getFunction.function.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
+        if (getFunction) {
+          getFunction.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
         }
       }
     }
@@ -239,8 +239,8 @@ export class Poller {
         this.platform.log.info('Updating value for device: ',
           `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.heatingThermostatSetpoint}`);
         const getFunction = this.platform.getFunctions.getFunctionsMapping.get(subscription.characteristic.UUID);
-        if (getFunction.function) {
-          getFunction.function.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
+        if (getFunction) {
+          getFunction.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
         }
       }
     }
