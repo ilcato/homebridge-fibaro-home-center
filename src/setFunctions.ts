@@ -26,220 +26,205 @@ export class SetFunctions {
   timeoutsUpdating;
 
   constructor(platform) {
+    const Characteristic = this.platform.Characteristic;
     this.platform = platform;
     this.timeoutsUpdating = [];
-
-    const Characteristic = this.platform.Characteristic;
-    this.setFunctionsMapping = new Map([
-      [Characteristic.On.UUID, this.setOn],
-      [Characteristic.Brightness.UUID, this.setBrightness],
-      [Characteristic.TargetPosition.UUID, this.setTargetPosition],
-      [Characteristic.HoldPosition.UUID, this.setHoldPosition],
-      [Characteristic.TargetHorizontalTiltAngle.UUID, this.setTargetTiltAngle],
-      [Characteristic.LockTargetState.UUID, this.setLockTargetState],
-      [Characteristic.TargetHeatingCoolingState.UUID, this.setTargetHeatingCoolingState],
-      [Characteristic.TargetTemperature.UUID, this.setTargetTemperature],
-      [Characteristic.TargetDoorState.UUID, this.setTargetDoorState],
-      [Characteristic.Hue.UUID, this.setHue],
-      [Characteristic.Saturation.UUID, this.setSaturation],
-      [Characteristic.SecuritySystemTargetState.UUID, this.setSecuritySystemTargetState],
-      [Characteristic.Active.UUID, this.setActive],
-    ]);
-
     this.getTargetSecuritySystemSceneMapping = new Map([
       [Characteristic.SecuritySystemTargetState.AWAY_ARM, this.platform.scenes.SetAwayArmed],
       [Characteristic.SecuritySystemTargetState.DISARM, this.platform.scenes.SetDisarmed],
       [Characteristic.SecuritySystemTargetState.NIGHT_ARM, this.platform.scenes.SetNightArmed],
       [Characteristic.SecuritySystemTargetState.STAY_ARM, this.platform.scenes.SetStayArmed],
     ]);
-  }
 
-  async setOn(value, context, characteristic, service, IDs) {
-    if (service.isVirtual && !service.isGlobalVariableSwitch && !service.isGlobalVariableDimmer) {
-      // It's a virtual device so the command is pressButton and not turnOn or Off
-      this.command('pressButton', [IDs[1]], service, IDs);
-      // In order to behave like a push button reset the status to off
-      setTimeout(() => {
-        characteristic.setValue(0, undefined, 'fromSetValue');
-      }, 100);
-    } else if (service.isScene) {
-      // It's a scene so the command is execute scene
-      this.scene(IDs[0]);
-      // In order to behave like a push button reset the status to off
-      setTimeout(() => {
-        characteristic.setValue(0, undefined, 'fromSetValue');
-      }, 100);
-    } else if (service.isGlobalVariableSwitch) {
-      this.setGlobalVariable(IDs[1], value === true ? 'true' : 'false');
-    } else if (service.isGlobalVariableDimmer) {
-      const currentDimmerValue = (await this.getGlobalVariable(IDs[1])).body.value;
-      if (currentDimmerValue !== '0' && value === true) {
+    this.setFunctionsMapping = new Map();
+    // Map the setting function to the corresponding characteristic UUID
+
+    // set On
+    this.setFunctionsMapping.set(Characteristic.On.UUID, async (value, context, characteristic, service, IDs) => {
+      if (service.isVirtual && !service.isGlobalVariableSwitch && !service.isGlobalVariableDimmer) {
+        // It's a virtual device so the command is pressButton and not turnOn or Off
+        this.command('pressButton', [IDs[1]], service, IDs);
+        // In order to behave like a push button reset the status to off
+        setTimeout(() => {
+          characteristic.setValue(0, undefined, 'fromSetValue');
+        }, 100);
+      } else if (service.isScene) {
+        // It's a scene so the command is execute scene
+        this.scene(IDs[0]);
+        // In order to behave like a push button reset the status to off
+        setTimeout(() => {
+          characteristic.setValue(0, undefined, 'fromSetValue');
+        }, 100);
+      } else if (service.isGlobalVariableSwitch) {
+        this.setGlobalVariable(IDs[1], value === true ? 'true' : 'false');
+      } else if (service.isGlobalVariableDimmer) {
+        const currentDimmerValue = (await this.getGlobalVariable(IDs[1])).body.value;
+        if (currentDimmerValue !== '0' && value === true) {
+          return;
+        }
+        this.setGlobalVariable(IDs[1], value === true ? '100' : '0');
+      } else {
+        if (!this.timeoutsUpdating[IDs[0]]) { // see in setBrightness function
+          await this.command(value ? 'turnOn' : 'turnOff', null, service, IDs);
+        }
+      }
+    });
+    // set Brightness
+    this.setFunctionsMapping.set(Characteristic.Brightness.UUID, async (value, context, characteristic, service, IDs) => {
+      if (service.isGlobalVariableDimmer) {
+        await this.setGlobalVariable(IDs[1], value.toString());
+      } else {
+        clearTimeout(this.timeoutsUpdating[IDs[0]]);
+        this.timeoutsUpdating[IDs[0]] = null;
+        this.timeoutsUpdating[IDs[0]] = setTimeout(async () => {
+          await this.command('setValue', [value], service, IDs);
+          clearTimeout(this.timeoutsUpdating[IDs[0]]);
+          this.timeoutsUpdating[IDs[0]] = null;
+        }, 500);
+      }
+    });
+    // set TargetPosition
+    this.setFunctionsMapping.set(Characteristic.TargetPosition.UUID, async (value, context, characteristic, service, IDs) => {
+      if (service.isOpenCloseOnly) {
+        if (value === 0) {
+          await this.command('close', [0], service, IDs);
+        } else if (value >= 99) {
+          await this.command('open', [0], service, IDs);
+        }
+      } else {
+        clearTimeout(this.timeoutsUpdating[IDs[0]]);
+        this.timeoutsUpdating[IDs[0]] = null;
+        this.timeoutsUpdating[IDs[0]] = setTimeout(async () => {
+          await this.command('setValue', [value], service, IDs);
+          clearTimeout(this.timeoutsUpdating[IDs[0]]);
+          this.timeoutsUpdating[IDs[0]] = null;
+        }, 1500);
+      }
+    });
+    // set HoldPosition
+    this.setFunctionsMapping.set(Characteristic.HoldPosition.UUID, async (value, context, characteristic, service, IDs) => {
+      if(value) {
+        await this.command('stop', [0], service, IDs);
+      }
+    });
+    // set TargetTiltAngle
+    this.setFunctionsMapping.set(Characteristic.TargetHorizontalTiltAngle.UUID, async (angle, context, characteristic, service, IDs) => {
+      const value2 = SetFunctions.scale(angle, characteristic.props.minValue, characteristic.props.maxValue, 0, 100);
+      await this.command('setValue2', [value2], service, IDs);
+    });
+    // set LockTargetState
+    this.setFunctionsMapping.set(Characteristic.LockTargetState.UUID, async (value, context, characteristic, service, IDs) => {
+      if(service.isLockSwitch) {
+        const action = (value === this.platform.Characteristic.LockTargetState.UNSECURED) ? 'turnOn' : 'turnOff';
+        await this.command(action, null, service, IDs);
+        const lockCurrentStateCharacteristic = service.getCharacteristic(this.platform.Characteristic.LockCurrentState);
+        lockCurrentStateCharacteristic.updateValue(value, undefined, 'fromSetValue');
         return;
       }
-      this.setGlobalVariable(IDs[1], value === true ? '100' : '0');
-    } else {
-      if (!this.timeoutsUpdating[IDs[0]]) { // see in setBrightness function
-        await this.command(value ? 'turnOn' : 'turnOff', null, service, IDs);
-      }
-    }
-  }
-
-  async setBrightness(value, context, characteristic, service, IDs) {
-    if (service.isGlobalVariableDimmer) {
-      await this.setGlobalVariable(IDs[1], value.toString());
-    } else {
-      clearTimeout(this.timeoutsUpdating[IDs[0]]);
-      this.timeoutsUpdating[IDs[0]] = null;
-      this.timeoutsUpdating[IDs[0]] = setTimeout(async () => {
-        await this.command('setValue', [value], service, IDs);
-        clearTimeout(this.timeoutsUpdating[IDs[0]]);
-        this.timeoutsUpdating[IDs[0]] = null;
-      }, 500);
-    }
-  }
-
-  async setTargetPosition(value, context, characteristic, service, IDs) {
-    if (service.isOpenCloseOnly) {
-      if (value === 0) {
-        await this.command('close', [0], service, IDs);
-      } else if (value >= 99) {
-        await this.command('open', [0], service, IDs);
-      }
-    } else {
-      clearTimeout(this.timeoutsUpdating[IDs[0]]);
-      this.timeoutsUpdating[IDs[0]] = null;
-      this.timeoutsUpdating[IDs[0]] = setTimeout(async () => {
-        await this.command('setValue', [value], service, IDs);
-        clearTimeout(this.timeoutsUpdating[IDs[0]]);
-        this.timeoutsUpdating[IDs[0]] = null;
-      }, 1500);
-    }
-  }
-
-  async setHoldPosition(value, context, characteristic, service, IDs) {
-    if (value) {
-      await this.command('stop', [0], service, IDs);
-    }
-  }
-
-  async setTargetTiltAngle(angle, context, characteristic, service, IDs) {
-    const value2 = SetFunctions.scale(angle, characteristic.props.minValue, characteristic.props.maxValue, 0, 100);
-    await this.command('setValue2', [value2], service, IDs);
-  }
-
-  async setLockTargetState(value, context, characteristic, service, IDs) {
-    if (service.isLockSwitch) {
-      const action = (value === this.platform.Characteristic.LockTargetState.UNSECURED) ? 'turnOn' : 'turnOff';
-      await this.command(action, null, service, IDs);
-      const lockCurrentStateCharacteristic = service.getCharacteristic(this.platform.Characteristic.LockCurrentState);
-      lockCurrentStateCharacteristic.updateValue(value, undefined, 'fromSetValue');
-      return;
-    }
-
-    const action = (value === this.platform.Characteristic.LockTargetState.UNSECURED) ? 'unsecure' : 'secure';
-    await this.command(action, [0], service, IDs);
-    setTimeout(() => {
-      const lockCurrentStateCharacteristic = service.getCharacteristic(this.platform.Characteristic.LockCurrentState);
-      lockCurrentStateCharacteristic.updateValue(value, undefined, 'fromSetValue');
-    }, 1000);
-    // check if the action is correctly executed by reading the state after a specified timeout.
-    // If the lock is not active after the timeout an IFTTT message is generated
-    if (this.platform.config.doorlocktimeout !== '0') {
-      const timeout = parseInt(this.platform.config.doorlocktimeout) * 1000;
+      const action = (value === this.platform.Characteristic.LockTargetState.UNSECURED) ? 'unsecure' : 'secure';
+      await this.command(action, [0], service, IDs);
       setTimeout(() => {
-        this.checkLockCurrentState(IDs, value);
-      }, timeout);
-    }
-  }
-
-  async setTargetDoorState(value, context, characteristic, service, IDs) {
-    const action = value === 1 ? 'close' : 'open';
-    await this.command(action, [0], service, IDs);
-    setTimeout(() => {
-      characteristic.setValue(value, undefined, 'fromSetValue');
-      // set also current state
-      const currentDoorStateCharacteristic = service.getCharacteristic(this.platform.Characteristic.CurrentDoorState);
-      currentDoorStateCharacteristic.setValue(value, undefined, 'fromSetValue');
-    }, 100);
-  }
-
-  async setTargetHeatingCoolingState(value, context, characteristic, service, IDs) {
-    if (service.isClimateZone) {
-      const currentTemperature = service.getCharacteristic(this.platform.Characteristic.CurrentTemperature).value;
-      let mode = '';
-      switch (value) {
-        case this.platform.Characteristic.TargetHeatingCoolingState.OFF:
-          mode = 'Off';
-          break;
-        case this.platform.Characteristic.TargetHeatingCoolingState.HEAT:
-          mode = 'Heat';
-          break;
-        case this.platform.Characteristic.TargetHeatingCoolingState.COOL:
-          mode = 'Cool';
-          break;
-        case this.platform.Characteristic.TargetHeatingCoolingState.AUTO:
-          mode = 'Auto';
-          break;
-        default:
-          return;
+        const lockCurrentStateCharacteristic = service.getCharacteristic(this.platform.Characteristic.LockCurrentState);
+        lockCurrentStateCharacteristic.updateValue(value, undefined, 'fromSetValue');
+      }, 1000);
+      // check if the action is correctly executed by reading the state after a specified timeout.
+      // If the lock is not active after the timeout an IFTTT message is generated
+      if (this.platform.config.doorlocktimeout !== '0') {
+        const timeout = parseInt(this.platform.config.doorlocktimeout) * 1000;
+        setTimeout(() => {
+          this.checkLockCurrentState(IDs, value);
+        }, timeout);
       }
+    });
+    // set TargetHeatingCoolingState
+    this.setFunctionsMapping.set(Characteristic.TargetHeatingCoolingState.UUID, async (value, context, characteristic, service, IDs) => {
+      if (service.isClimateZone) {
+        const currentTemperature = service.getCharacteristic(this.platform.Characteristic.CurrentTemperature).value;
+        let mode = '';
+        switch (value) {
+          case this.platform.Characteristic.TargetHeatingCoolingState.OFF:
+            mode = 'Off';
+            break;
+          case this.platform.Characteristic.TargetHeatingCoolingState.HEAT:
+            mode = 'Heat';
+            break;
+          case this.platform.Characteristic.TargetHeatingCoolingState.COOL:
+            mode = 'Cool';
+            break;
+          case this.platform.Characteristic.TargetHeatingCoolingState.AUTO:
+            mode = 'Auto';
+            break;
+          default:
+            return;
+        }
+        const timestamp = parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000);
+        await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, currentTemperature, timestamp);
+      } else if (service.isHeatingZone) {
+        return;
+      }
+    });
+    // set TargetTemperature
+    this.setFunctionsMapping.set(Characteristic.TargetTemperature.UUID, async (value, context, characteristic, service, IDs) => {
       const timestamp = parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000);
-      await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, currentTemperature, timestamp);
-    } else if (service.isHeatingZone) {
-      return;
-    }
-  }
-
-  async setTargetTemperature(value, context, characteristic, service, IDs) {
-    const timestamp = parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000);
-    if (service.isClimateZone) {
-      let mode = '';
-      const currentHeatingCoolingState = service.getCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState).value;
-      switch (currentHeatingCoolingState) {
-        case this.platform.Characteristic.CurrentHeatingCoolingState.OFF:
-          mode = 'Off';
-          break;
-        case this.platform.Characteristic.CurrentHeatingCoolingState.HEAT:
-          mode = 'Heat';
-          break;
-        case this.platform.Characteristic.CurrentHeatingCoolingState.COOL:
-          mode = 'Cool';
-          break;
-        case this.platform.Characteristic.CurrentHeatingCoolingState.AUTO:
-          mode = 'Auto';
-          break;
-        default:
-          return;
+      if (service.isClimateZone) {
+        let mode = '';
+        const currentHeatingCoolingState = service.getCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState).value;
+        switch (currentHeatingCoolingState) {
+          case this.platform.Characteristic.CurrentHeatingCoolingState.OFF:
+            mode = 'Off';
+            break;
+          case this.platform.Characteristic.CurrentHeatingCoolingState.HEAT:
+            mode = 'Heat';
+            break;
+          case this.platform.Characteristic.CurrentHeatingCoolingState.COOL:
+            mode = 'Cool';
+            break;
+          case this.platform.Characteristic.CurrentHeatingCoolingState.AUTO:
+            mode = 'Auto';
+            break;
+          default:
+            return;
+        }
+        await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, value, timestamp);
+      } else if (service.isHeatingZone) {
+        await this.platform.fibaroClient.setHeatingZoneHandTemperature(IDs[0], value, timestamp);
       }
-      await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, value, timestamp);
-    } else if (service.isHeatingZone) {
-      await this.platform.fibaroClient.setHeatingZoneHandTemperature(IDs[0], value, timestamp);
-    }
-  }
-
-  setHue(value, context, characteristic, service, IDs) {
-    this.updateHomeCenterColorFromHomeKit(value, null, service, IDs);
-  }
-
-  setSaturation(value, context, characteristic, service, IDs) {
-    this.updateHomeCenterColorFromHomeKit(null, value, service, IDs);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async setSecuritySystemTargetState(value, context, characteristic, service, IDs) {
-    const sceneID = this.getTargetSecuritySystemSceneMapping.get(value);
-    if (value === this.platform.Characteristic.SecuritySystemTargetState.DISARM) {
-      value = this.platform.Characteristic.SecuritySystemCurrentState.DISARMED;
-    }
-    if (sceneID === undefined) {
-      return;
-    }
-    await this.scene(sceneID);
-  }
-
-  async setActive(value, context, characteristic, service, IDs) {
-    const action = (value === this.platform.Characteristic.Active.ACTIVE) ? 'turnOn' : 'turnOff';
-    await this.command(action, null, service, IDs);
+    });
+    // set argetDoorState
+    this.setFunctionsMapping.set(Characteristic.TargetDoorState.UUID, async (value, context, characteristic, service, IDs) => {
+      const action = value === 1 ? 'close' : 'open';
+      await this.command(action, [0], service, IDs);
+      setTimeout(() => {
+        characteristic.setValue(value, undefined, 'fromSetValue');
+        // set also current state
+        const currentDoorStateCharacteristic = service.getCharacteristic(this.platform.Characteristic.CurrentDoorState);
+        currentDoorStateCharacteristic.setValue(value, undefined, 'fromSetValue');
+      }, 100);
+    });
+    // set Hue
+    this.setFunctionsMapping.set(Characteristic.Hue.UUID, (value, context, characteristic, service, IDs) => {
+      this.updateHomeCenterColorFromHomeKit(value, null, service, IDs);
+    });
+    // set Saturation
+    this.setFunctionsMapping.set(Characteristic.Saturation.UUID, (value, context, characteristic, service, IDs) => {
+      this.updateHomeCenterColorFromHomeKit(null, value, service, IDs);
+    });
+    // set SecuritySystemTargetState
+    this.setFunctionsMapping.set(Characteristic.SecuritySystemTargetState.UUID, async (value) => {
+      const sceneID = this.getTargetSecuritySystemSceneMapping.get(value);
+      if (value === this.platform.Characteristic.SecuritySystemTargetState.DISARM) {
+        value = this.platform.Characteristic.SecuritySystemCurrentState.DISARMED;
+      }
+      if (sceneID === undefined) {
+        return;
+      }
+      await this.scene(sceneID);
+    });
+    // set Active  [, this.],
+    this.setFunctionsMapping.set(Characteristic.Active.UUID, async (value, context, characteristic, service, IDs) => {
+      const action = (value === this.platform.Characteristic.Active.ACTIVE) ? 'turnOn' : 'turnOff';
+      await this.command(action, null, service, IDs);
+    });
   }
 
   async updateHomeCenterColorFromHomeKit(h, s, service, IDs) {
