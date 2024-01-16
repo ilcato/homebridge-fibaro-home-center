@@ -26,7 +26,7 @@ export class SetFunctions {
   timeoutsUpdating;
 
   constructor(platform) {
-    const Characteristic = platform.Characteristic;
+    const Characteristic = this.platform.Characteristic;
     this.platform = platform;
     this.timeoutsUpdating = [];
     this.getTargetSecuritySystemSceneMapping = new Map([
