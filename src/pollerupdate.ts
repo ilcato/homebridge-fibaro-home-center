@@ -70,7 +70,9 @@ export class Poller {
 
       this.pollingUpdateRunning = false;
       this.restartPoll(this.pollerPeriod * 1000);
-      this.platform.log.debug('Restarting poller...');
+      if (this.platform.config.logsLevel > 1) {
+        this.platform.log.debug('Restarting poller...');
+      }
 
     } catch (e) {
       this.platform.log.error('Error fetching updates: ', e);
