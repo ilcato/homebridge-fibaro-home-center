@@ -293,7 +293,7 @@ export class SetFunctions {
         const nc = c.replaceAll('turnOn', 'On').replaceAll('turnOff', 'Off').replaceAll('setValue', '')
           .replaceAll('open', 'Open').replaceAll('close', 'Close');
         this.platform.log(service.displayName + ' [' + IDs[0] + ']: set ' + nc
-          + ((value !== null && nc !== 'Open' && nc !== 'Close') ? ' ' + value + ' %' : ''));
+          + ((value !== null && nc !== 'Open' && nc !== 'Close') ? '' + value + ' %' : ''));
       }
     } catch (e) {
       this.platform.log.error('There was a problem sending command ', c + ' to ' + IDs[0]);
