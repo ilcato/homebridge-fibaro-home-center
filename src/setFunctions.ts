@@ -290,9 +290,10 @@ export class SetFunctions {
     try {
       await this.platform.fibaroClient.executeDeviceAction(IDs[0], c, value);
       if (this.platform.config.logsLevel >= 1) {
-        const nc = c.replaceAll('turnOn', 'On').replaceAll('turnOff', 'Off').replaceAll('setValue', 'Set');
-        this.platform.log(service.displayName + ' [' + IDs[0] + ']: ' + nc
-          + ((value !== null && nc !== 'open' && nc !== 'close') ? ' ' + value + ' %' : ''));
+        const nc = c.replaceAll('turnOn', 'On').replaceAll('turnOff', 'Off').replaceAll('setValue', '')
+          .replaceAll('open', 'Open').replaceAll('close', 'Close');
+        this.platform.log(service.displayName + ' [' + IDs[0] + ']: set ' + nc
+          + ((value !== null && nc !== 'Open' && nc !== 'Close') ? ' ' + value + ' %' : ''));
       }
     } catch (e) {
       this.platform.log.error('There was a problem sending command ', c + ' to ' + IDs[0]);
