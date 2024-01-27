@@ -372,7 +372,11 @@ export class GetFunctions {
 
   getCurrentDoorState(characteristic, _service, _IDs, properties) {
     const v = parseInt(properties.value);
-    this.platform.log('getCurrentDoorState value:', v);
+    if (!isNaN(v)) {
+      this.platform.log('getCurrentDoorState value:', v);
+    } else if (properties.state !== undefined) {
+      this.platform.log('getCurrentDoorState:', properties.state);
+    }
     switch (properties.state) {
       case 'Opened':
         characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
@@ -404,7 +408,11 @@ export class GetFunctions {
 
   getTargetDoorState(characteristic, _service, _IDs, properties) {
     const v = parseInt(properties.value);
-    this.platform.log('getTargetDoorState value:', v);
+    if (!isNaN(v)) {
+      this.platform.log('getTargetDoorState value:', v);
+    } else if (properties.state !== undefined) {
+      this.platform.log('getTargetDoorState:', properties.state);
+    }
     switch (properties.state) {
       case 'Opened':
         characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
