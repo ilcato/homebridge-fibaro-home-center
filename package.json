@@ -51,10 +51,6 @@
   "homepage": "https://github.com/ilcato/homebridge-fibaro-home-center",
   "funding": [
     {
-      "type": "paypal",
-      "url": "https://paypal.me/ilcato"
-    },
-    {
       "type": "buymeacoffee",
       "url": "https://www.buymeacoffee.com/ilcato"
     }
