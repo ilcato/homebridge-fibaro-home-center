@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { SECURITY_SYSTEM_GLOBAL_VARIABLE } from './constants_and_params';
+import { SECURITY_SYSTEM_GLOBAL_VARIABLE } from './constants';
 
 export class Poller {
 

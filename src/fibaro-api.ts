@@ -21,6 +21,8 @@ import Throttle = require('superagent-throttle');
 import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as constants from './constants';
+
 
 declare const Buffer;
 
@@ -172,27 +174,27 @@ export class FibaroClient {
   }
 
   getInfo() {
-    return this.genericGet('/api/settings/info');
+    return this.genericGet(constants.API_URL_INFO);
   }
 
   getScenes() {
-    return this.genericGet('/api/scenes');
+    return this.genericGet(constants.API_URL_SCENES);
   }
 
   getClimateZones() {
-    return this.genericGet('/api/panels/climate?detailed=false');
+    return this.genericGet(constants.API_URL_CLIMATE + '?detailed=false');
   }
 
   getClimateZone(ID) {
-    return this.genericGet('/api/panels/climate/' + ID);
+    return this.genericGet(constants.API_URL_CLIMATE + '/' + ID);
   }
 
   getHeatingZones() {
-    return this.genericGet('/api/panels/heating');
+    return this.genericGet(constants.API_URL_HEATING);
   }
 
   getHeatingZone(ID) {
-    return this.genericGet('/api/panels/heating/' + ID);
+    return this.genericGet(constants.API_URL_HEATING + '/' + ID);
   }
 
   setClimateZoneHandTemperature(ID, mode, temperature, timestamp) {
@@ -210,7 +212,7 @@ export class FibaroClient {
         body.properties['handSetPointCooling'] = temperature;
         break;
     }
-    return this.genericPut('/api/panels/climate/' + ID, body);
+    return this.genericPut(constants.API_URL_CLIMATE + '/' + ID, body);
   }
 
   setHeatingZoneHandTemperature(ID, temperature, timestamp) {
@@ -220,23 +222,23 @@ export class FibaroClient {
         'handTimestamp': timestamp,
       },
     };
-    return this.genericPut('/api/panels/heating/' + ID, body);
+    return this.genericPut(constants.API_URL_HEATING + '/' + ID, body);
   }
 
   getRooms() {
-    return this.genericGet('/api/rooms');
+    return this.genericGet(constants.API_URL_ROOMS);
   }
 
   getDevices() {
-    return this.genericGet('/api/devices');
+    return this.genericGet(constants.API_URL_DEVICES);
   }
 
   getDeviceProperties(ID) {
-    return this.genericGet('/api/devices/' + ID);
+    return this.genericGet(constants.API_URL_DEVICES + '/' + ID);
   }
 
   refreshStates(lastPoll) {
-    return this.genericGet('/api/refreshStates?last=' + lastPoll);
+    return this.genericGet(constants.API_URL_REFRESH_STATES + '?last=' + lastPoll);
   }
 
   executeDeviceAction(ID, action, param) {
@@ -244,16 +246,16 @@ export class FibaroClient {
       'args': param,
       'delay': 0,
     } : {};
-    return this.genericPost('/api/devices/' + ID + '/action/' + action, body);
+    return this.genericPost(constants.API_URL_DEVICES + '/' + ID + '/action/' + action, body);
   }
 
   executeScene(ID, useOldApi) {
     const body = {};
-    return this.genericPost('/api/scenes/' + ID + (useOldApi ? '/action/start' : '/execute'), body);
+    return this.genericPost(constants.API_URL_SCENES + '/' + ID + (useOldApi ? '/action/start' : '/execute'), body);
   }
 
   getGlobalVariable(globalVariableID) {
-    return this.genericGet('/api/globalVariables/' + globalVariableID);
+    return this.genericGet(constants.API_URL_GLOBAL_VARIABLES + '/' + globalVariableID);
   }
 
   setGlobalVariable(globalVariableID, value) {
@@ -261,6 +263,6 @@ export class FibaroClient {
       'value': value,
       'invokeScenes': true,
     } : null;
-    return this.genericAdminPut('/api/globalVariables/' + globalVariableID, body);
+    return this.genericAdminPut(constants.API_URL_GLOBAL_VARIABLES + '/' + globalVariableID, body);
   }
 }

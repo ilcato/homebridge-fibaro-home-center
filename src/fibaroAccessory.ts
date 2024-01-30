@@ -16,7 +16,7 @@
 // Fibaro Home Center Platform plugin for HomeBridge
 import { PlatformAccessory, CharacteristicEventTypes, CharacteristicSetCallback, CharacteristicGetCallback, CharacteristicValue } from 'homebridge';
 import { FibaroHC } from './platform';
-import { SECURITY_SYSTEM_GLOBAL_VARIABLE } from './constants_and_params';
+import * as constants from './constants';
 
 export class FibaroAccessory {
   mainService;
@@ -529,7 +529,7 @@ export class FibaroAccessory {
       }
       // Manage security system status
       if (service.isSecuritySystem) {
-        const securitySystemStatus = (await this.platform.fibaroClient.getGlobalVariable(SECURITY_SYSTEM_GLOBAL_VARIABLE)).body;
+        const securitySystemStatus = (await this.platform.fibaroClient.getGlobalVariable(constants.SECURITY_SYSTEM_GLOBAL_VARIABLE)).body;
         if (this.platform.getFunctions) {
           this.platform.getFunctions.getSecuritySystemState(characteristic, service, IDs, securitySystemStatus);
         }
