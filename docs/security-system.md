@@ -34,4 +34,4 @@
          fibaro.setGlobalVariable("SecuritySystem", "Disarmed")
        ```
 
-+ Scene must have flag `Do not stop scene when alarm breached` checked.
++ Scene must have flag `Do not stop scene when alarm breached` checked, in recent versions it's `Allow to run when alarm breached`.
