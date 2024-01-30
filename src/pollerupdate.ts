@@ -16,6 +16,8 @@
 
 'use strict';
 
+import { SECURITY_SYSTEM_GLOBAL_VARIABLE } from './constants_and_params';
+
 export class Poller {
 
   platform;
@@ -183,7 +185,8 @@ export class Poller {
   }
 
   async manageSecuritySystem() {
-    const securitySystemStatus = (await this.platform.fibaroClient.getGlobalVariable('SecuritySystem')).body;
+    const securitySystemStatus = (await this.platform.fibaroClient.getGlobalVariable(SECURITY_SYSTEM_GLOBAL_VARIABLE)).body;
+    this.platform.log.info('securitySystemStatus: ', securitySystemStatus);
 
     const s = this.platform.findServiceByName('FibaroSecuritySystem', this.platform.Service.SecuritySystem);
 

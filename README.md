@@ -157,12 +157,13 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 # Latest release notes
 
-### Version 1.7.3
+### Version 1.7.4
 + Small refactoring
 + Bump dependencies
 
-### Version 1.7.2
-+ Fix problem with global variable based accessories #265
+### Version 1.7.3
++ Small refactoring
++ Bump dependencies
 
 
 #### See all: [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)

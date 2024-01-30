@@ -1,0 +1,1 @@
+export const SECURITY_SYSTEM_GLOBAL_VARIABLE = 'SecuritySystem';
