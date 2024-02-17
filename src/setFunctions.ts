@@ -112,7 +112,7 @@ export class SetFunctions {
         await this.command('setValue', [value], service, IDs);
         clearTimeout(this.timeoutsUpdating[IDs[0]]);
         this.timeoutsUpdating[IDs[0]] = null;
-      }, 1500);
+      }, 1200);
     }
   }
 
