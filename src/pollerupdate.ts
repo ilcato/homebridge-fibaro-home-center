@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { SECURITY_SYSTEM_GLOBAL_VARIABLE } from './constants';
+import * as constants from './constants';
 
 export class Poller {
 
@@ -185,7 +185,7 @@ export class Poller {
   }
 
   async manageSecuritySystem() {
-    const securitySystemStatus = (await this.platform.fibaroClient.getGlobalVariable(SECURITY_SYSTEM_GLOBAL_VARIABLE)).body;
+    const securitySystemStatus = (await this.platform.fibaroClient.getGlobalVariable(constants.SECURITY_SYSTEM_GLOBAL_VARIABLE)).body;
 
     const s = this.platform.findServiceByName('FibaroSecuritySystem', this.platform.Service.SecuritySystem);
 
