@@ -159,6 +159,7 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 ### Version 1.7.4
 + Manage Satel motion sensor
++ Manage heating/climate zone id collision
 + Small refactoring
 + Bump dependencies
 
