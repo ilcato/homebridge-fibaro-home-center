@@ -158,6 +158,7 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 # Latest release notes
 
 ### Version 1.7.4
++ Manage Satel motion sensor
 + Small refactoring
 + Bump dependencies
 
