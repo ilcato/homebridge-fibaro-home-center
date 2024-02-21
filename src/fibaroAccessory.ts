@@ -290,7 +290,10 @@ export class FibaroAccessory {
       case 'com.fibaro.windowSensor':
       case 'com.fibaro.satelZone':
       case 'com.fibaro.doorWindowSensor':
-        if (this.device.id === this.platform.config.doorbellDeviceId) {
+        if (properties.deviceRole === 'MotionSensor') {
+          service = this.platform.Service.MotionSensor;
+          this.mainCharacteristics = [this.platform.Characteristic.MotionDetected];
+        } else if (this.device.id === this.platform.config.doorbellDeviceId) {
           service = this.platform.Service.Doorbell;
           this.mainCharacteristics = [this.platform.Characteristic.ProgrammableSwitchEvent];
         } else {
