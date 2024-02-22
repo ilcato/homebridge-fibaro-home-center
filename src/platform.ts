@@ -267,7 +267,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
     const uuidV1 = this.api.hap.uuid.generate(device.name + device.roomID);
     // add a new seed for uuidV2 to avoid conflicts with devices with same name in same room
     // manage collision with climate/heating zones (id starting from 1)
-    const seed = device.id.toString() + (device.type==='heatingZone' || device.type==='climateZone') ? 'hc' : '';
+    const seed = device.id.toString() + ((device.type==='heatingZone' || device.type==='climateZone') ? 'hc' : '');
     const uuidV2 = this.api.hap.uuid.generate(seed);
     // check if the accessory already exists based on old uuid seed (device.name + device.roomID)
     // if yes, keep it to preserve compatibility with HomeKit automations
