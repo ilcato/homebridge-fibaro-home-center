@@ -157,14 +157,13 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 # Latest release notes
 
+### Version 1.7.5
++ Added new Fibaro "Roller Shutter com.fibaro.FGR224"
++ Bump dependencies
+
 ### Version 1.7.4
 + Manage Satel motion sensor
 + Manage heating/climate zone id collision
-+ Added new Fibaro "Roller Shutter com.fibaro.FGR224"
-+ Small refactoring
-+ Bump dependencies
-
-### Version 1.7.3
 + Small refactoring
 + Bump dependencies
 
