@@ -197,6 +197,7 @@ export class FibaroAccessory {
       case 'com.fibaro.FGR221':
       case 'com.fibaro.FGRM222':
       case 'com.fibaro.FGR223':
+      case 'com.fibaro.FGR224':
       case 'com.fibaro.rollerShutter':
       case 'com.fibaro.FGWR111':
       case 'com.fibaro.remoteBaseShutter':
