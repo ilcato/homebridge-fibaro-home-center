@@ -34,7 +34,7 @@
   ],
   "dependencies": {
     "async-mutex": "^0.5.0",
-    "superagent": "^8.1.2",
+    "superagent": "^9.0.2",
     "superagent-throttle": "^1.0.1"
   },
   "devDependencies": {
