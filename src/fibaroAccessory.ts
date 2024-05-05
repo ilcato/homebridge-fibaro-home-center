@@ -46,10 +46,10 @@ export class FibaroAccessory {
     let subtype = this.device.id + '----';
     const controlType = parseInt(properties.deviceControlType);
     const type = this.device.type;
-    
+
     switch (true) {
       // Light / Dimmer
-      
+
       case type.startsWith('com.fibaro.FGD') && !type.startsWith('com.fibaro.FGDW'): //FGD212
       case type.startsWith('com.fibaro.FGWD') && !type.startsWith('com.fibaro.FGWDS'): //FGWD111
       case type === 'com.fibaro.multilevelSwitch':
@@ -80,7 +80,7 @@ export class FibaroAccessory {
       case type.startsWith('com.fibaro.FGWDS'): //FGWDS221
       case type === 'com.fibaro.binarySwitch':
       case type === 'com.fibaro.developer.bxs.virtualBinarySwitch':
-      case type === 'com.fibaro.satelOutput':   
+      case type === 'com.fibaro.satelOutput':
         if (this.platform.config.advControl === 1) {
           switch (controlType) {
             case 2: // Lighting
