@@ -50,10 +50,8 @@ export class FibaroAccessory {
     switch (true) {
       // Light / Dimmer
       
-      case type.startsWith('com.fibaro.FGD') && !type.startsWith('com.fibaro.FGDW'):
-         //case type == 'com.fibaro.FGD212':
-      case type.startsWith('com.fibaro.FGWD') && !type.startsWith('com.fibaro.FGWDS'):
-        //case type == 'com.fibaro.FGWD111':
+      case type.startsWith('com.fibaro.FGD') && !type.startsWith('com.fibaro.FGDW'): //FGD212
+      case type.startsWith('com.fibaro.FGWD') && !type.startsWith('com.fibaro.FGWDS'): //FGWD111
       case type == 'com.fibaro.multilevelSwitch':
         switch (controlType) {
           case 2: // Lighting
