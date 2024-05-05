@@ -157,6 +157,10 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 # Latest release notes
 
+### Version 1.8.0
++ Support for many new devices, also the upcoming ones
++ Bump dependencies
+
 ### Version 1.7.5
 + Added new Fibaro "Roller Shutter com.fibaro.FGR224"
 + Bump dependencies
