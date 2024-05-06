@@ -150,7 +150,8 @@ export class FibaroAccessory {
         }
       // Light / Switch / Outlet / Valve
       // for Wall Plug etc.
-      case 'FGWP': //FGWP101, FGWP102, FGWPG111, FGWPG121
+      case 'FGWP': //FGWP101, FGWP102
+      case 'FGWPG': //FGWPG111, FGWPG121
       case 'FGWOEF': //FGWOEF011
         if (this.platform.config.advControl === 1) {
           switch (controlType) {
@@ -192,7 +193,8 @@ export class FibaroAccessory {
           break;
         }
       // Window Covering / Garage door
-      case 'FGR': //FGR221, FGRM222, FGR223, FGR223
+      case 'FGR': //FGR221, FGR223, FGR223
+      case 'FGRM': //FGRM222
       case 'FGWR': //FGWR111
       case 'rollerShutter':
       case 'remoteBaseShutter':
