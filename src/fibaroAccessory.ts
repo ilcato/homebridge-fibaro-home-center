@@ -193,7 +193,7 @@ export class FibaroAccessory {
           break;
         }
       // Window Covering / Garage door
-      case 'FGR': //FGR221, FGR223, FGR223
+      case 'FGR': //FGR221, FGR223
       case 'FGRM': //FGRM222
       case 'FGWR': //FGWR111
       case 'rollerShutter':
