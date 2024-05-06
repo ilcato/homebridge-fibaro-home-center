@@ -199,7 +199,7 @@ export class FibaroAccessory {
       case 'baseShutter': // only if favoritePositionsNativeSupport is true otherwise it's a garage door
         // it's a garage door
         // case 57 - gate with positioning
-        if (control56 || control57) {
+        if (controlType === 56 || controlType === 57) {
           service = this.platform.Service.GarageDoorOpener;
           this.mainCharacteristics =
             [this.platform.Characteristic.CurrentDoorState,
@@ -207,7 +207,7 @@ export class FibaroAccessory {
               this.platform.Characteristic.ObstructionDetected];
           break;
         } else if (this.device.type !== 'com.fibaro.baseShutter' ||
-                   this.device.'com.fibaro.baseShutter' && properties.favoritePositionsNativeSupport) {
+                   this.device.type === 'com.fibaro.baseShutter' && properties.favoritePositionsNativeSupport) {
           service = this.platform.Service.WindowCovering;
           this.mainCharacteristics = [
             this.platform.Characteristic.CurrentPosition,
@@ -215,13 +215,13 @@ export class FibaroAccessory {
             this.platform.Characteristic.PositionState,
             this.platform.Characteristic.HoldPosition,
           ];
-          if (control55) {
+          if (controlType === 55) {
             this.mainCharacteristics.push(
               this.platform.Characteristic.CurrentHorizontalTiltAngle,
               this.platform.Characteristic.TargetHorizontalTiltAngle,
             );
           }
-          if (this.device.'com.fibaro.remoteBaseShutter' || this.device.'com.fibaro.baseShutter') {
+          if (this.device.type === 'com.fibaro.remoteBaseShutter' || this.device.type === 'com.fibaro.baseShutter') {
             subtype = device.id + '--OPENCLOSEONLY';
           }
           break;
