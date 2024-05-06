@@ -45,14 +45,15 @@ export class FibaroAccessory {
     let service;
     let subtype = this.device.id + '----';
     const controlType = parseInt(properties.deviceControlType);
-    const type = this.device.type;
+    let type = this.device.type;
+    type = type.replace('com.fibaro.',''); //remove 'com.fibaro.'
+    type = type.split(/\d/, 1).join().trim(); //remove everything from first digit
 
-    switch (true) {
+    switch (type) {
       // Light / Dimmer
-
-      case type.startsWith('com.fibaro.FGD') && !type.startsWith('com.fibaro.FGDW'): //FGD212
-      case type.startsWith('com.fibaro.FGWD') && !type.startsWith('com.fibaro.FGWDS'): //FGWD111
-      case type === 'com.fibaro.multilevelSwitch':
+      case 'FGD': //FGD212
+      case 'FGWD': //FGWD111
+      case 'multilevelSwitch':
         switch (controlType) {
           case 2: // Lighting
           case 23: // Lighting
@@ -66,8 +67,8 @@ export class FibaroAccessory {
         }
         break;
       // Light RGBW
-      case type.startsWith('com.fibaro.FGRGBW'): //FGRGBW441M, FGRGBW442, FGRGBW442CC
-      case type === 'com.fibaro.colorController':
+      case 'FGRGBW': //FGRGBW441M, FGRGBW442, FGRGBW442CC
+      case 'colorController':
         service = this.platform.Service.Lightbulb;
         this.mainCharacteristics =
           [this.platform.Characteristic.On,
@@ -77,10 +78,10 @@ export class FibaroAccessory {
         break;
       // Light / Switch / Outlet / Valve
       // for Switch / Double Switch / Smart Implant / etc.
-      case type.startsWith('com.fibaro.FGWDS'): //FGWDS221
-      case type === 'com.fibaro.binarySwitch':
-      case type === 'com.fibaro.developer.bxs.virtualBinarySwitch':
-      case type === 'com.fibaro.satelOutput':
+      case 'FGWDS': //FGWDS221
+      case 'binarySwitch':
+      case 'developer.bxs.virtualBinarySwitch':
+      case 'satelOutput':
         if (this.platform.config.advControl === 1) {
           switch (controlType) {
             case 2: // Lighting
@@ -149,8 +150,8 @@ export class FibaroAccessory {
         }
       // Light / Switch / Outlet / Valve
       // for Wall Plug etc.
-      case type.startsWith('com.fibaro.FGWP'): //FGWP101, FGWP102, FGWPG111, FGWPG121
-      case type.startsWith('com.fibaro.FGWOEF'): //FGWOEF011
+      case 'FGWP': //FGWP101, FGWP102, FGWPG111, FGWPG121
+      case 'FGWOEF': //FGWOEF011
         if (this.platform.config.advControl === 1) {
           switch (controlType) {
             case 2: // Lighting
@@ -191,14 +192,14 @@ export class FibaroAccessory {
           break;
         }
       // Window Covering / Garage door
-      case type.startsWith('com.fibaro.FGR') && !type.startsWith('com.fibaro.FGRGBW'): //FGR221, FGRM222, FGR223, FGR223
-      case type.startsWith('com.fibaro.FGWR'): //FGWR111
-      case type === 'com.fibaro.rollerShutter':
-      case type === 'com.fibaro.remoteBaseShutter':
-      case type === 'com.fibaro.baseShutter': // only if favoritePositionsNativeSupport is true otherwise it's a garage door
+      case 'FGR': //FGR221, FGRM222, FGR223, FGR223
+      case 'FGWR': //FGWR111
+      case 'rollerShutter':
+      case 'remoteBaseShutter':
+      case 'baseShutter': // only if favoritePositionsNativeSupport is true otherwise it's a garage door
         // it's a garage door
         // case 57 - gate with positioning
-        if (controlType === 56 || controlType === 57) {
+        if (control56 || control57) {
           service = this.platform.Service.GarageDoorOpener;
           this.mainCharacteristics =
             [this.platform.Characteristic.CurrentDoorState,
@@ -206,7 +207,7 @@ export class FibaroAccessory {
               this.platform.Characteristic.ObstructionDetected];
           break;
         } else if (this.device.type !== 'com.fibaro.baseShutter' ||
-                   this.device.type === 'com.fibaro.baseShutter' && properties.favoritePositionsNativeSupport) {
+                   this.device.'com.fibaro.baseShutter' && properties.favoritePositionsNativeSupport) {
           service = this.platform.Service.WindowCovering;
           this.mainCharacteristics = [
             this.platform.Characteristic.CurrentPosition,
@@ -214,21 +215,21 @@ export class FibaroAccessory {
             this.platform.Characteristic.PositionState,
             this.platform.Characteristic.HoldPosition,
           ];
-          if (controlType === 55) {
+          if (control55) {
             this.mainCharacteristics.push(
               this.platform.Characteristic.CurrentHorizontalTiltAngle,
               this.platform.Characteristic.TargetHorizontalTiltAngle,
             );
           }
-          if (this.device.type === 'com.fibaro.remoteBaseShutter' || this.device.type === 'com.fibaro.baseShutter') {
+          if (this.device.'com.fibaro.remoteBaseShutter' || this.device.'com.fibaro.baseShutter') {
             subtype = device.id + '--OPENCLOSEONLY';
           }
           break;
         }
       // Garage door
       // eslint-disable-next-line no-duplicate-case, no-fallthrough
-      case type === 'com.fibaro.baseShutter':
-      case type === 'com.fibaro.barrier':
+      case 'baseShutter':
+      case 'barrier':
         service = this.platform.Service.GarageDoorOpener;
         this.mainCharacteristics =
           [this.platform.Characteristic.CurrentDoorState,
@@ -236,22 +237,22 @@ export class FibaroAccessory {
             this.platform.Characteristic.ObstructionDetected];
         break;
       // Temperature sensor
-      case type === 'com.fibaro.temperatureSensor':
+      case 'temperatureSensor':
         service = this.platform.Service.TemperatureSensor;
         this.mainCharacteristics = [this.platform.Characteristic.CurrentTemperature];
         break;
       // Humidity sensor
-      case type === 'com.fibaro.humiditySensor':
+      case 'humiditySensor':
         service = this.platform.Service.HumiditySensor;
         this.mainCharacteristics = [this.platform.Characteristic.CurrentRelativeHumidity];
         break;
       // Light sensor
-      case type === 'com.fibaro.lightSensor':
+      case 'lightSensor':
         service = this.platform.Service.LightSensor;
         this.mainCharacteristics = [this.platform.Characteristic.CurrentAmbientLightLevel];
         break;
       // Temperature sensor / Humidity sensor / Light sensor
-      case type === 'com.fibaro.multilevelSensor':
+      case 'multilevelSensor':
         switch (properties.deviceRole) {
           case 'TemperatureSensor':
             service = this.platform.Service.TemperatureSensor;
@@ -272,18 +273,18 @@ export class FibaroAccessory {
         }
         break;
       // Motion sensor
-      case type.startsWith('com.fibaro.FGMS'): //FGMS001, FGMS001v2
-      case type === 'com.fibaro.motionSensor':
+      case 'FGMS': //FGMS001, FGMS001v2
+      case 'motionSensor':
         service = this.platform.Service.MotionSensor;
         this.mainCharacteristics = [this.platform.Characteristic.MotionDetected];
         break;
       // Doorbell / Contact sensor
-      case type.startsWith('com.fibaro.FGDW'): //FGDW002
-      case type === 'com.fibaro.binarySensor':
-      case type === 'com.fibaro.doorSensor':
-      case type === 'com.fibaro.windowSensor':
-      case type === 'com.fibaro.satelZone':
-      case type === 'com.fibaro.doorWindowSensor':
+      case 'FGDW': //FGDW002
+      case 'binarySensor':
+      case 'doorSensor':
+      case 'windowSensor':
+      case 'satelZone':
+      case 'doorWindowSensor':
         if (properties.deviceRole === 'MotionSensor') {
           service = this.platform.Service.MotionSensor;
           this.mainCharacteristics = [this.platform.Characteristic.MotionDetected];
@@ -296,20 +297,20 @@ export class FibaroAccessory {
         }
         break;
       // Leak sensor
-      case type.startsWith('com.fibaro.FGFS'): //FGFS101
-      case type === 'com.fibaro.floodSensor':
+      case 'FGFS': //FGFS101
+      case 'floodSensor':
         service = this.platform.Service.LeakSensor;
         this.mainCharacteristics = [this.platform.Characteristic.LeakDetected];
         break;
       // Smoke sensor
-      case type.startsWith('com.fibaro.FGSS'): //FGSS001
-      case type === 'com.fibaro.smokeSensor':
-      case type === 'com.fibaro.gasDetector':
+      case 'FGSS': //FGSS001
+      case 'smokeSensor':
+      case 'gasDetector':
         service = this.platform.Service.SmokeSensor;
         this.mainCharacteristics = [this.platform.Characteristic.SmokeDetected];
         break;
       // Carbon Monoxide Sensor
-      case type.startsWith('com.fibaro.FGCD'): //FGCD001
+      case 'FGCD': //FGCD001
         service = this.platform.Service.CarbonMonoxideSensor;
         this.mainCharacteristics =
           [this.platform.Characteristic.CarbonMonoxideDetected,
@@ -317,13 +318,13 @@ export class FibaroAccessory {
             this.platform.Characteristic.CarbonMonoxidePeakLevel, this.platform.Characteristic.BatteryLevel];
         break;
       // Lock Mechanism
-      case type === 'com.fibaro.doorLock':
-      case type === 'com.fibaro.gerda':
+      case 'doorLock':
+      case 'gerda':
         service = this.platform.Service.LockMechanism;
         this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
         break;
       // Security system
-      case type === 'securitySystem':
+      case 'securitySystem':
         service = this.platform.Service.SecuritySystem;
         this.mainCharacteristics =
           [this.platform.Characteristic.SecuritySystemCurrentState,
@@ -331,13 +332,13 @@ export class FibaroAccessory {
         subtype = '0--';
         break;
       // Scene
-      case type === 'scene':
+      case 'scene':
         service = this.platform.Service.Switch;
         this.mainCharacteristics = [this.platform.Characteristic.On];
         subtype = device.id + '--SC';
         break;
       // Climate zone (HC3)
-      case type === 'climateZone':
+      case 'climateZone':
         service = this.platform.Service.Thermostat;
         this.mainCharacteristics =
           [this.platform.Characteristic.CurrentTemperature,
@@ -348,7 +349,7 @@ export class FibaroAccessory {
         subtype = device.id + '--CZ';
         break;
       // Heating zone (HC2 and HCL)
-      case type === 'heatingZone':
+      case 'heatingZone':
         service = this.platform.Service.Thermostat;
         this.mainCharacteristics =
           [this.platform.Characteristic.CurrentTemperature,
@@ -359,13 +360,13 @@ export class FibaroAccessory {
         subtype = device.id + '--HZ';
         break;
       // Global variables
-      case type === 'G':
+      case 'G':
         service = this.platform.Service.Switch;
         this.mainCharacteristics = [this.platform.Characteristic.On];
         subtype = this.device.type + '-' + this.device.name + '-';
         break;
       // Dimmer global variables
-      case type === 'D':
+      case 'D':
         service = this.platform.Service.Lightbulb;
         this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.Brightness];
         subtype = this.device.type + '-' + this.device.name + '-';
