@@ -46,7 +46,7 @@ export class FibaroAccessory {
     let subtype = this.device.id + '----';
     const controlType = parseInt(properties.deviceControlType);
     let type = this.device.type;
-    type = type.replace('com.fibaro.',''); //remove 'com.fibaro.'
+    type = type.replace('com.fibaro.', ''); //remove 'com.fibaro.'
     type = type.split(/\d/, 1).join().trim(); //remove everything from first digit
 
     switch (type) {
