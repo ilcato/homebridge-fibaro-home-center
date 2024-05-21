@@ -47,23 +47,23 @@ export class FibaroAccessory {
     const controlType = parseInt(properties.deviceControlType);
 
     const devConfig = this.platform.config.devices.find((item) => item.id === this.device.id)
-            || this.platform.config.devices.find((item) => item.id === this.device.type) || {};
-
+      || this.platform.config.devices.find((item) => item.id === this.device.type) || {};
+    
     if (devConfig) {
-        switch (devConfig.displayAs) {
-            case 'switch':
-                service = this.platform.Service.Switch;
-                this.mainCharacteristics = [this.platform.Characteristic.On];
-                break;
-            case 'dimmer':
-                service = this.platform.Service.Lightbulb;
-                this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.Brightness];
-                break;
-            default:
-                service = this.platform.Service.Switch;
-                this.mainCharacteristics = [this.platform.Characteristic.On];
-                break;
-        }
+      switch (devConfig.displayAs) {
+        case 'switch':
+          service = this.platform.Service.Switch;
+          this.mainCharacteristics = [this.platform.Characteristic.On];
+          break;
+        case 'dimmer':
+          service = this.platform.Service.Lightbulb;
+          this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.Brightness];
+          break;
+        default:
+          service = this.platform.Service.Switch;
+          this.mainCharacteristics = [this.platform.Characteristic.On];
+          break;
+      }
     }
 
     switch (this.device.type) {
