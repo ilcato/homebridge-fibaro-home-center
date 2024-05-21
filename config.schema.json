@@ -314,7 +314,7 @@
     {
 	"type": "array",
 	"key": "devices",
-	"title": "Devices",
+	"title": "Individual devices settings",
 	"description": "The ability to add individual settings for each device. Provide ID or type and choose as which device to display. This way you can also add any device that is not currently supported.",
 	"buttonText": "Add",
 	"expandable": true,
