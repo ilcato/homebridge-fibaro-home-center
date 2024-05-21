@@ -315,6 +315,7 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 ### Version 2.0.0
 + The ability to add individual settings for each device. Provide ID or type and choose as which device to display. This way you can also add any device that is not currently supported.
++ Bump dependencies.
 
 ### Version 1.7.5
 + Added new Fibaro "Roller Shutter com.fibaro.FGR224"
