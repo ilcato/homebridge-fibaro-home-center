@@ -48,7 +48,7 @@ export class FibaroAccessory {
 
     const devConfig = this.platform.config.devices.find((item) => item.id === this.device.id)
       || this.platform.config.devices.find((item) => item.id === this.device.type) || {};
-    
+
     if (devConfig) {
       switch (devConfig.displayAs) {
         case 'switch':
