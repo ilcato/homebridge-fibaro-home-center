@@ -46,6 +46,26 @@ export class FibaroAccessory {
     let subtype = this.device.id + '----';
     const controlType = parseInt(properties.deviceControlType);
 
+    const devConfig = this.platform.config.devices.find((item) => item.id === this.device.id)
+            || this.platform.config.devices.find((item) => item.id === this.device.type) || {};
+
+    if (devConfig) {
+        switch (devConfig.displayAs) {
+            case 'switch':
+                service = this.platform.Service.Switch;
+                this.mainCharacteristics = [this.platform.Characteristic.On];
+                break;
+            case 'dimmer':
+                service = this.platform.Service.Lightbulb;
+                this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.Brightness];
+                break;
+            default:
+                service = this.platform.Service.Switch;
+                this.mainCharacteristics = [this.platform.Characteristic.On];
+                break;
+        }
+    }
+
     switch (this.device.type) {
       // Light / Dimmer
       case 'com.fibaro.multilevelSwitch':
