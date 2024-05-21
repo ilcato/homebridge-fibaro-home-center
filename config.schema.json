@@ -176,7 +176,48 @@
             ]
           }
         ]
-      }
+      },
+      "devices": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"title": "ID",
+							"type": "string",
+							"required": true,
+							"description": "Device ID (like: 41) or identifier (like: com.Fibaro.FGR225)."
+						},
+						"displayAs": {
+							"title": "Display as..",
+							"description": "Display as.. switch, dimmer, blind etc.",
+							"type": "string",
+							"default": "auto",
+							"oneOf": [
+								{
+									"title": "Switch",
+									"enum": [
+										"switch"
+									]
+								},
+								{
+									"title": "Dimmer",
+									"enum": [
+										"dimmer"
+									]
+								},
+								{
+									"title": "Blind with positioning",
+									"enum": [
+										"blind"
+									]
+								}
+							],
+							"required": true
+						}
+					}
+				}
+			}
     }
   },
   "layout": [  
@@ -269,7 +310,20 @@
           "items": ["name", "logsLevel"]
         }
       ]
-    }
+    },
+    {
+			"type": "array",
+			"key": "devices",
+			"title": "Devices",
+			"description": "Add devices to apply individual settings. You can also add here unsupported devices.",
+			"buttonText": "Add",
+			"expandable": true,
+			"expanded": false,
+			"items": [
+				"devices[].id",
+				"devices[].displayAs"
+			]
+		}
   ],
   "form": null,
   "display": null
