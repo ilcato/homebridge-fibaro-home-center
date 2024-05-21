@@ -55,6 +55,11 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 
 #### Example: [config.json](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/config.json)
 
+#### Individual device settings
+The ability to add individual settings for each device. Provide ID or type and choose as which device to display. This way you can also add any device that is not currently supported.
++ `id` : device ID (like: 42) or type (like: com.Fibaro.FGR224)
++ `displayAS` : display as: switch, dimmer, etc.
+
 # Manuals
 
 <details>
@@ -156,6 +161,9 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 - This is not the official Fibaro plugin. The plugin uses the official API. Despite the efforts made, the operation of the plugin is without any guarantees and at your own risk.
 
 # Latest release notes
+
+### Version 2.0.0
++ The ability to add individual settings for each device. Provide ID or type and choose as which device to display. This way you can also add any device that is not currently supported.
 
 ### Version 1.7.5
 + Added new Fibaro "Roller Shutter com.fibaro.FGR224"
