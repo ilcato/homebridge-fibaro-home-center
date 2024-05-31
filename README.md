@@ -24,7 +24,7 @@ Results will appear in Homebridge and via HomeKit in your Apple Home app (or oth
 
 # Installation
 
-This plugin can be easily installed and configured through Homebridge UI or via [NPM](https://www.npmjs.com/package/homebridge-fibaro-home-center) "globally" by typing:
+This plugin can be easily installed through Homebridge UI or via [NPM](https://www.npmjs.com/package/homebridge-fibaro-home-center) "globally" by typing:
 
     npm install -g homebridge-fibaro-home-center
     
