@@ -51,6 +51,10 @@ export class FibaroAccessory {
       || this.platform.config.devices.find((item) => item.id === this.device.type) || {};
 
     if (devConfig) {
+      if (devConfig.exclude) {
+        this.isValid = false;
+        return
+      }
       switch (devConfig.displayAs) {
         case 'switch':
           service = this.platform.Service.Switch;
