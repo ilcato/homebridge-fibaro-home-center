@@ -187,7 +187,7 @@ Every change of devices display type (e.g. from Switch to Outlet etc.) can make 
 <summary><b>Exclude devices</b></summary>
 
 Exclude one or more devices:
-+ add id or type of this device in plugin settings and check field 'exclude'
++ add id or type of this device in plugin settings and select display as: 'exclude'
 + or use a specific user (not an admin one) and grant access to only the needed devices
 + or rename the device you want to exclude with an initial _ character.
 
@@ -314,7 +314,7 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 # Latest release notes
 
 ### Version 2.0.0
-+ The ability to add individual settings for each device. Provide ID or type and choose as which device to display. This way you can also add any device that is currently not supported.
++ The ability to add individual settings for each device. Provide ID or type and choose as which device to display. This way you can also add any device that is currently not supported or exclude device.
 + Bump dependencies.
 
 ### Version 1.7.5
