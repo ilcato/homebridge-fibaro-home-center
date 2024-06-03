@@ -182,7 +182,7 @@
 				"items": {
 					"type": "object",
 					"properties": {
-						"id": {
+						"idOrType": {
 							"title": "ID or type",
 							"type": "string",
 							"required": true,
