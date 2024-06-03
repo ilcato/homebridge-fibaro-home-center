@@ -187,7 +187,8 @@ Every change of devices display type (e.g. from Switch to Outlet etc.) can make 
 <summary><b>Exclude devices</b></summary>
 
 Exclude one or more devices:
-+ use a specific user (not an admin one) and grant access to only the needed devices
++ add id or type of this device in plugin settings and check field 'exclude'
++ or use a specific user (not an admin one) and grant access to only the needed devices
 + or rename the device you want to exclude with an initial _ character.
 
 Warning: If you exclude the device, adding it again will require reconfiguration (assignment to a room, automations, etc.).
@@ -220,8 +221,7 @@ Warning: If you exclude the device, adding it again will require reconfiguration
 <details>
 <summary><b>Security System</b></summary>
 
-+ In config.json:
-  + add the parameter: `"securitysystem": "enabled"`
++ Enable security system in plugin settings or in config.json add the parameter: `"securitysystem": "enabled"`
 
 + In Fibaro Home Center:
   + Create an Enumerated variable named `SecuritySystem` with the following values:
