@@ -184,7 +184,7 @@
 					"properties": {
 						"id": {
 							"title": "Device ID",
-							"type": "string",
+							"type": "integer",
 							"required": true,
 							"description": "Device ID (like: 41)."
 						},
