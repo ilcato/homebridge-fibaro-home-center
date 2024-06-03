@@ -53,7 +53,7 @@ export class FibaroAccessory {
     if (devConfig) {
       if (devConfig.exclude) {
         this.isValid = false;
-        return
+        return;
       }
       switch (devConfig.displayAs) {
         case 'switch':
