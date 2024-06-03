@@ -117,9 +117,9 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 <details>
 <summary><b>Individual device settings</b></summary>
 
-The ability to add individual settings for each device. Provide ID or type and choose as which device to display. This way you can also add any device that is not currently supported.
-+ `id` : device ID (like: 42) or type (like: com.Fibaro.FGR224)
-+ `displayAS` : display as: switch, dimmer, etc.
+The ability to add individual settings for each device. Provide device ID and choose as which device to display. This way you can also add any device that is not currently supported pr exclude device. 
++ `id` : device ID (like: 42).
++ `displayAS` : display as: switch, dimmer, etc. or exclude device.
 
 ```json
 {
@@ -136,7 +136,7 @@ The ability to add individual settings for each device. Provide ID or type and c
                     "displayAs": "switch",
                 },
                 {
-                    "id": "com.Fibaro.FGR228",
+                    "id": "58",
                     "displayAs": "blind",
                 }
             ]
@@ -314,7 +314,7 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 # Latest release notes
 
 ### Version 2.0.0
-+ The ability to add individual settings for each device. Provide ID or type and choose as which device to display. This way you can also add any device that is currently not supported or exclude device.
++ The ability to add individual settings for each device. Provide device ID and choose as which device to display. This way you can also add any device that is currently not supported or exclude device.
 + Bump dependencies.
 
 ### Version 1.7.5
