@@ -132,12 +132,12 @@ The ability to add individual settings for each device. Provide device ID and ch
         "password": "PUT PASSWORD OF YOUR HOME CENTER HERE",
         "devices": [
                 {
-                    "id": "42",
+                    "id": 42,
                     "displayAs": "switch",
                 },
                 {
-                    "id": "58",
-                    "displayAs": "blind",
+                    "id": 58,
+                    "displayAs": "exclude",
                 }
             ]
     }
