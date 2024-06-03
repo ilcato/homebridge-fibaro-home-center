@@ -182,17 +182,17 @@
 				"items": {
 					"type": "object",
 					"properties": {
-						"idOrType": {
-							"title": "ID or type",
+						"id": {
+							"title": "Device ID",
 							"type": "string",
 							"required": true,
-							"description": "Device ID (like: 41) or type (like: com.Fibaro.FGR225)."
+							"description": "Device ID (like: 41)."
 						},
 						"displayAs": {
-							"title": "Display as..",
-							"description": "Display as: switch, dimmer, blind etc.",
+							"title": "Display as",
+							"description": "Display as: switch, dimmer, blind etc. or exclude device.",
 							"type": "string",
-							"default": "auto",
+							"default": "switch",
 							"oneOf": [
 								{
 									"title": "Switch",
