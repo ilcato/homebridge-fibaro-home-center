@@ -211,17 +211,16 @@
 									"enum": [
 										"blind"
 									]
+								},
+								{
+									"title": "Exclude",
+									"enum": [
+										"exclude"
+									]
 								}
 							],
 							"required": true
-						},
-						"exclude": {
-							"title": "Exclude device",
-							"type": "boolean",
-							"required": false,
-							"default": false,
-							"description": "Exclude this device. Warning: Re-adding may require reconfiguration in HomeKit."
-						},
+						}
 					}
 				}
 			}
@@ -328,8 +327,7 @@
 	"expanded": false,
 	"items": [
 		"devices[].id",
-		"devices[].displayAs",
-		"devices[].exclude"
+		"devices[].displayAs"
 	]
 	}
   ],
