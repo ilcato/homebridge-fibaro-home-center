@@ -176,7 +176,54 @@
             ]
           }
         ]
-      }
+      },
+      "devices": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"title": "Device ID",
+							"type": "integer",
+							"required": true,
+							"description": "Device ID (like: 41)."
+						},
+						"displayAs": {
+							"title": "Display as",
+							"description": "Display as: switch, dimmer, blind etc. or exclude device.",
+							"type": "string",
+							"default": "switch",
+							"oneOf": [
+								{
+									"title": "Switch",
+									"enum": [
+										"switch"
+									]
+								},
+								{
+									"title": "Dimmer",
+									"enum": [
+										"dimmer"
+									]
+								},
+								{
+									"title": "Blind with positioning",
+									"enum": [
+										"blind"
+									]
+								},
+								{
+									"title": "Exclude",
+									"enum": [
+										"exclude"
+									]
+								}
+							],
+							"required": true
+						}
+					}
+				}
+			}
     }
   },
   "layout": [  
@@ -269,7 +316,20 @@
           "items": ["name", "logsLevel"]
         }
       ]
-    }
+    },
+    {
+	"type": "array",
+	"key": "devices",
+	"title": "Individual devices settings",
+	"description": "The ability to add individual settings for each device. Provide ID or type and choose as which device to display. This way you can also add any device that is not currently supported.",
+	"buttonText": "Add",
+	"expandable": true,
+	"expanded": false,
+	"items": [
+		"devices[].id",
+		"devices[].displayAs"
+	]
+	}
   ],
   "form": null,
   "display": null
