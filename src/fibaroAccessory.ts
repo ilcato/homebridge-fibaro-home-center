@@ -65,6 +65,64 @@ export class FibaroAccessory {
           service = this.platform.Service.Lightbulb;
           this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.Brightness];
           break;
+        case 'blind':
+          service = this.platform.Service.WindowCovering;
+          this.mainCharacteristics = [
+            this.platform.Characteristic.CurrentPosition,
+            this.platform.Characteristic.TargetPosition,
+            this.platform.Characteristic.PositionState,
+            this.platform.Characteristic.HoldPosition,
+          ];
+          break;
+        case 'blind2':
+          service = this.platform.Service.WindowCovering;
+          this.mainCharacteristics = [
+            this.platform.Characteristic.CurrentPosition,
+            this.platform.Characteristic.TargetPosition,
+            this.platform.Characteristic.PositionState,
+            this.platform.Characteristic.HoldPosition,
+            this.platform.Characteristic.CurrentHorizontalTiltAngle,
+            this.platform.Characteristic.TargetHorizontalTiltAngle,
+          ];
+          break;
+        case 'garage':
+          service = this.platform.Service.GarageDoorOpener;
+          this.mainCharacteristics =
+            [this.platform.Characteristic.CurrentDoorState,
+              this.platform.Characteristic.TargetDoorState,
+              this.platform.Characteristic.ObstructionDetected];
+          break;
+        case 'temperature':
+          service = this.platform.Service.TemperatureSensor;
+          this.mainCharacteristics = [this.platform.Characteristic.CurrentTemperature];
+          break;
+        case 'humidity':
+          service = this.platform.Service.HumiditySensor;
+          this.mainCharacteristics = [this.platform.Characteristic.CurrentRelativeHumidity];
+          break;
+        case 'lightSensor':
+          service = this.platform.Service.LightSensor;
+          this.mainCharacteristics = [this.platform.Characteristic.CurrentAmbientLightLevel];
+          break;
+        case 'motion':
+          service = this.platform.Service.MotionSensor;
+          this.mainCharacteristics = [this.platform.Characteristic.MotionDetected];
+          break;
+        case 'leak':
+          service = this.platform.Service.LeakSensor;
+          this.mainCharacteristics = [this.platform.Characteristic.LeakDetected];
+          break;
+        case 'smoke':
+          service = this.platform.Service.SmokeSensor;
+          this.mainCharacteristics = [this.platform.Characteristic.SmokeDetected];
+          break;
+        case 'security':
+          service = this.platform.Service.SecuritySystem;
+          this.mainCharacteristics =
+            [this.platform.Characteristic.SecuritySystemCurrentState,
+             this.platform.Characteristic.SecuritySystemTargetState];
+          subtype = '0--';
+          break;
         default:
           service = this.platform.Service.Switch;
           this.mainCharacteristics = [this.platform.Characteristic.On];
