@@ -119,7 +119,7 @@ export class FibaroAccessory {
         case 'security':
           service = this.platform.Service.SecuritySystem;
           this.mainCharacteristics = [this.platform.Characteristic.SecuritySystemCurrentState,
-                                      this.platform.Characteristic.SecuritySystemTargetState];
+            this.platform.Characteristic.SecuritySystemTargetState];
           subtype = '0--';
           break;
         default:
