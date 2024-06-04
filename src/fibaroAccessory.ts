@@ -47,7 +47,10 @@ export class FibaroAccessory {
     const controlType = parseInt(properties.deviceControlType);
 
     // Check if there is individual device added in plugin settings with this device ID.
-    const devConfig = this.platform.config.devices.find((item) => item.id === this.device.id) || {};
+    let devConfig = {};
+    if (this.platform.config.devices) {
+      devConfig = this.platform.config.devices.find((item) => item.id === this.device.id);
+    }
 
     if (devConfig) {
       switch (devConfig.displayAs) {
