@@ -118,9 +118,8 @@ export class FibaroAccessory {
           break;
         case 'security':
           service = this.platform.Service.SecuritySystem;
-          this.mainCharacteristics =
-            [this.platform.Characteristic.SecuritySystemCurrentState,
-             this.platform.Characteristic.SecuritySystemTargetState];
+          this.mainCharacteristics = [this.platform.Characteristic.SecuritySystemCurrentState,
+                                      this.platform.Characteristic.SecuritySystemTargetState];
           subtype = '0--';
           break;
         default:
@@ -128,344 +127,344 @@ export class FibaroAccessory {
           this.mainCharacteristics = [this.platform.Characteristic.On];
           break;
       }
-    }
+    } else {
 
-    switch (this.device.type) {
-      // Light / Dimmer
-      case 'com.fibaro.multilevelSwitch':
-      case 'com.fibaro.FGD212':
-      case 'com.fibaro.FGWD111':
-        switch (controlType) {
-          case 2: // Lighting
-          case 23: // Lighting
-            service = this.platform.Service.Lightbulb;
-            this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.Brightness];
+      switch (this.device.type) {
+        // Light / Dimmer
+        case 'com.fibaro.multilevelSwitch':
+        case 'com.fibaro.FGD212':
+        case 'com.fibaro.FGWD111':
+          switch (controlType) {
+            case 2: // Lighting
+            case 23: // Lighting
+              service = this.platform.Service.Lightbulb;
+              this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.Brightness];
+              break;
+            default:
+              service = this.platform.Service.Switch;
+              this.mainCharacteristics = [this.platform.Characteristic.On];
+              break;
+          }
+          break;
+        // Light RGBW
+        case 'com.fibaro.FGRGBW441M':
+        case 'com.fibaro.colorController':
+        case 'com.fibaro.FGRGBW442':
+        case 'com.fibaro.FGRGBW442CC':
+          service = this.platform.Service.Lightbulb;
+          this.mainCharacteristics =
+            [this.platform.Characteristic.On,
+              this.platform.Characteristic.Brightness,
+              this.platform.Characteristic.Hue,
+              this.platform.Characteristic.Saturation];
+          break;
+        // Light / Switch / Outlet / Valve
+        // for Switch / Double Switch / Smart Implant / etc.
+        case 'com.fibaro.binarySwitch':
+        case 'com.fibaro.developer.bxs.virtualBinarySwitch':
+        case 'com.fibaro.satelOutput':
+        case 'com.fibaro.FGWDS221':
+          if (this.platform.config.advControl === 1) {
+            switch (controlType) {
+              case 2: // Lighting
+              case 5: // Bedside Lamp
+              case 7: // Wall Lamp
+                service = this.platform.Service.Lightbulb;
+                this.mainCharacteristics = [this.platform.Characteristic.On];
+                break;
+              case 1: // Other device
+              case 20: // Other device
+                service = this.platform.Service.Switch;
+                this.mainCharacteristics = [this.platform.Characteristic.On];
+                break;
+              case 24: // Video intercom
+              case 25: // Video gate open
+                service = this.platform.Service.LockMechanism;
+                subtype = device.id + '--' + 'LOCK';
+                this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
+                break;
+              case 3: // sprinkler
+              case 26: // valve
+                service = this.platform.Service.Valve;
+                this.mainCharacteristics = [
+                  this.platform.Characteristic.Active,
+                  this.platform.Characteristic.InUse,
+                  this.platform.Characteristic.ValveType,
+                ];
+                break;
+              default:
+                service = this.platform.Service.Outlet;
+                this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
+                break;
+            }
             break;
-          default:
-            service = this.platform.Service.Switch;
-            this.mainCharacteristics = [this.platform.Characteristic.On];
+          } else {
+            switch (controlType) {
+              case 2: // Lighting
+              case 5: // Bedside Lamp
+              case 7: // Wall Lamp
+                service = this.platform.Service.Lightbulb;
+                this.mainCharacteristics = [this.platform.Characteristic.On];
+                break;
+              case 20: // Other device
+                service = this.platform.Service.Outlet;
+                this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
+                break;
+              case 25: // Video gate open
+                service = this.platform.Service.LockMechanism;
+                subtype = device.id + '--' + 'LOCK';
+                this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
+                break;
+              case 26: // valve
+                service = this.platform.Service.Valve;
+                this.mainCharacteristics = [
+                  this.platform.Characteristic.Active,
+                  this.platform.Characteristic.InUse,
+                  this.platform.Characteristic.ValveType,
+                ];
+                break;
+              default:
+                service = this.platform.Service.Switch;
+                this.mainCharacteristics = [this.platform.Characteristic.On];
+                break;
+            }
             break;
-        }
-        break;
-      // Light RGBW
-      case 'com.fibaro.FGRGBW441M':
-      case 'com.fibaro.colorController':
-      case 'com.fibaro.FGRGBW442':
-      case 'com.fibaro.FGRGBW442CC':
-        service = this.platform.Service.Lightbulb;
-        this.mainCharacteristics =
-          [this.platform.Characteristic.On,
-            this.platform.Characteristic.Brightness,
-            this.platform.Characteristic.Hue,
-            this.platform.Characteristic.Saturation];
-        break;
-      // Light / Switch / Outlet / Valve
-      // for Switch / Double Switch / Smart Implant / etc.
-      case 'com.fibaro.binarySwitch':
-      case 'com.fibaro.developer.bxs.virtualBinarySwitch':
-      case 'com.fibaro.satelOutput':
-      case 'com.fibaro.FGWDS221':
-        if (this.platform.config.advControl === 1) {
-          switch (controlType) {
-            case 2: // Lighting
-            case 5: // Bedside Lamp
-            case 7: // Wall Lamp
-              service = this.platform.Service.Lightbulb;
-              this.mainCharacteristics = [this.platform.Characteristic.On];
-              break;
-            case 1: // Other device
-            case 20: // Other device
-              service = this.platform.Service.Switch;
-              this.mainCharacteristics = [this.platform.Characteristic.On];
-              break;
-            case 24: // Video intercom
-            case 25: // Video gate open
-              service = this.platform.Service.LockMechanism;
-              subtype = device.id + '--' + 'LOCK';
-              this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
-              break;
-            case 3: // sprinkler
-            case 26: // valve
-              service = this.platform.Service.Valve;
-              this.mainCharacteristics = [
-                this.platform.Characteristic.Active,
-                this.platform.Characteristic.InUse,
-                this.platform.Characteristic.ValveType,
-              ];
-              break;
-            default:
-              service = this.platform.Service.Outlet;
-              this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
-              break;
           }
-          break;
-        } else {
-          switch (controlType) {
-            case 2: // Lighting
-            case 5: // Bedside Lamp
-            case 7: // Wall Lamp
-              service = this.platform.Service.Lightbulb;
-              this.mainCharacteristics = [this.platform.Characteristic.On];
-              break;
-            case 20: // Other device
-              service = this.platform.Service.Outlet;
-              this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
-              break;
-            case 25: // Video gate open
-              service = this.platform.Service.LockMechanism;
-              subtype = device.id + '--' + 'LOCK';
-              this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
-              break;
-            case 26: // valve
-              service = this.platform.Service.Valve;
-              this.mainCharacteristics = [
-                this.platform.Characteristic.Active,
-                this.platform.Characteristic.InUse,
-                this.platform.Characteristic.ValveType,
-              ];
-              break;
-            default:
-              service = this.platform.Service.Switch;
-              this.mainCharacteristics = [this.platform.Characteristic.On];
-              break;
+        // Light / Switch / Outlet / Valve
+        // for Wall Plug etc.
+        case 'com.fibaro.FGWP101':
+        case 'com.fibaro.FGWP102':
+        case 'com.fibaro.FGWPG111':
+        case 'com.fibaro.FGWPG121':
+        case 'com.fibaro.FGWOEF011':
+          if (this.platform.config.advControl === 1) {
+            switch (controlType) {
+              case 2: // Lighting
+              case 5: // Bedside Lamp
+              case 7: // Wall Lamp
+                service = this.platform.Service.Lightbulb;
+                this.mainCharacteristics = [this.platform.Characteristic.On];
+                break;
+              case 1: // Other device
+              case 20: // Other device
+                service = this.platform.Service.Switch;
+                this.mainCharacteristics = [this.platform.Characteristic.On];
+                break;
+              case 24: // Video intercom
+              case 25: // Video gate open
+                service = this.platform.Service.LockMechanism;
+                subtype = device.id + '--' + 'LOCK';
+                this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
+                break;
+              case 3: // sprinkler
+              case 26: // valve
+                service = this.platform.Service.Valve;
+                this.mainCharacteristics = [
+                  this.platform.Characteristic.Active,
+                  this.platform.Characteristic.InUse,
+                  this.platform.Characteristic.ValveType,
+                ];
+                break;
+              default:
+                service = this.platform.Service.Outlet;
+                this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
+                break;
+            }
+            break;
+          } else {
+            service = this.platform.Service.Outlet;
+            this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
+            break;
           }
-          break;
-        }
-      // Light / Switch / Outlet / Valve
-      // for Wall Plug etc.
-      case 'com.fibaro.FGWP101':
-      case 'com.fibaro.FGWP102':
-      case 'com.fibaro.FGWPG111':
-      case 'com.fibaro.FGWPG121':
-      case 'com.fibaro.FGWOEF011':
-        if (this.platform.config.advControl === 1) {
-          switch (controlType) {
-            case 2: // Lighting
-            case 5: // Bedside Lamp
-            case 7: // Wall Lamp
-              service = this.platform.Service.Lightbulb;
-              this.mainCharacteristics = [this.platform.Characteristic.On];
-              break;
-            case 1: // Other device
-            case 20: // Other device
-              service = this.platform.Service.Switch;
-              this.mainCharacteristics = [this.platform.Characteristic.On];
-              break;
-            case 24: // Video intercom
-            case 25: // Video gate open
-              service = this.platform.Service.LockMechanism;
-              subtype = device.id + '--' + 'LOCK';
-              this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
-              break;
-            case 3: // sprinkler
-            case 26: // valve
-              service = this.platform.Service.Valve;
-              this.mainCharacteristics = [
-                this.platform.Characteristic.Active,
-                this.platform.Characteristic.InUse,
-                this.platform.Characteristic.ValveType,
-              ];
-              break;
-            default:
-              service = this.platform.Service.Outlet;
-              this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
-              break;
+        // Window Covering / Garage door
+        case 'com.fibaro.FGR221':
+        case 'com.fibaro.FGRM222':
+        case 'com.fibaro.FGR223':
+        case 'com.fibaro.FGR224':
+        case 'com.fibaro.rollerShutter':
+        case 'com.fibaro.FGWR111':
+        case 'com.fibaro.remoteBaseShutter':
+        case 'com.fibaro.baseShutter': // only if favoritePositionsNativeSupport is true otherwise it's a garage door
+          // it's a garage door
+          // case 57 - gate with positioning
+          if (controlType === 56 || controlType === 57) {
+            service = this.platform.Service.GarageDoorOpener;
+            this.mainCharacteristics =
+              [this.platform.Characteristic.CurrentDoorState,
+                this.platform.Characteristic.TargetDoorState,
+                this.platform.Characteristic.ObstructionDetected];
+            break;
+          } else if (this.device.type !== 'com.fibaro.baseShutter' ||
+                     this.device.type === 'com.fibaro.baseShutter' && properties.favoritePositionsNativeSupport) {
+            service = this.platform.Service.WindowCovering;
+            this.mainCharacteristics = [
+              this.platform.Characteristic.CurrentPosition,
+              this.platform.Characteristic.TargetPosition,
+              this.platform.Characteristic.PositionState,
+              this.platform.Characteristic.HoldPosition,
+            ];
+            if (controlType === 55) {
+              this.mainCharacteristics.push(
+                this.platform.Characteristic.CurrentHorizontalTiltAngle,
+                this.platform.Characteristic.TargetHorizontalTiltAngle,
+              );
+            }
+            if (this.device.type === 'com.fibaro.remoteBaseShutter' || this.device.type === 'com.fibaro.baseShutter') {
+              subtype = device.id + '--OPENCLOSEONLY';
+            }
+            break;
           }
-          break;
-        } else {
-          service = this.platform.Service.Outlet;
-          this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
-          break;
-        }
-      // Window Covering / Garage door
-      case 'com.fibaro.FGR221':
-      case 'com.fibaro.FGRM222':
-      case 'com.fibaro.FGR223':
-      case 'com.fibaro.FGR224':
-      case 'com.fibaro.rollerShutter':
-      case 'com.fibaro.FGWR111':
-      case 'com.fibaro.remoteBaseShutter':
-      case 'com.fibaro.baseShutter': // only if favoritePositionsNativeSupport is true otherwise it's a garage door
-        // it's a garage door
-        // case 57 - gate with positioning
-        if (controlType === 56 || controlType === 57) {
+        // Garage door
+        // eslint-disable-next-line no-duplicate-case, no-fallthrough
+        case 'com.fibaro.baseShutter':
+        case 'com.fibaro.barrier':
           service = this.platform.Service.GarageDoorOpener;
           this.mainCharacteristics =
             [this.platform.Characteristic.CurrentDoorState,
               this.platform.Characteristic.TargetDoorState,
               this.platform.Characteristic.ObstructionDetected];
           break;
-        } else if (this.device.type !== 'com.fibaro.baseShutter' ||
-                   this.device.type === 'com.fibaro.baseShutter' && properties.favoritePositionsNativeSupport) {
-          service = this.platform.Service.WindowCovering;
-          this.mainCharacteristics = [
-            this.platform.Characteristic.CurrentPosition,
-            this.platform.Characteristic.TargetPosition,
-            this.platform.Characteristic.PositionState,
-            this.platform.Characteristic.HoldPosition,
-          ];
-          if (controlType === 55) {
-            this.mainCharacteristics.push(
-              this.platform.Characteristic.CurrentHorizontalTiltAngle,
-              this.platform.Characteristic.TargetHorizontalTiltAngle,
-            );
-          }
-          if (this.device.type === 'com.fibaro.remoteBaseShutter' || this.device.type === 'com.fibaro.baseShutter') {
-            subtype = device.id + '--OPENCLOSEONLY';
+        // Temperature sensor
+        case 'com.fibaro.temperatureSensor':
+          service = this.platform.Service.TemperatureSensor;
+          this.mainCharacteristics = [this.platform.Characteristic.CurrentTemperature];
+          break;
+        // Humidity sensor
+        case 'com.fibaro.humiditySensor':
+          service = this.platform.Service.HumiditySensor;
+          this.mainCharacteristics = [this.platform.Characteristic.CurrentRelativeHumidity];
+          break;
+        // Light sensor
+        case 'com.fibaro.lightSensor':
+          service = this.platform.Service.LightSensor;
+          this.mainCharacteristics = [this.platform.Characteristic.CurrentAmbientLightLevel];
+          break;
+        // Temperature sensor / Humidity sensor / Light sensor
+        case 'com.fibaro.multilevelSensor':
+          switch (properties.deviceRole) {
+            case 'TemperatureSensor':
+              service = this.platform.Service.TemperatureSensor;
+              this.mainCharacteristics = [this.platform.Characteristic.CurrentTemperature];
+              break;
+            case 'HumiditySensor':
+              service = this.platform.Service.HumiditySensor;
+              this.mainCharacteristics = [this.platform.Characteristic.CurrentRelativeHumidity];
+              break;
+            case 'LightSensor':
+            case 'MultilevelSensor':
+              service = this.platform.Service.LightSensor;
+              this.mainCharacteristics = [this.platform.Characteristic.CurrentAmbientLightLevel];
+              break;
+            default:
+              this.isValid = false;
+              return;
           }
           break;
-        }
-      // Garage door
-      // eslint-disable-next-line no-duplicate-case, no-fallthrough
-      case 'com.fibaro.baseShutter':
-      case 'com.fibaro.barrier':
-        service = this.platform.Service.GarageDoorOpener;
-        this.mainCharacteristics =
-          [this.platform.Characteristic.CurrentDoorState,
-            this.platform.Characteristic.TargetDoorState,
-            this.platform.Characteristic.ObstructionDetected];
-        break;
-      // Temperature sensor
-      case 'com.fibaro.temperatureSensor':
-        service = this.platform.Service.TemperatureSensor;
-        this.mainCharacteristics = [this.platform.Characteristic.CurrentTemperature];
-        break;
-      // Humidity sensor
-      case 'com.fibaro.humiditySensor':
-        service = this.platform.Service.HumiditySensor;
-        this.mainCharacteristics = [this.platform.Characteristic.CurrentRelativeHumidity];
-        break;
-      // Light sensor
-      case 'com.fibaro.lightSensor':
-        service = this.platform.Service.LightSensor;
-        this.mainCharacteristics = [this.platform.Characteristic.CurrentAmbientLightLevel];
-        break;
-      // Temperature sensor / Humidity sensor / Light sensor
-      case 'com.fibaro.multilevelSensor':
-        switch (properties.deviceRole) {
-          case 'TemperatureSensor':
-            service = this.platform.Service.TemperatureSensor;
-            this.mainCharacteristics = [this.platform.Characteristic.CurrentTemperature];
-            break;
-          case 'HumiditySensor':
-            service = this.platform.Service.HumiditySensor;
-            this.mainCharacteristics = [this.platform.Characteristic.CurrentRelativeHumidity];
-            break;
-          case 'LightSensor':
-          case 'MultilevelSensor':
-            service = this.platform.Service.LightSensor;
-            this.mainCharacteristics = [this.platform.Characteristic.CurrentAmbientLightLevel];
-            break;
-          default:
-            this.isValid = false;
-            return;
-        }
-        break;
-      // Motion sensor
-      case 'com.fibaro.FGMS001':
-      case 'com.fibaro.FGMS001v2':
-      case 'com.fibaro.motionSensor':
-        service = this.platform.Service.MotionSensor;
-        this.mainCharacteristics = [this.platform.Characteristic.MotionDetected];
-        break;
-      // Doorbell / Contact sensor
-      case 'com.fibaro.binarySensor':
-      case 'com.fibaro.doorSensor':
-      case 'com.fibaro.FGDW002':
-      case 'com.fibaro.windowSensor':
-      case 'com.fibaro.satelZone':
-      case 'com.fibaro.doorWindowSensor':
-        if (properties.deviceRole === 'MotionSensor') {
+        // Motion sensor
+        case 'com.fibaro.FGMS001':
+        case 'com.fibaro.FGMS001v2':
+        case 'com.fibaro.motionSensor':
           service = this.platform.Service.MotionSensor;
           this.mainCharacteristics = [this.platform.Characteristic.MotionDetected];
-        } else if (this.device.id === this.platform.config.doorbellDeviceId) {
-          service = this.platform.Service.Doorbell;
-          this.mainCharacteristics = [this.platform.Characteristic.ProgrammableSwitchEvent];
-        } else {
-          service = this.platform.Service.ContactSensor;
-          this.mainCharacteristics = [this.platform.Characteristic.ContactSensorState];
-        }
-        break;
-      // Leak sensor
-      case 'com.fibaro.FGFS101':
-      case 'com.fibaro.floodSensor':
-        service = this.platform.Service.LeakSensor;
-        this.mainCharacteristics = [this.platform.Characteristic.LeakDetected];
-        break;
-      // Smoke sensor
-      case 'com.fibaro.FGSS001':
-      case 'com.fibaro.smokeSensor':
-      case 'com.fibaro.gasDetector':
-        service = this.platform.Service.SmokeSensor;
-        this.mainCharacteristics = [this.platform.Characteristic.SmokeDetected];
-        break;
-      // Carbon Monoxide Sensor
-      case 'com.fibaro.FGCD001':
-        service = this.platform.Service.CarbonMonoxideSensor;
-        this.mainCharacteristics =
-          [this.platform.Characteristic.CarbonMonoxideDetected,
-            this.platform.Characteristic.CarbonMonoxideLevel,
-            this.platform.Characteristic.CarbonMonoxidePeakLevel, this.platform.Characteristic.BatteryLevel];
-        break;
-      // Lock Mechanism
-      case 'com.fibaro.doorLock':
-      case 'com.fibaro.gerda':
-        service = this.platform.Service.LockMechanism;
-        this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
-        break;
-      // Security system
-      case 'securitySystem':
-        service = this.platform.Service.SecuritySystem;
-        this.mainCharacteristics =
-          [this.platform.Characteristic.SecuritySystemCurrentState,
-            this.platform.Characteristic.SecuritySystemTargetState];
-        subtype = '0--';
-        break;
-      // Scene
-      case 'scene':
-        service = this.platform.Service.Switch;
-        this.mainCharacteristics = [this.platform.Characteristic.On];
-        subtype = device.id + '--SC';
-        break;
-      // Climate zone (HC3)
-      case 'climateZone':
-        service = this.platform.Service.Thermostat;
-        this.mainCharacteristics =
-          [this.platform.Characteristic.CurrentTemperature,
-            this.platform.Characteristic.TargetTemperature,
-            this.platform.Characteristic.CurrentHeatingCoolingState,
-            this.platform.Characteristic.TargetHeatingCoolingState,
-            this.platform.Characteristic.TemperatureDisplayUnits];
-        subtype = device.id + '--CZ';
-        break;
-      // Heating zone (HC2 and HCL)
-      case 'heatingZone':
-        service = this.platform.Service.Thermostat;
-        this.mainCharacteristics =
-          [this.platform.Characteristic.CurrentTemperature,
-            this.platform.Characteristic.TargetTemperature,
-            this.platform.Characteristic.CurrentHeatingCoolingState,
-            this.platform.Characteristic.TargetHeatingCoolingState,
-            this.platform.Characteristic.TemperatureDisplayUnits];
-        subtype = device.id + '--HZ';
-        break;
-      // Global variables
-      case 'G':
-        service = this.platform.Service.Switch;
-        this.mainCharacteristics = [this.platform.Characteristic.On];
-        subtype = this.device.type + '-' + this.device.name + '-';
-        break;
-      // Dimmer global variables
-      case 'D':
-        service = this.platform.Service.Lightbulb;
-        this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.Brightness];
-        subtype = this.device.type + '-' + this.device.name + '-';
-        break;
-      default:
-        this.isValid = false;
-        return;
+          break;
+        // Doorbell / Contact sensor
+        case 'com.fibaro.binarySensor':
+        case 'com.fibaro.doorSensor':
+        case 'com.fibaro.FGDW002':
+        case 'com.fibaro.windowSensor':
+        case 'com.fibaro.satelZone':
+        case 'com.fibaro.doorWindowSensor':
+          if (properties.deviceRole === 'MotionSensor') {
+            service = this.platform.Service.MotionSensor;
+            this.mainCharacteristics = [this.platform.Characteristic.MotionDetected];
+          } else if (this.device.id === this.platform.config.doorbellDeviceId) {
+            service = this.platform.Service.Doorbell;
+            this.mainCharacteristics = [this.platform.Characteristic.ProgrammableSwitchEvent];
+          } else {
+            service = this.platform.Service.ContactSensor;
+            this.mainCharacteristics = [this.platform.Characteristic.ContactSensorState];
+          }
+          break;
+        // Leak sensor
+        case 'com.fibaro.FGFS101':
+        case 'com.fibaro.floodSensor':
+          service = this.platform.Service.LeakSensor;
+          this.mainCharacteristics = [this.platform.Characteristic.LeakDetected];
+          break;
+        // Smoke sensor
+        case 'com.fibaro.FGSS001':
+        case 'com.fibaro.smokeSensor':
+        case 'com.fibaro.gasDetector':
+          service = this.platform.Service.SmokeSensor;
+          this.mainCharacteristics = [this.platform.Characteristic.SmokeDetected];
+          break;
+        // Carbon Monoxide Sensor
+        case 'com.fibaro.FGCD001':
+          service = this.platform.Service.CarbonMonoxideSensor;
+          this.mainCharacteristics =
+            [this.platform.Characteristic.CarbonMonoxideDetected,
+              this.platform.Characteristic.CarbonMonoxideLevel,
+              this.platform.Characteristic.CarbonMonoxidePeakLevel, this.platform.Characteristic.BatteryLevel];
+          break;
+        // Lock Mechanism
+        case 'com.fibaro.doorLock':
+        case 'com.fibaro.gerda':
+          service = this.platform.Service.LockMechanism;
+          this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
+          break;
+        // Security system
+        case 'securitySystem':
+          service = this.platform.Service.SecuritySystem;
+          this.mainCharacteristics =
+            [this.platform.Characteristic.SecuritySystemCurrentState,
+              this.platform.Characteristic.SecuritySystemTargetState];
+          subtype = '0--';
+          break;
+        // Scene
+        case 'scene':
+          service = this.platform.Service.Switch;
+          this.mainCharacteristics = [this.platform.Characteristic.On];
+          subtype = device.id + '--SC';
+          break;
+        // Climate zone (HC3)
+        case 'climateZone':
+          service = this.platform.Service.Thermostat;
+          this.mainCharacteristics =
+            [this.platform.Characteristic.CurrentTemperature,
+              this.platform.Characteristic.TargetTemperature,
+              this.platform.Characteristic.CurrentHeatingCoolingState,
+              this.platform.Characteristic.TargetHeatingCoolingState,
+              this.platform.Characteristic.TemperatureDisplayUnits];
+          subtype = device.id + '--CZ';
+          break;
+        // Heating zone (HC2 and HCL)
+        case 'heatingZone':
+          service = this.platform.Service.Thermostat;
+          this.mainCharacteristics =
+            [this.platform.Characteristic.CurrentTemperature,
+              this.platform.Characteristic.TargetTemperature,
+              this.platform.Characteristic.CurrentHeatingCoolingState,
+              this.platform.Characteristic.TargetHeatingCoolingState,
+              this.platform.Characteristic.TemperatureDisplayUnits];
+          subtype = device.id + '--HZ';
+          break;
+        // Global variables
+        case 'G':
+          service = this.platform.Service.Switch;
+          this.mainCharacteristics = [this.platform.Characteristic.On];
+          subtype = this.device.type + '-' + this.device.name + '-';
+          break;
+        // Dimmer global variables
+        case 'D':
+          service = this.platform.Service.Lightbulb;
+          this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.Brightness];
+          subtype = this.device.type + '-' + this.device.name + '-';
+          break;
+        default:
+          this.isValid = false;
+          return;
+      }
     }
-
 
     this.mainService = this.accessory.getService(service);
     if (!this.mainService) {
