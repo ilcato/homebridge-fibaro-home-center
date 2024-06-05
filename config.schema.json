@@ -176,10 +176,111 @@
             ]
           }
         ]
+      },
+      "devices": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "title": "Device ID",
+              "type": "integer",
+              "required": true,
+              "description": "Device ID (like: 41)."
+            },
+            "displayAs": {
+              "title": "Display as",
+              "description": "Display as: switch, dimmer, blind etc. or exclude device.",
+              "type": "string",
+              "default": "switch",
+              "oneOf": [
+                {
+                  "title": "Switch",
+                  "enum": [
+                    "switch"
+                  ]
+                },
+                {
+                  "title": "Dimmer",
+                  "enum": [
+                    "dimmer"
+                  ]
+                },
+                {
+                  "title": "Blind",
+                  "enum": [
+                    "blind"
+                  ]
+                },
+		{
+                  "title": "Blind with tilt angle",
+                  "enum": [
+                    "blind2"
+                  ]
+                },
+		{
+                  "title": "Garage",
+                  "enum": [
+                    "garage"
+                  ]
+                },
+		{
+                  "title": "Temperature",
+                  "enum": [
+                    "temperature"
+                  ]
+                },
+		{
+                  "title": "Humidity",
+                  "enum": [
+                    "humidity"
+                  ]
+                },
+		{
+                  "title": "Light sensor",
+                  "enum": [
+                    "lightSensor"
+                  ]
+                },
+		{
+                  "title": "Motion",
+                  "enum": [
+                    "motion"
+                  ]
+                },
+		{
+                  "title": "Leak",
+                  "enum": [
+                    "leak"
+                  ]
+                },
+		{
+                  "title": "Smoke sensor",
+                  "enum": [
+                    "smoke"
+                  ]
+                },
+		{
+                  "title": "Security",
+                  "enum": [
+                    "security"
+                  ]
+                },
+                {
+                  "title": "Exclude device",
+                  "enum": [
+                    "exclude"
+                  ]
+                }
+              ],
+              "required": true
+            }
+          }
+        }
       }
     }
   },
-  "layout": [  
+  "layout": [
     {
       "type": "fieldset",
       "title": "Basic settings",
@@ -190,12 +291,17 @@
         {
           "type": "flex",
           "flex-flow": "row wrap",
-          "items": ["url"]
+          "items": [
+            "url"
+          ]
         },
         {
           "type": "flex",
           "flex-flow": "row wrap",
-          "items": ["username", "password"]
+          "items": [
+            "username",
+            "password"
+          ]
         }
       ]
     },
@@ -209,17 +315,26 @@
         {
           "type": "flex",
           "flex-flow": "row wrap",
-          "items": ["pollerperiod", "securitysystem"]
+          "items": [
+            "pollerperiod",
+            "securitysystem"
+          ]
         },
         {
           "type": "flex",
           "flex-flow": "row wrap",
-          "items": ["addRoomNameToDeviceName", "doorbellDeviceId"]
+          "items": [
+            "addRoomNameToDeviceName",
+            "doorbellDeviceId"
+          ]
         },
         {
           "type": "flex",
           "flex-flow": "row wrap",
-          "items": ["thermostattimeout", "thermostatmaxtemperature"]
+          "items": [
+            "thermostattimeout",
+            "thermostatmaxtemperature"
+          ]
         }
       ]
     },
@@ -233,7 +348,9 @@
         {
           "type": "flex",
           "flex-flow": "row wrap",
-          "items": ["advControl"]
+          "items": [
+            "advControl"
+          ]
         }
       ]
     },
@@ -247,12 +364,18 @@
         {
           "type": "flex",
           "flex-flow": "row wrap",
-          "items": ["switchglobalvariables", "dimmerglobalvariables"]
+          "items": [
+            "switchglobalvariables",
+            "dimmerglobalvariables"
+          ]
         },
         {
           "type": "flex",
           "flex-flow": "row wrap",
-          "items": ["adminUsername", "adminPassword"]
+          "items": [
+            "adminUsername",
+            "adminPassword"
+          ]
         }
       ]
     },
@@ -266,8 +389,24 @@
         {
           "type": "flex",
           "flex-flow": "row wrap",
-          "items": ["name", "logsLevel"]
+          "items": [
+            "name",
+            "logsLevel"
+          ]
         }
+      ]
+    },
+    {
+      "type": "array",
+      "key": "devices",
+      "title": "Individual devices settings",
+      "description": "The ability to add individual settings for each device. Provide ID or type and choose as which device to display. This way you can also add any device that is not currently supported. Warning: Selecting incorrect type may cause errors. The changed device may not display correctly (e.g. display both as the old type and as a new one), in this situation, remove this device from the cache (Homebridge settings).",
+      "buttonText": "Add",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        "devices[].id",
+        "devices[].displayAs"
       ]
     }
   ],

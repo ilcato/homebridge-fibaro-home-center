@@ -8,6 +8,5 @@ export const API_URL_DEVICES = '/api/devices';
 export const API_URL_REFRESH_STATES = '/api/refreshStates';
 export const API_URL_GLOBAL_VARIABLES = '/api/globalVariables';
 
-// 
+//
 export const SECURITY_SYSTEM_GLOBAL_VARIABLE = 'SecuritySystem';
-
