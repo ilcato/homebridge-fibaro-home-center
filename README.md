@@ -315,6 +315,7 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 ### Version 2.0.0
 + The ability to add individual settings for each device. Provide device ID and choose as which device to display. This way you can also add any device that is currently not supported or exclude device.
++ Improved mechanism of device detection to support more new devices.
 + Bump dependencies.
 
 ### Version 1.7.5
