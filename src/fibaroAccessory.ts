@@ -41,7 +41,7 @@ export class FibaroAccessory {
         this.device.type :
         'HomeCenter Bridged Accessory'}`)
       .setCharacteristic(this.platform.Characteristic.SerialNumber,
-                         `${properties.serialNumber || '<unknown>'}, ID: ${this.device.id || '<unknown>'}`);
+        `${properties.serialNumber || '<unknown>'}, ID: ${this.device.id || '<unknown>'}`);
 
     let service;
     let subtype = this.device.id + '----';
