@@ -46,7 +46,7 @@
     "nodemon": "^3.0.2",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.5"
   },
   "homepage": "https://github.com/ilcato/homebridge-fibaro-home-center",
   "funding": [
