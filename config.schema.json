@@ -400,7 +400,7 @@
       "type": "array",
       "key": "devices",
       "title": "Individual devices settings",
-      "description": "The ability to add individual settings for each device. Provide ID or type and choose as which device to display. This way you can also add any device that is not currently supported.",
+      "description": "The ability to add individual settings for each device. Provide ID or type and choose as which device to display. This way you can also add any device that is not currently supported. Warning: Selecting incorrect type may cause errors. The changed device may not display correctly (e.g. display both as the old type and as a new one), in this situation, remove this device from the cache (Homebridge settings).",
       "buttonText": "Add",
       "expandable": true,
       "expanded": false,
