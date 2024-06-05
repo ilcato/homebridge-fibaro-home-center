@@ -54,12 +54,12 @@ export class FibaroAccessory {
 
     if (devConfig) {
       if (this.platform.config.logsLevel === 2) {
-        this.platform.log.info(`${this.device.name} [${IDs[0]}]: device config`);
+        this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${this.device.type}]: device found in config`);
       }
       switch (devConfig.displayAs) {
         case 'excluded':
            if (this.platform.config.logsLevel > 0) {
-             this.platform.log.info(`${this.device.name} [${IDs[0]}]: device excluded in config`);
+             this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${this.device.type}]: device excluded in config`);
            }
           this.isValid = false;
           return;
@@ -485,7 +485,7 @@ export class FibaroAccessory {
           break;
         default:
           if (this.platform.config.logsLevel > 0) {
-            this.platform.log.info(`${this.device.name} [${IDs[0]}]: device not supported`);
+            this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${this.device.type}]: device not supported`);
           }
           this.isValid = false;
           return;
