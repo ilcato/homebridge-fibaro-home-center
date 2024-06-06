@@ -88,8 +88,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
             "securitysystem": "PUT enabled OR disabled IN ORDER TO MANAGE THE AVAILABILITY OF THE SECURITY SYSTEM",
             "addRoomNameToDeviceName" : "PUT enabled OR disabled IN ORDER TO ADD THE ROOM NAME TO DEVICE NAME. DEFAULT disabled",
             "doorbellDeviceId" : "PUT HOME CENTER BINARY SENSOR DEVICE ID ACTING AS A DOORBELL",
-            "logsLevel": "PUT THE DESIRED LOG LEVEL: 0 DISABLED, 1 ONLY CHANGES, 2 ALL",
-            "advControl": "0 - DISABLED, 1-ENABLED"
+            "logsLevel": "PUT THE DESIRED LOG LEVEL: 0 DISABLED, 1 ONLY CHANGES, 2 ALL"
         }
     ],
 
@@ -109,7 +108,6 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 + `addRoomNameToDeviceName` : If enabled, to each device name will be added the name of the room in which it is located. Default: disabled.
 + `doorbellDeviceId` : home center binary sensor device id acting as a doorbell
 + `logsLevel` : desired log level: 0 disabled, 1 only changes, 2 all
-+ `advControl` : enable if you want the device type in homekit to depend on how the device role in fibaro is selected. 0-disabled, 1-enabled
 
 </details>
 
@@ -149,39 +147,6 @@ The ability to add individual settings for each device. Provide device ID and ch
 
 
 # Manuals
-
-<details>
-<summary><b>Advanced Control</b></summary>
-
-Now you can enable new option in plugin settings if you want the device type in Homekit to depend on how the device role in Fibaro is selected. For devices like Switch, Double Switch, Smart Implant, Wall Plug etc. you can change how it will display in Homekit - in the Fibaro panel go to this device and check field Role (or What controls the device).
-+ Selecting Light should set device as Light,
-+ selecting "Other" / "Another device" should set the device as Switch,
-+ selecting Sprinkler or Valve should set device as Valve,
-+ and any other case will be Outlet.
-
-#### Important
-Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). It is recommended to turn off Apple hubs during changes. If device displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
-
-#### What it changed
-
-| Product group  | Role (in Fibaro panel) | Displayed in HomeKit (Advanced Control Disabled) | Displayed in HomeKit (Advanced Control Enabled) | Changed (Yes / No) |
-| ------------------------ | --------------------- | ------------------------ | ------------------------ | ------------------------ |
-| Binary                   | Light                 | Light                    | Light                    | no                       |
-| Binary                   | Other (on HC2)        | Outlet                   | Switch                   | yes                      |
-| Binary                   | Other (on HC3)        | Switch                   | Switch                   | no                       |
-| Binary                   | Sprinkler             | Switch                   | Valve                    | yes                      |
-| Binary                   | Valve                 | Valve                    | Valve                    | no                       |
-| Binary                   | Default               | Switch                   | Outlet                   | yes                      |
-| Wall Plug                | Light                 | Outlet                   | Light                    | yes                      |
-| Wall Plug                | Other (on HC2)        | Outlet                   | Switch                   | yes                      |
-| Wall Plug                | Other (on HC3)        | Outlet                   | Switch                   | yes                      |
-| Wall Plug                | Sprinkler             | Outlet                   | Valve                    | yes                      |
-| Wall Plug                | Valve                 | Outlet                   | Valve                    | yes                      |
-| Wall Plug                | Default               | Outlet                   | Outlet                   | no                       |
-
-</details>
-
-
 
 <details>
 <summary><b>Exclude devices</b></summary>
@@ -282,8 +247,8 @@ You can run this plugin as child bridge, that is an isolated process. There are 
 <details>
 <summary><b>The device is displayed incorrectly or doesn't display at all</b></summary>
     
-+ For some devices, responsible for the display method is field Role (for a given device in the Fibaro Panel). Check [Advanced Control](https://github.com/ilcato/homebridge-Fibaro-home-center/blob/main/docs/advcontrol.md).
-+ If device still displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
+
++ If device displays incorrectly (e.g. as Switch but should be Outlet) or doubled (one device is displayed as two), you must remove this device from cache (in Homebridge Settings). Unfortunately, in this case, the settings for this device will most likely be lost (room selection, automations, etc.).
 + Every change of devices display type (e.g. from Switch to Outlet etc.) can make it display incorrectly (like doubled). It is recommended to turn off Apple hubs during changes.
 
 </details>
@@ -313,8 +278,11 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 # Latest release notes
 
 ### Version 2.0.0
+Warning! Read carefully before updating!
+
 + The ability to add individual settings for each device. Provide device ID and choose as which device to display. This way you can also add any device that is currently not supported or exclude device.
 + Improved mechanism of device detection to support more new devices.
++ Removed Advanced Control. If you have Advanced Control enabled before the update, nothing will change, if not, some devices can change the way they are displayed. This may require removal from the cache and/or reconfiguration in HomeKit. You can individually change the display way for each device.
 + Bump dependencies.
 
 ### Version 1.7.5
