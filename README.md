@@ -256,7 +256,7 @@ You can run this plugin as child bridge, that is an isolated process. There are 
 <details>
 <summary><b>Get API response for device</b></summary>
 
-Open in browser: http://FIBARO-IP/api/devices/DEVICE-ID (replace FIBARO-IP with your Home Center IP and DEVICE-ID with device ID) and login.
+Open in browser: http://FIBARO-IP/api/devices/DEVICE-ID (replace FIBARO-IP with your Home Center IP and DEVICE-ID with device ID) and login. Device ID you can check in Fibaro panel or directly in HomeKit device information (serial number field). 
 
 </details>
 
