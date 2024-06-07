@@ -40,7 +40,8 @@ export class FibaroAccessory {
       .setCharacteristic(this.platform.Characteristic.Model, `${this.device.type.length > 1 ?
         this.device.type :
         'HomeCenter Bridged Accessory'}`)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, `${properties.serialNumber || '<unknown>'}`);
+      .setCharacteristic(this.platform.Characteristic.SerialNumber,
+        `${properties.serialNumber || '<unknown>'}, ID: ${this.device.id || '<unknown>'}`);
 
     let service;
     let subtype = this.device.id + '----';
@@ -176,72 +177,39 @@ export class FibaroAccessory {
         case (type === 'com.fibaro.developer.bxs.virtualBinarySwitch'):
         case (type === 'com.fibaro.satelOutput'):
         case (type === 'com.fibaro.FGWDS221'):
-          if (this.platform.config.advControl === 1) {
-            switch (controlType) {
-              case 2: // Lighting
-              case 5: // Bedside Lamp
-              case 7: // Wall Lamp
-                service = this.platform.Service.Lightbulb;
-                this.mainCharacteristics = [this.platform.Characteristic.On];
-                break;
-              case 1: // Other device
-              case 20: // Other device
-                service = this.platform.Service.Switch;
-                this.mainCharacteristics = [this.platform.Characteristic.On];
-                break;
-              case 24: // Video intercom
-              case 25: // Video gate open
-                service = this.platform.Service.LockMechanism;
-                subtype = device.id + '--' + 'LOCK';
-                this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
-                break;
-              case 3: // sprinkler
-              case 26: // valve
-                service = this.platform.Service.Valve;
-                this.mainCharacteristics = [
-                  this.platform.Characteristic.Active,
-                  this.platform.Characteristic.InUse,
-                  this.platform.Characteristic.ValveType,
-                ];
-                break;
-              default:
-                service = this.platform.Service.Outlet;
-                this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
-                break;
-            }
-            break;
-          } else {
-            switch (controlType) {
-              case 2: // Lighting
-              case 5: // Bedside Lamp
-              case 7: // Wall Lamp
-                service = this.platform.Service.Lightbulb;
-                this.mainCharacteristics = [this.platform.Characteristic.On];
-                break;
-              case 20: // Other device
-                service = this.platform.Service.Outlet;
-                this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
-                break;
-              case 25: // Video gate open
-                service = this.platform.Service.LockMechanism;
-                subtype = device.id + '--' + 'LOCK';
-                this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
-                break;
-              case 26: // valve
-                service = this.platform.Service.Valve;
-                this.mainCharacteristics = [
-                  this.platform.Characteristic.Active,
-                  this.platform.Characteristic.InUse,
-                  this.platform.Characteristic.ValveType,
-                ];
-                break;
-              default:
-                service = this.platform.Service.Switch;
-                this.mainCharacteristics = [this.platform.Characteristic.On];
-                break;
-            }
-            break;
+          switch (controlType) {
+            case 2: // Lighting
+            case 5: // Bedside Lamp
+            case 7: // Wall Lamp
+              service = this.platform.Service.Lightbulb;
+              this.mainCharacteristics = [this.platform.Characteristic.On];
+              break;
+            case 1: // Other device
+            case 20: // Other device
+              service = this.platform.Service.Switch;
+              this.mainCharacteristics = [this.platform.Characteristic.On];
+              break;
+            case 24: // Video intercom
+            case 25: // Video gate open
+              service = this.platform.Service.LockMechanism;
+              subtype = device.id + '--' + 'LOCK';
+              this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
+              break;
+            case 3: // sprinkler
+            case 26: // valve
+              service = this.platform.Service.Valve;
+              this.mainCharacteristics = [
+                this.platform.Characteristic.Active,
+                this.platform.Characteristic.InUse,
+                this.platform.Characteristic.ValveType,
+              ];
+              break;
+            default:
+              service = this.platform.Service.Outlet;
+              this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
+              break;
           }
+          break;
         // Light / Switch / Outlet / Valve
         // for Wall Plug etc.
         case (type.startsWith('com.fibaro.FGWP')):
@@ -252,45 +220,39 @@ export class FibaroAccessory {
         case (type === 'com.fibaro.FGWPG111'):
         case (type === 'com.fibaro.FGWPG121'):
         case (type === 'com.fibaro.FGWOEF011'):
-          if (this.platform.config.advControl === 1) {
-            switch (controlType) {
-              case 2: // Lighting
-              case 5: // Bedside Lamp
-              case 7: // Wall Lamp
-                service = this.platform.Service.Lightbulb;
-                this.mainCharacteristics = [this.platform.Characteristic.On];
-                break;
-              case 1: // Other device
-              case 20: // Other device
-                service = this.platform.Service.Switch;
-                this.mainCharacteristics = [this.platform.Characteristic.On];
-                break;
-              case 24: // Video intercom
-              case 25: // Video gate open
-                service = this.platform.Service.LockMechanism;
-                subtype = device.id + '--' + 'LOCK';
-                this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
-                break;
-              case 3: // sprinkler
-              case 26: // valve
-                service = this.platform.Service.Valve;
-                this.mainCharacteristics = [
-                  this.platform.Characteristic.Active,
-                  this.platform.Characteristic.InUse,
-                  this.platform.Characteristic.ValveType,
-                ];
-                break;
-              default:
-                service = this.platform.Service.Outlet;
-                this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
-                break;
-            }
-            break;
-          } else {
-            service = this.platform.Service.Outlet;
-            this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
-            break;
+          switch (controlType) {
+            case 2: // Lighting
+            case 5: // Bedside Lamp
+            case 7: // Wall Lamp
+              service = this.platform.Service.Lightbulb;
+              this.mainCharacteristics = [this.platform.Characteristic.On];
+              break;
+            case 1: // Other device
+            case 20: // Other device
+              service = this.platform.Service.Switch;
+              this.mainCharacteristics = [this.platform.Characteristic.On];
+              break;
+            case 24: // Video intercom
+            case 25: // Video gate open
+              service = this.platform.Service.LockMechanism;
+              subtype = device.id + '--' + 'LOCK';
+              this.mainCharacteristics = [this.platform.Characteristic.LockCurrentState, this.platform.Characteristic.LockTargetState];
+              break;
+            case 3: // sprinkler
+            case 26: // valve
+              service = this.platform.Service.Valve;
+              this.mainCharacteristics = [
+                this.platform.Characteristic.Active,
+                this.platform.Characteristic.InUse,
+                this.platform.Characteristic.ValveType,
+              ];
+              break;
+            default:
+              service = this.platform.Service.Outlet;
+              this.mainCharacteristics = [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse];
+              break;
           }
+          break;
         // Window Covering / Garage door
         case (type.startsWith('com.fibaro.FGR') && !type.startsWith('com.fibaro.FGRGBW')):
         case (type.startsWith('com.fibaro.FGRM')):
