@@ -152,7 +152,7 @@ The ability to add individual settings for each device. Provide device ID and ch
 <summary><b>Exclude devices</b></summary>
 
 Exclude one or more devices:
-+ add id or type of this device in plugin settings and select display as: 'exclude'
++ add id of this device in plugin settings and select display as: 'exclude'
 + or use a specific user (not an admin one) and grant access to only the needed devices
 + or rename the device you want to exclude with an initial _ character.
 
@@ -282,7 +282,7 @@ Warning! Read carefully before updating!
 
 + The ability to add individual settings for each device. Provide device ID and choose as which device to display. This way you can also add any device that is currently not supported or exclude device.
 + Improved mechanism of device detection to support more new devices.
-+ Removed Advanced Control. If you have Advanced Control enabled before the update, nothing will change, if not, some devices can change the way they are displayed. This may require removal from the cache and/or reconfiguration in HomeKit. You can individually change the display way for each device.
++ Removed Advanced Control. If you have Advanced Control enabled before the update, nothing will change, if not, some devices can change the way they are displayed (this may require removal from the cache in Homebridge settings and/or reconfiguration in HomeKit). Now you can individually change the way that each device display.
 + Bump dependencies.
 
 ### Version 1.7.5
