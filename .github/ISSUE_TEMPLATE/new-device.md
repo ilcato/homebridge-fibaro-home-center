@@ -13,7 +13,7 @@ assignees: ''
 **API response for this device:**
 
 ```
-Past here response API response for this device. To get API response, open in browser: http://FIBARO-IP/api/devices/DEVICE-ID (replace FIBARO-IP with your Home Center IP and DEVICE-ID with device ID) and login.
+Past here response API response for this device. To get API response, open in browser: http://FIBARO-IP/api/devices/DEVICE-ID (replace FIBARO-IP with your Home Center IP and DEVICE-ID with device ID) and login. Device ID you can check in Fibaro panel or directly in HomeKit device information (serial number field).
 ```
 
 **As what should be displayed?:**
