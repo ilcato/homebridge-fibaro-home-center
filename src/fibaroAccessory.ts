@@ -129,6 +129,12 @@ export class FibaroAccessory {
             this.platform.Characteristic.SecuritySystemTargetState];
           subtype = '0--';
           break;
+        case 'airQualitySensorPm25':
+          service = this.platform.Service.AirQualitySensor;
+          this.mainCharacteristics = [this.platform.Characteristic.AirQuality,
+            this.platform.Characteristic.PM2_5Density];
+          subtype = device.id + '--PM2_5';
+          break;
         default:
           service = this.platform.Service.Switch;
           this.mainCharacteristics = [this.platform.Characteristic.On];
@@ -510,6 +516,9 @@ export class FibaroAccessory {
       if (characteristic.UUID === this.platform.Characteristic.ValveType.UUID) {
         characteristic.value = this.platform.Characteristic.ValveType.GENERIC_VALVE;
       }
+      if (characteristic.UUID === this.platform.Characteristic.AirQuality.UUID) {
+        characteristic.value = this.platform.Characteristic.AirQuality.UNKNOWN;
+      }
       this.bindCharacteristicEvents(characteristic, service);
     }
   }
@@ -532,6 +541,7 @@ export class FibaroAccessory {
     service.isClimateZone = (IDs.length >= 3 && IDs[2] === 'CZ') ? true : false;
     service.isHeatingZone = (IDs.length >= 3 && IDs[2] === 'HZ') ? true : false;
     service.isOpenCloseOnly = (IDs.length >= 3 && IDs[2] === 'OPENCLOSEONLY') ? true : false;
+    service.isPM2_5Sensor = (IDs.length >= 3 && IDs[2] === 'PM2_5') ? true : false;
     if (!service.isVirtual && !service.isScene
       && characteristic.UUID !== this.platform.Characteristic.ValveType.UUID) {
       let propertyChanged = 'value'; // subscribe to the changes of this property
