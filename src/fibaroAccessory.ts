@@ -359,6 +359,9 @@ export class FibaroAccessory {
           if (properties.deviceRole === 'MotionSensor') {
             service = this.platform.Service.MotionSensor;
             this.mainCharacteristics = [this.platform.Characteristic.MotionDetected];
+          } else if (properties.deviceRole === 'PresenceSensor') {
+            service = this.platform.Service.OccupancySensor;
+            this.mainCharacteristics = [this.platform.Characteristic.OccupancyDetected];
           } else if (this.device.id === this.platform.config.doorbellDeviceId) {
             service = this.platform.Service.Doorbell;
             this.mainCharacteristics = [this.platform.Characteristic.ProgrammableSwitchEvent];

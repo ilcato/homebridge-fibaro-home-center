@@ -37,6 +37,7 @@ export class GetFunctions {
       [Characteristic.CurrentHorizontalTiltAngle.UUID, this.getCurrentTiltAngle],
       [Characteristic.TargetHorizontalTiltAngle.UUID, this.getCurrentTiltAngle],
       [Characteristic.MotionDetected.UUID, this.getBool],
+      [Characteristic.OccupancyDetected.UUID, this.getBool],
       [Characteristic.CurrentTemperature.UUID, this.getCurrentTemperature || 0],
       [Characteristic.TargetTemperature.UUID, this.getTargetTemperature || 0],
       [Characteristic.CurrentRelativeHumidity.UUID, this.getFloat],
