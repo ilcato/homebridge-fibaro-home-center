@@ -89,7 +89,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 + `adminPassword` (string) : Admin password of your home center, needed only to set global variables.
 + `securitysystem` (string) : Set 'enabled' or 'disabled' in order to manage the availability of the security system.
 + `addRoomNameToDeviceName` (string) : Set 'enabled' or 'disabled'. If enabled, to each device name will be added the name of the room in which it is located. Default: disabled.
-+ `doorbellDeviceId` (integer) : Home Center binary sensor device id acting as a doorbell.
++ `doorbellDeviceId` (string) : Home Center binary sensor device id acting as a doorbell.
 + `logsLevel` (integer) : Desired log level: 0 disabled, 1 only changes, 2 all.
 
 #### Individual for each device
