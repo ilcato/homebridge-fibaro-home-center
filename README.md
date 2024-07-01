@@ -222,11 +222,13 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 # Contributing and support
 
-- Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-center/issues) or [Pull Request](https://github.com/ilcato/homebridge-fibaro-home-center/pulls)
+Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-center/issues) or [Pull Request](https://github.com/ilcato/homebridge-fibaro-home-center/pulls)
 
 # Disclaimer
 
-- This is not the official Fibaro plugin. The plugin uses the official API. Despite the efforts made, the operation of the plugin is without any guarantees and at your own risk.
+- This is not the official Fibaro plugin but it uses the official Fibaro API. 
+- Despite the efforts made, the operation of the plugin is without any guarantees and at your own risk.
+- All product and company names are trademarks™ or registered® trademarks of their respective holders. Use of them does not imply any affiliation with or endorsement by them.
 
 # Latest release notes
 
