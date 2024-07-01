@@ -43,7 +43,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
       "name": "FibaroHC",
       "url": "192.168.1.100",
       "username": "mail@domain.com",
-      "password": "HCpassword123",
+      "password": "your-password",
       "pollerperiod": 3,
       "thermostattimeout": 7200
       "thermostatmaxtemperature": 100,
