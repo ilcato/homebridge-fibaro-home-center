@@ -31,23 +31,45 @@ This plugin can be easily installed through Homebridge UI or via [NPM](https://w
 # Configuration
 Configure the plugin through the settings UI or directly in the JSON editor.
 
-#### Required:
+<details>
+<summary><b>config.json example</b></summary>
 
 ```json
+
 {
   "platforms": [
     {
-        "platform": "FibaroHC",
-        "name": "FibaroHC",
-        "url": "PUT URL OR IP OF YOUR HOME CENTER HERE CONTAINING PROTOCOL AND NAME E.G.: https://hc-00000XXX.local OR IP E.G.: 192.168.1.100",
-        "username": "PUT USERNAME OF YOUR HOME CENTER HERE",
-        "password": "PUT PASSWORD OF YOUR HOME CENTER HERE"
+      "platform": "FibaroHC",
+      "name": "FibaroHC",
+      "url": "192.168.1.100",
+      "username": "mail@domain.com",
+      "password": "HCpassword123",
+      "pollerperiod": 3,
+      "thermostattimeout": 7200
+      "thermostatmaxtemperature": 100,
+      "switchglobalvariables": "24,78,54"
+      "dimmerglobalvariables": "12,56,81",
+      "adminUsername": "admin_name",
+      "adminPassword": "admin_password",
+      "securitysystem": "enabled",
+      "addRoomNameToDeviceName" : "disabled",
+      "doorbellDeviceId" : "21,88",
+      "logsLevel": 1,
+      "devices": [
+        {
+          "id": 42,
+          "displayAs": "switch",
+        },
+        {
+          "id": 58,
+          "displayAs": "exclude",
+        }
+      ]
     }
   ]
 }
-
 ```
-
+#### Basic fields (required)
 + `url` : url or IP of your Home Center / Yubii Home. Using https may be mandatory if you configured HC to use it. Examples:
   + `192.168.1.100` - replace with your IP
   + `https://hc-00000XXX.local` - replace with your HC serial, get ca.cer file from HC and put it in Homebridge in same folder as config.json
@@ -55,48 +77,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 + `username` : username of your Home Center / Yubii Home
 + `password` : password of your Home Center / Yubii Home
 
-
-<details>
-<summary><b>Advanced settings</b></summary>
-
-```json
-
-{
-    "bridge": {
-        "name": "Homebridge",
-        "username": "CC:22:3D:E3:CE:30",
-        "port": 51826,
-        "pin": "031-45-154"
-    },
-    
-    "description": "This is an example configuration file. You can use this as a template for creating your own configuration file.",
-
-    "platforms": [
-        {
-            "platform": "FibaroHC",
-            "name": "FibaroHC",
-            "url": "PUT URL OR IP OF YOUR HOME CENTER HERE CONTAINING PROTOCOL AND NAME E.G.: https://hc-00000XXX.local OR IP E.G.: 192.168.1.100",
-            "username": "PUT USERNAME OF YOUR HOME CENTER HERE",
-            "password": "PUT PASSWORD OF YOUR HOME CENTER HERE",
-            "pollerperiod": "PUT 0 FOR DISABLING POLLING (REFRESH INTERVAL), 1 - 100 INTERVAL IN SECONDS. 3 SECONDS IS THE DEFAULT",
-            "thermostattimeout": "NUMBER OF SECONDS FOR THERMOSTAT TIMEOUT, DEFAULT: 7200 (2 HOURS)"
-            "thermostatmaxtemperature": "SET MAX TEMPERATURE FOR THERMOSTATIC DEVICES (DEFAULT 100C)",
-            "switchglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A BISTABLE SWITCH",
-            "dimmerglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A DIMMER",
-            "adminUsername": "PUT ADMIN USERNAME OF YOUR HOME CENTER HERE TO SET GLOBAL VARIABLES",
-            "adminPassword": "PUT ADMIN PASSWORD OF YOUR HOME CENTER HERE TO SET GLOBAL VARIABLES",
-            "securitysystem": "PUT enabled OR disabled IN ORDER TO MANAGE THE AVAILABILITY OF THE SECURITY SYSTEM",
-            "addRoomNameToDeviceName" : "PUT enabled OR disabled IN ORDER TO ADD THE ROOM NAME TO DEVICE NAME. DEFAULT disabled",
-            "doorbellDeviceId" : "PUT HOME CENTER BINARY SENSOR DEVICE ID ACTING AS A DOORBELL",
-            "logsLevel": "PUT THE DESIRED LOG LEVEL: 0 DISABLED, 1 ONLY CHANGES, 2 ALL"
-        }
-    ],
-
-    "accessories": [
-    ]
-}
-```
-    
+#### Advanced
 + `pollerperiod` : Polling interval (refresh interval) for querying Fibaro Home Center (0: disabled, recomended: 3, 1 or 2 seconds allows for a more responsive update of the Home app when changes appear outside the HomeKit environment). If it is disabled the Home app is not updated automatically when such a change happen but only when you close a panel and reopen it. Enabling this option is useful to read the new state when controlling devices outside HomeKit, E.G.: via Fibaro, physical buttons, scenes and automations.
 + `thermostatmaxtemperature` : set max temperature for thermostatic devices (default 100 C)
 + `thermostattimeout` : number of seconds for the thermostat timeout, default: 7200 (2 hours)
@@ -109,41 +90,11 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 + `doorbellDeviceId` : home center binary sensor device id acting as a doorbell
 + `logsLevel` : desired log level: 0 disabled, 1 only changes, 2 all
 
-</details>
-
-
-<details>
-<summary><b>Individual device settings</b></summary>
-
-The ability to add individual settings for each device. Provide device ID and choose as which device to display. This way you can also add any device that is not currently supported pr exclude device. 
+#### Individual for each device
 + `id` : device ID (like: 42).
 + `displayAS` : display as: switch, dimmer, etc. or exclude device.
 
-```json
-{
-  "platforms": [
-    {
-        "platform": "FibaroHC",
-        "name": "FibaroHC",
-        "url": "PUT URL OR IP OF YOUR HOME CENTER HERE CONTAINING PROTOCOL AND NAME E.G.: https://hc-00000XXX.local OR IP E.G.: 192.168.1.100",
-        "username": "PUT USERNAME OF YOUR HOME CENTER HERE",
-        "password": "PUT PASSWORD OF YOUR HOME CENTER HERE",
-        "devices": [
-                {
-                    "id": 42,
-                    "displayAs": "switch",
-                },
-                {
-                    "id": 58,
-                    "displayAs": "exclude",
-                }
-            ]
-    }
-  ]
-}
-```
 </details>
-
 
 
 # Manuals
