@@ -246,6 +246,12 @@
                   ]
                 },
                 {
+                  "title": "Air Quality Sensor - PM2.5",
+                  "enum": [
+                    "airQualitySensorPm25"
+                  ]
+                },
+                {
                   "title": "Exclude device",
                   "enum": [
                     "exclude"
