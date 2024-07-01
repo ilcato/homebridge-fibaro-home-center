@@ -47,8 +47,8 @@ Configure the plugin through the settings UI or directly in the JSON editor.
       "pollerperiod": 3,
       "thermostattimeout": 7200
       "thermostatmaxtemperature": 100,
-      "switchglobalvariables": "24,78,54"
-      "dimmerglobalvariables": "12,56,81",
+      "switchglobalvariables": "name1,name2,name3"
+      "dimmerglobalvariables": "name1,name2,name3",
       "adminUsername": "admin_name",
       "adminPassword": "admin_password",
       "securitysystem": "enabled",
@@ -83,8 +83,8 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 + `pollerperiod` (integer) : Polling interval (refresh interval) for querying Fibaro Home Center (0: disabled, recomended: 3, 1 or 2 seconds allows for a more responsive update of the Home app when changes appear outside the HomeKit environment). If it is disabled the Home app is not updated automatically when such a change happen but only when you close a panel and reopen it. Enabling this option is useful to read the new state when controlling devices outside HomeKit, E.G.: via Fibaro, physical buttons, scenes and automations.
 + `thermostatmaxtemperature` (integer) : Set max temperature for thermostatic devices (default 100 C).
 + `thermostattimeout` (integer) : Number of seconds for the thermostat timeout, default: 7200 (2 hours).
-+ `switchglobalvariables` (string) : Comma separated list of home center global variables acting like a bistable switch.
-+ `dimmerglobalvariables` (string) : Comma separated list of home center global variables acting like a dimmer.
++ `switchglobalvariables` (string) : Comma separated list of home center global variables names acting like a bistable switch.
++ `dimmerglobalvariables` (string) : Comma separated list of home center global variables names acting like a dimmer.
 + `adminUsername` (string) : Admin username of your home center, needed only to set global variables.
 + `adminPassword` (string) : Admin password of your home center, needed only to set global variables.
 + `securitysystem` (string) : Set 'enabled' or 'disabled' in order to manage the availability of the security system.
