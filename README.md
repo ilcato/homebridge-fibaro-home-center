@@ -71,28 +71,30 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 ```
 #### Basic fields (required)
 + `url` : url or IP of your Home Center / Yubii Home. Using https may be mandatory if you configured HC to use it. Examples:
-  + `192.168.1.100` - replace with your IP
-  + `https://hc-00000XXX.local` - replace with your HC serial, get ca.cer file from HC and put it in Homebridge in same folder as config.json
-  + `http://hc-00000XXX.local` - replace with your HC serial
-+ `username` : username of your Home Center / Yubii Home
-+ `password` : password of your Home Center / Yubii Home
+  + `192.168.1.100` - replace with your IP,
+  + `https://hc-00000XXX.local` - replace with your HC serial, get ca.cer file from HC and put it in Homebridge in same folder as config.json,
+  + `http://hc-00000XXX.local` - replace with your HC serial.
++ `username` : username of your Home Center / Yubii Home.
++ `password` : password of your Home Center / Yubii Home.
++ `platform` : platform name, must be 'FibaroHC'.
++ `name`: name of the plugin displayed in Homebridge log and as plugin bridge name, default 'FibaroHC'.
 
 #### Advanced
 + `pollerperiod` : Polling interval (refresh interval) for querying Fibaro Home Center (0: disabled, recomended: 3, 1 or 2 seconds allows for a more responsive update of the Home app when changes appear outside the HomeKit environment). If it is disabled the Home app is not updated automatically when such a change happen but only when you close a panel and reopen it. Enabling this option is useful to read the new state when controlling devices outside HomeKit, E.G.: via Fibaro, physical buttons, scenes and automations.
-+ `thermostatmaxtemperature` : set max temperature for thermostatic devices (default 100 C)
-+ `thermostattimeout` : number of seconds for the thermostat timeout, default: 7200 (2 hours)
-+ `switchglobalvariables` : comma separated list of home center global variables acting like a bistable switch
-+ `dimmerglobalvariables` : comma separated list of home center global variables acting like a dimmer
-+ `adminUsername`: admin username of your home center, needed only to set global variables,
-+ `adminPassword`: admin password of your home center, needed only to set global variables,
-+ `securitysystem` : enabled or disabled in order to manage the availability of the security system
-+ `addRoomNameToDeviceName` : If enabled, to each device name will be added the name of the room in which it is located. Default: disabled.
-+ `doorbellDeviceId` : home center binary sensor device id acting as a doorbell
-+ `logsLevel` : desired log level: 0 disabled, 1 only changes, 2 all
++ `thermostatmaxtemperature` : Set max temperature for thermostatic devices (default 100 C).
++ `thermostattimeout` : Number of seconds for the thermostat timeout, default: 7200 (2 hours).
++ `switchglobalvariables` : Comma separated list of home center global variables acting like a bistable switch.
++ `dimmerglobalvariables` : Comma separated list of home center global variables acting like a dimmer.
++ `adminUsername`: Admin username of your home center, needed only to set global variables.
++ `adminPassword`: Admin password of your home center, needed only to set global variables.
++ `securitysystem` : Set 'enabled' or 'disabled' in order to manage the availability of the security system.
++ `addRoomNameToDeviceName` : Set 'enabled' or 'disabled'. If enabled, to each device name will be added the name of the room in which it is located. Default: disabled.
++ `doorbellDeviceId` : Home Center binary sensor device id acting as a doorbell.
++ `logsLevel` : Desired log level: 0 disabled, 1 only changes, 2 all.
 
 #### Individual for each device
-+ `id` : device ID (like: 42).
-+ `displayAS` : display as: switch, dimmer, etc. or exclude device.
++ `id` : Device ID (like: 42).
++ `displayAS` : Display as: switch, dimmer, etc. or exclude device.
 
 </details>
 
