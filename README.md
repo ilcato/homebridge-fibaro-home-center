@@ -239,15 +239,4 @@ Warning! Read carefully before updating!
 + Removed Advanced Control. If you have Advanced Control enabled before the update, nothing will change, if not, some devices can change the way they are displayed (this may require removal from the cache in Homebridge settings and/or reconfiguration in HomeKit). Now you can individually change the way that each device display.
 + Bump dependencies.
 
-### Version 1.7.5
-+ Added new Fibaro "Roller Shutter com.fibaro.FGR224"
-+ Bump dependencies
-
-### Version 1.7.4
-+ Manage Satel motion sensor
-+ Manage heating/climate zone id collision
-+ Small refactoring
-+ Bump dependencies
-
-
 #### See all: [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)
