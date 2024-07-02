@@ -516,7 +516,7 @@ export class GetFunctions {
     // https://www.epa.gov/system/files/documents/2024-02/pm-naaqs-air-quality-index-fact-sheet.pdf
     if (_service.isPM2_5Sensor) {
       if (v <= 5) {
-        characteristic.updateValue(this.platform.Characteristic.AirQuality.EXCELENT);
+        characteristic.updateValue(this.platform.Characteristic.AirQuality.EXCELLENT);
       } else if (v < 9.1) {
         characteristic.updateValue(this.platform.Characteristic.AirQuality.GOOD);
       } else if ( v < 35.5) {
