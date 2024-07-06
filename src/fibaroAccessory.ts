@@ -310,7 +310,7 @@ export class FibaroAccessory {
               this.platform.Characteristic.TargetDoorState,
               this.platform.Characteristic.ObstructionDetected];
           break;
-        // Thermostat  
+        // Thermostat
         case (type === 'com.fibaro.hvacSystem'):
         case (type === 'com.fibaro.hvacSystemAuto'):
         case (type === 'com.fibaro.FGT001'):
