@@ -37,6 +37,7 @@ export class GetFunctions {
       [Characteristic.CurrentHorizontalTiltAngle.UUID, this.getCurrentTiltAngle],
       [Characteristic.TargetHorizontalTiltAngle.UUID, this.getCurrentTiltAngle],
       [Characteristic.MotionDetected.UUID, this.getBool],
+      [Characteristic.OccupancyDetected.UUID, this.getBool],
       [Characteristic.CurrentTemperature.UUID, this.getCurrentTemperature || 0],
       [Characteristic.TargetTemperature.UUID, this.getTargetTemperature || 0],
       [Characteristic.CurrentRelativeHumidity.UUID, this.getFloat],
@@ -64,6 +65,8 @@ export class GetFunctions {
       [Characteristic.Active.UUID, this.getActive],
       [Characteristic.InUse.UUID, this.getInUse],
       [Characteristic.ProgrammableSwitchEvent.UUID, this.getProgrammableSwitchEvent],
+      [Characteristic.AirQuality.UUID, this.getAirQuality],
+      [Characteristic.PM2_5Density.UUID, this.getFloat],
     ]);
 
     this.getCurrentSecuritySystemStateMapping = new Map([
@@ -504,6 +507,25 @@ export class GetFunctions {
     const v = this.getBoolean(properties.value);
     if (v) {
       characteristic.updateValue(this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
+    }
+  }
+
+  getAirQuality(characteristic, _service, _IDs, properties) {
+    const v = parseFloat(properties.value);
+    // 2024 AQI for PM 2.5
+    // https://www.epa.gov/system/files/documents/2024-02/pm-naaqs-air-quality-index-fact-sheet.pdf
+    if (_service.isPM2_5Sensor) {
+      if (v <= 5) {
+        characteristic.updateValue(this.platform.Characteristic.AirQuality.EXCELLENT);
+      } else if (v < 9.1) {
+        characteristic.updateValue(this.platform.Characteristic.AirQuality.GOOD);
+      } else if ( v < 35.5) {
+        characteristic.updateValue(this.platform.Characteristic.AirQuality.FAIR);
+      } else if ( v < 55.5) {
+        characteristic.updateValue(this.platform.Characteristic.AirQuality.INFERIOR);
+      } else {
+        characteristic.updateValue(this.platform.Characteristic.AirQuality.POOR);
+      }
     }
   }
 
