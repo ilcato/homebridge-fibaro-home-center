@@ -234,6 +234,7 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 
 ### Version 2.1.0
 
+- Support for Thermostats, Heat controllers etc.
 - Support for air quality sensor (PM2.5).
 - Support for presence sensor.
 - Fixes for small bugs.
