@@ -31,119 +31,72 @@ This plugin can be easily installed through Homebridge UI or via [NPM](https://w
 # Configuration
 Configure the plugin through the settings UI or directly in the JSON editor.
 
-#### Required:
+<details>
+<summary><b>config.json example</b></summary>
 
 ```json
+
 {
   "platforms": [
     {
-        "platform": "FibaroHC",
-        "name": "FibaroHC",
-        "url": "PUT URL OR IP OF YOUR HOME CENTER HERE CONTAINING PROTOCOL AND NAME E.G.: https://hc-00000XXX.local OR IP E.G.: 192.168.1.100",
-        "username": "PUT USERNAME OF YOUR HOME CENTER HERE",
-        "password": "PUT PASSWORD OF YOUR HOME CENTER HERE"
-    }
-  ]
-}
-
-```
-
-+ `url` : url or IP of your Home Center / Yubii Home. Using https may be mandatory if you configured HC to use it. Examples:
-  + `192.168.1.100` - replace with your IP
-  + `https://hc-00000XXX.local` - replace with your HC serial, get ca.cer file from HC and put it in Homebridge in same folder as config.json
-  + `http://hc-00000XXX.local` - replace with your HC serial
-+ `username` : username of your Home Center / Yubii Home
-+ `password` : password of your Home Center / Yubii Home
-
-
-<details>
-<summary><b>Advanced settings</b></summary>
-
-```json
-
-{
-    "bridge": {
-        "name": "Homebridge",
-        "username": "CC:22:3D:E3:CE:30",
-        "port": 51826,
-        "pin": "031-45-154"
-    },
-    
-    "description": "This is an example configuration file. You can use this as a template for creating your own configuration file.",
-
-    "platforms": [
+      "platform": "FibaroHC",
+      "name": "FibaroHC",
+      "url": "192.168.1.100",
+      "username": "mail@domain.com",
+      "password": "your-password",
+      "pollerperiod": 3,
+      "thermostattimeout": 7200
+      "thermostatmaxtemperature": 100,
+      "switchglobalvariables": "name1,name2,name3"
+      "dimmerglobalvariables": "name1,name2,name3",
+      "adminUsername": "admin_name",
+      "adminPassword": "admin_password",
+      "securitysystem": "enabled",
+      "addRoomNameToDeviceName" : "disabled",
+      "doorbellDeviceId" : 21,
+      "logsLevel": 1,
+      "devices": [
         {
-            "platform": "FibaroHC",
-            "name": "FibaroHC",
-            "url": "PUT URL OR IP OF YOUR HOME CENTER HERE CONTAINING PROTOCOL AND NAME E.G.: https://hc-00000XXX.local OR IP E.G.: 192.168.1.100",
-            "username": "PUT USERNAME OF YOUR HOME CENTER HERE",
-            "password": "PUT PASSWORD OF YOUR HOME CENTER HERE",
-            "pollerperiod": "PUT 0 FOR DISABLING POLLING (REFRESH INTERVAL), 1 - 100 INTERVAL IN SECONDS. 3 SECONDS IS THE DEFAULT",
-            "thermostattimeout": "NUMBER OF SECONDS FOR THERMOSTAT TIMEOUT, DEFAULT: 7200 (2 HOURS)"
-            "thermostatmaxtemperature": "SET MAX TEMPERATURE FOR THERMOSTATIC DEVICES (DEFAULT 100C)",
-            "switchglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A BISTABLE SWITCH",
-            "dimmerglobalvariables": "PUT A COMMA SEPARATED LIST OF HOME CENTER GLOBAL VARIABLES ACTING LIKE A DIMMER",
-            "adminUsername": "PUT ADMIN USERNAME OF YOUR HOME CENTER HERE TO SET GLOBAL VARIABLES",
-            "adminPassword": "PUT ADMIN PASSWORD OF YOUR HOME CENTER HERE TO SET GLOBAL VARIABLES",
-            "securitysystem": "PUT enabled OR disabled IN ORDER TO MANAGE THE AVAILABILITY OF THE SECURITY SYSTEM",
-            "addRoomNameToDeviceName" : "PUT enabled OR disabled IN ORDER TO ADD THE ROOM NAME TO DEVICE NAME. DEFAULT disabled",
-            "doorbellDeviceId" : "PUT HOME CENTER BINARY SENSOR DEVICE ID ACTING AS A DOORBELL",
-            "logsLevel": "PUT THE DESIRED LOG LEVEL: 0 DISABLED, 1 ONLY CHANGES, 2 ALL"
+          "id": 42,
+          "displayAs": "switch",
+        },
+        {
+          "id": 58,
+          "displayAs": "exclude",
         }
-    ],
-
-    "accessories": [
-    ]
-}
-```
-    
-+ `pollerperiod` : Polling interval (refresh interval) for querying Fibaro Home Center (0: disabled, recomended: 3, 1 or 2 seconds allows for a more responsive update of the Home app when changes appear outside the HomeKit environment). If it is disabled the Home app is not updated automatically when such a change happen but only when you close a panel and reopen it. Enabling this option is useful to read the new state when controlling devices outside HomeKit, E.G.: via Fibaro, physical buttons, scenes and automations.
-+ `thermostatmaxtemperature` : set max temperature for thermostatic devices (default 100 C)
-+ `thermostattimeout` : number of seconds for the thermostat timeout, default: 7200 (2 hours)
-+ `switchglobalvariables` : comma separated list of home center global variables acting like a bistable switch
-+ `dimmerglobalvariables` : comma separated list of home center global variables acting like a dimmer
-+ `adminUsername`: admin username of your home center, needed only to set global variables,
-+ `adminPassword`: admin password of your home center, needed only to set global variables,
-+ `securitysystem` : enabled or disabled in order to manage the availability of the security system
-+ `addRoomNameToDeviceName` : If enabled, to each device name will be added the name of the room in which it is located. Default: disabled.
-+ `doorbellDeviceId` : home center binary sensor device id acting as a doorbell
-+ `logsLevel` : desired log level: 0 disabled, 1 only changes, 2 all
-
-</details>
-
-
-<details>
-<summary><b>Individual device settings</b></summary>
-
-The ability to add individual settings for each device. Provide device ID and choose as which device to display. This way you can also add any device that is not currently supported pr exclude device. 
-+ `id` : device ID (like: 42).
-+ `displayAS` : display as: switch, dimmer, etc. or exclude device.
-
-```json
-{
-  "platforms": [
-    {
-        "platform": "FibaroHC",
-        "name": "FibaroHC",
-        "url": "PUT URL OR IP OF YOUR HOME CENTER HERE CONTAINING PROTOCOL AND NAME E.G.: https://hc-00000XXX.local OR IP E.G.: 192.168.1.100",
-        "username": "PUT USERNAME OF YOUR HOME CENTER HERE",
-        "password": "PUT PASSWORD OF YOUR HOME CENTER HERE",
-        "devices": [
-                {
-                    "id": 42,
-                    "displayAs": "switch",
-                },
-                {
-                    "id": 58,
-                    "displayAs": "exclude",
-                }
-            ]
+      ]
     }
   ]
 }
 ```
-</details>
+#### Basic fields (required)
++ `url` (string) : url or IP of your Home Center / Yubii Home. Using https may be mandatory if you configured HC to use it. Examples:
+  + `192.168.1.100` - replace with your IP,
+  + `https://hc-00000XXX.local` - replace with your HC serial, get ca.cer file from HC and put it in Homebridge in same folder as config.json,
+  + `http://hc-00000XXX.local` - replace with your HC serial.
++ `username` (string) : username of your Home Center / Yubii Home.
++ `password` (string) : password of your Home Center / Yubii Home.
++ `platform` (string) : platform name, must be 'FibaroHC'.
++ `name` (string) : name of the plugin displayed in Homebridge log and as plugin bridge name, default 'FibaroHC'.
 
+#### Advanced
++ `pollerperiod` (integer) : Polling interval (refresh interval) for querying Fibaro Home Center (0: disabled, recomended: 3, 1 or 2 seconds allows for a more responsive update of the Home app when changes appear outside the HomeKit environment). If it is disabled the Home app is not updated automatically when such a change happen but only when you close a panel and reopen it. Enabling this option is useful to read the new state when controlling devices outside HomeKit, E.G.: via Fibaro, physical buttons, scenes and automations.
++ `thermostatmaxtemperature` (integer) : Set max temperature for thermostatic devices (default 100 C).
++ `thermostattimeout` (integer) : Number of seconds for the thermostat timeout, default: 7200 (2 hours).
++ `switchglobalvariables` (string) : Comma separated list of home center global variables names acting like a bistable switch.
++ `dimmerglobalvariables` (string) : Comma separated list of home center global variables names acting like a dimmer.
++ `adminUsername` (string) : Admin username of your home center, needed only to set global variables.
++ `adminPassword` (string) : Admin password of your home center, needed only to set global variables.
++ `securitysystem` (string) : Set 'enabled' or 'disabled' in order to manage the availability of the security system.
++ `addRoomNameToDeviceName` (string) : Set 'enabled' or 'disabled'. If enabled, to each device name will be added the name of the room in which it is located. Default: disabled.
++ `doorbellDeviceId` (integer) : Home Center binary sensor device id acting as a doorbell.
++ `logsLevel` (integer) : Desired log level: 0 disabled, 1 only changes, 2 all.
+
+#### Individual for each device
++ `id` : Device ID (like: 42).
++ `displayAS` : Display as: switch, dimmer, etc. or exclude device.
+
+</details>
 
 
 # Manuals
@@ -269,11 +222,13 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 # Contributing and support
 
-- Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-center/issues) or [Pull Request](https://github.com/ilcato/homebridge-fibaro-home-center/pulls)
+Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-center/issues) or [Pull Request](https://github.com/ilcato/homebridge-fibaro-home-center/pulls)
 
 # Disclaimer
 
-- This is not the official Fibaro plugin. The plugin uses the official API. Despite the efforts made, the operation of the plugin is without any guarantees and at your own risk.
+- This is not the official Fibaro plugin but it uses the official Fibaro API. 
+- Despite the efforts made, the operation of the plugin is without any guarantees and at your own risk.
+- All product and company names are trademarks™ or registered® trademarks of their respective holders. Use of them does not imply any affiliation with or endorsement by them.
 
 # Latest release notes
 
@@ -285,16 +240,5 @@ Warning! Read carefully before updating!
 + Check device ID directly in HomeKit accessory information (in device serial number field). 
 + Removed Advanced Control. If you have Advanced Control enabled before the update, nothing will change, if not, some devices can change the way they are displayed (this may require removal from the cache in Homebridge settings and/or reconfiguration in HomeKit). Now you can individually change the way that each device display.
 + Bump dependencies.
-
-### Version 1.7.5
-+ Added new Fibaro "Roller Shutter com.fibaro.FGR224"
-+ Bump dependencies
-
-### Version 1.7.4
-+ Manage Satel motion sensor
-+ Manage heating/climate zone id collision
-+ Small refactoring
-+ Bump dependencies
-
 
 #### See all: [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)

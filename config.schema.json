@@ -132,26 +132,26 @@
       "logsLevel": {
         "description": "Choose what logs to display. The most important logs will be displayed regardless of this choice.",
         "title": "Logs Level",
-        "type": "number",
-        "default": "1",
+        "type": "integer",
+        "default": 1,
         "required": true,
         "oneOf": [
           {
             "title": "Disabled",
             "enum": [
-              "0"
+              0
             ]
           },
           {
             "title": "Only changes",
             "enum": [
-              "1"
+              1
             ]
           },
           {
             "title": "All Logs",
             "enum": [
-              "2"
+              2
             ]
           }
         ]

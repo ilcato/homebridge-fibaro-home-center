@@ -4,6 +4,7 @@
   "version": "2.0.0",
   "description": "Homebridge plugin for Fibaro Home Center (2, 2 Lite, 3, 3 Lite, Yubii Home).",
   "author": "ilcato",
+  "maintainers": ["ilcato"],
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
