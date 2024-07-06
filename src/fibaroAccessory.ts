@@ -310,6 +310,18 @@ export class FibaroAccessory {
               this.platform.Characteristic.TargetDoorState,
               this.platform.Characteristic.ObstructionDetected];
           break;
+        // Thermostat  
+        case (type === 'com.fibaro.hvacSystem'):
+        case (type === 'com.fibaro.hvacSystemAuto'):
+        case (type === 'com.fibaro.FGT001'):
+          service = this.platform.Service.Thermostat;
+          this.mainCharacteristics =
+            [this.platform.Characteristic.CurrentTemperature,
+              this.platform.Characteristic.TargetTemperature,
+              this.platform.Characteristic.CurrentHeatingCoolingState,
+              this.platform.Characteristic.TargetHeatingCoolingState,
+              this.platform.Characteristic.TemperatureDisplayUnits];
+          break;
         // Temperature sensor
         case (type === 'com.fibaro.temperatureSensor'):
           service = this.platform.Service.TemperatureSensor;
@@ -420,18 +432,8 @@ export class FibaroAccessory {
           this.mainCharacteristics = [this.platform.Characteristic.On];
           subtype = device.id + '--SC';
           break;
-        // Climate zone (HC3)
+        // Climate zone (HC3) and Heating zone (HC2 and HCL)
         case (type === 'climateZone'):
-          service = this.platform.Service.Thermostat;
-          this.mainCharacteristics =
-            [this.platform.Characteristic.CurrentTemperature,
-              this.platform.Characteristic.TargetTemperature,
-              this.platform.Characteristic.CurrentHeatingCoolingState,
-              this.platform.Characteristic.TargetHeatingCoolingState,
-              this.platform.Characteristic.TemperatureDisplayUnits];
-          subtype = device.id + '--CZ';
-          break;
-        // Heating zone (HC2 and HCL)
         case (type === 'heatingZone'):
           service = this.platform.Service.Thermostat;
           this.mainCharacteristics =
@@ -440,7 +442,7 @@ export class FibaroAccessory {
               this.platform.Characteristic.CurrentHeatingCoolingState,
               this.platform.Characteristic.TargetHeatingCoolingState,
               this.platform.Characteristic.TemperatureDisplayUnits];
-          subtype = device.id + '--HZ';
+          subtype = (type === 'climateZone') ? device.id + '--CZ' : device.id + '--HZ';
           break;
         // Global variables
         case (type === 'G'):
