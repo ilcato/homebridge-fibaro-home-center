@@ -31,6 +31,12 @@ body:
       value: |
         <details>
         <summary>API response for device - example</summary>
+
+        Most important values are:
+        - type
+        - baseType
+        - deviceControlType
+        - deviceRole
          
           ```json
             {
