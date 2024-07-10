@@ -5,12 +5,16 @@ body:
     id: product
     attributes:
       label: Product (manufacturer, model)
+      description: |
+        E.G.: Fibaro Roller shutter 4 (FGR-224).
     validations:
       required: true
   - type: input
     id: display-as
     attributes:
-      label: As what should be displayed? Switch? Dimmer? Blind with positioning? Blind without positioning? Etc.
+      label: As what should be displayed? 
+      description: |
+        Switch? Dimmer? Blind with positioning? Blind without positioning? Etc.
     validations:
       required: true
   - type: textarea
