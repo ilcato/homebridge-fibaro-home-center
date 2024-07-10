@@ -4,9 +4,10 @@ body:
   - type: markdown
     attributes:
       value: |
-        * Check plugin homepage (readme) first.
-        * Avoid duplicating any existing issues which already track or resolve your problem, search the existing issues first.
-        * Aim to find a descriptive and precise title for your report.
+        > [!NOTE]
+        > * Check plugin homepage (readme) first.
+        > * Avoid duplicating any existing issues which already track or resolve your problem, search the existing issues first.
+        > * Aim to find a descriptive and precise title for your report.
   - type: textarea
     id: description
     attributes:
