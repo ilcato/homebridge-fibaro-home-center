@@ -6,7 +6,7 @@ body:
     attributes:
       label: Product (manufacturer, model)
       description: |
-        E.G.: Fibaro Roller shutter 4 (FGR-224).
+        E.G.: Fibaro Roller Shutter 4 (FGR-224).
     validations:
       required: true
   - type: input
