@@ -38,7 +38,7 @@ body:
       render: JSON
       description: |
         If relevant to your report, include your plugin config. 
-        * Be sure to **remove any sensitive information (passwords, tokens, etc.).**
+        * Be sure to remove any sensitive information (passwords, tokens, etc.).
     validations:
       required: false
   - type: input
