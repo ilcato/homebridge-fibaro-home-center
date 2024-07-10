@@ -26,7 +26,7 @@ body:
       render: code
       description: |
         If relevant to your report, include your logs.
-        * You can enable more logs, set All logs in plugin config and debug mode in Homebridge settings.
+        * You can enable more logs, set all logs in plugin config and debug mode in Homebridge settings.
         * Keep this short. Do not paste in hundreds of lines repeating the same error.
         * Show the logs from the service being restarted until the error occurs.
         * Remove any sensitive data (like login details).
