@@ -25,7 +25,7 @@ body:
       description: |
         Past here response API response for this device. To get API response, open in browser: http://FIBARO-IP/api/devices/DEVICE-ID (replace FIBARO-IP with your Home Center IP and DEVICE-ID with device ID) and login. Device ID you can check in Fibaro panel or directly in HomeKit device information (serial number field).
     validations:
-      required: false
+      required: true
   - type: textarea
     id: info
     attributes:
