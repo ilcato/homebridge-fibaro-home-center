@@ -23,10 +23,10 @@ body:
     validations:
       required: false
   - type: textarea
-    id: description
+    id: info
     attributes:
-      label: Description
+      label: Additional info
       description: |
-        Any aditional info.
+        Any additional info.
     validations:
       required: false
