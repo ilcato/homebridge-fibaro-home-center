@@ -46,11 +46,15 @@ body:
     id: plugin-version
     attributes:
       label: Plugin version
+      description: |
+        E.G.: 2.0.1
     validations:
       required: true
   - type: input
     id: fibaro-version
     attributes:
-      label: Fibaro HC type and firmware
+      label: Fibaro HC / Yubii Home type and firmware
+      description: |
+        E.G.: Fibaro Home Center 3 Lite, v5.160.42
     validations:
       required: false
