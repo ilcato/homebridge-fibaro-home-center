@@ -216,124 +216,124 @@ You can run this plugin as child bridge, that is an isolated process. There are 
 API response example:
 
 ```json
-            {
-              "id": 114,
-              "name": "Bedroom",
-              "roomID": 226,
-              "view": [
-                  {
-                      "assetsPath": "dynamic-plugins/com.fibaro.binarySwitch",
-                      "name": "com.fibaro.binarySwitch",
-                      "translatesPath": "/assets/i18n/com.fibaro.binarySwitch",
-                      "type": "ts"
-                  }
-              ],
-              "type": "com.fibaro.binarySwitch",
-              "baseType": "com.fibaro.actor",
-              "enabled": true,
-              "visible": true,
-              "isPlugin": false,
-              "parentId": 110,
-              "viewXml": false,
-              "hasUIView": true,
-              "configXml": false,
-              "interfaces": [
-                  "zwave",
-                  "zwaveMultiChannelAssociation",
-                  "zwaveProtection"
-              ],
-              "properties": {
-                  "parameters": [
-                      {
-                          "id": 1,
-                          "lastReportedValue": 1,
-                          "lastSetValue": 1,
-                          "size": 1,
-                          "value": 1
-                      },
-                      {
-                          "id": 20,
-                          "lastReportedValue": 0,
-                          "lastSetValue": 0,
-                          "size": 1,
-                          "value": 0
-                      }
-                  ],
-                  "pollingTimeSec": 0,
-                  "zwaveCompany": "Fibargroup",
-                  "zwaveInfo": "3,6,4",
-                  "zwaveVersion": "5.0",
-                  "RFProtectionState": 0,
-                  "RFProtectionSupport": 3,
-                  "categories": [
-                      "other"
-                  ],
-                  "configured": true,
-                  "dead": false,
-                  "deadReason": "",
-                  "deviceControlType": 1,
-                  "deviceIcon": 2,
-                  "deviceRole": "Other",
-                  "endPointId": 2,
-                  "icon": {
-                      "path": "/assets/icon/fibaro/onoff/onoff0.png",
-                      "source": "HC"
-                  },
-                  "localProtectionState": 0,
-                  "localProtectionSupport": 5,
-                  "log": "",
-                  "logTemp": "",
-                  "manufacturer": "",
-                  "markAsDead": true,
-                  "model": "",
-                  "nodeId": 18,
-                  "parametersTemplate": "874",
-                  "productInfo": "1,15,2,4,16,0,5,0",
-                  "protectionExclusiveControl": 0,
-                  "protectionExclusiveControlSupport": false,
-                  "protectionState": 0,
-                  "protectionTimeout": 0,
-                  "protectionTimeoutSupport": false,
-                  "saveLogs": true,
-                  "serialNumber": "h'0000000000001f16",
-                  "state": false,
-                  "supportedDeviceRoles": [
-                      "Light",
-                      "Drencher",
-                      "Pin",
-                      "NightLamp",
-                      "Kettle",
-                      "Bracket",
-                      "AirConditioner",
-                      "AlarmAlarm",
-                      "Coffee",
-                      "GardenLamp",
-                      "TvSet",
-                      "CeilingFan",
-                      "Toaster",
-                      "Radio",
-                      "RoofWindow",
-                      "Other",
-                      "AlarmState",
-                      "AlarmArm",
-                      "VideoGateBell",
-                      "VideoGateOpen",
-                      "Valve"
-                  ],
-                  "useTemplate": true,
-                  "userDescription": "",
-                  "value": false
-              },
-              "actions": {
-                  "reconfigure": 0,
-                  "toggle": 0,
-                  "turnOff": 0,
-                  "turnOn": 0
-              },
-              "created": 1650223230,
-              "modified": 1717098148,
-              "sortOrder": 93
+{
+  "id": 114,
+  "name": "Bedroom",
+  "roomID": 226,
+  "view": [
+      {
+          "assetsPath": "dynamic-plugins/com.fibaro.binarySwitch",
+          "name": "com.fibaro.binarySwitch",
+          "translatesPath": "/assets/i18n/com.fibaro.binarySwitch",
+          "type": "ts"
+      }
+  ],
+  "type": "com.fibaro.binarySwitch",
+  "baseType": "com.fibaro.actor",
+  "enabled": true,
+  "visible": true,
+  "isPlugin": false,
+  "parentId": 110,
+  "viewXml": false,
+  "hasUIView": true,
+  "configXml": false,
+  "interfaces": [
+      "zwave",
+      "zwaveMultiChannelAssociation",
+      "zwaveProtection"
+  ],
+  "properties": {
+      "parameters": [
+          {
+              "id": 1,
+              "lastReportedValue": 1,
+              "lastSetValue": 1,
+              "size": 1,
+              "value": 1
+          },
+          {
+              "id": 20,
+              "lastReportedValue": 0,
+              "lastSetValue": 0,
+              "size": 1,
+              "value": 0
           }
+      ],
+      "pollingTimeSec": 0,
+      "zwaveCompany": "Fibargroup",
+      "zwaveInfo": "3,6,4",
+      "zwaveVersion": "5.0",
+      "RFProtectionState": 0,
+      "RFProtectionSupport": 3,
+      "categories": [
+          "other"
+      ],
+      "configured": true,
+      "dead": false,
+      "deadReason": "",
+      "deviceControlType": 1,
+      "deviceIcon": 2,
+      "deviceRole": "Other",
+      "endPointId": 2,
+      "icon": {
+          "path": "/assets/icon/fibaro/onoff/onoff0.png",
+          "source": "HC"
+      },
+      "localProtectionState": 0,
+      "localProtectionSupport": 5,
+      "log": "",
+      "logTemp": "",
+      "manufacturer": "",
+      "markAsDead": true,
+      "model": "",
+      "nodeId": 18,
+      "parametersTemplate": "874",
+      "productInfo": "1,15,2,4,16,0,5,0",
+      "protectionExclusiveControl": 0,
+      "protectionExclusiveControlSupport": false,
+      "protectionState": 0,
+      "protectionTimeout": 0,
+      "protectionTimeoutSupport": false,
+      "saveLogs": true,
+      "serialNumber": "h'0000000000001f16",
+      "state": false,
+      "supportedDeviceRoles": [
+          "Light",
+          "Drencher",
+          "Pin",
+          "NightLamp",
+          "Kettle",
+          "Bracket",
+          "AirConditioner",
+          "AlarmAlarm",
+          "Coffee",
+          "GardenLamp",
+          "TvSet",
+          "CeilingFan",
+          "Toaster",
+          "Radio",
+          "RoofWindow",
+          "Other",
+          "AlarmState",
+          "AlarmArm",
+          "VideoGateBell",
+          "VideoGateOpen",
+          "Valve"
+      ],
+      "useTemplate": true,
+      "userDescription": "",
+      "value": false
+  },
+  "actions": {
+      "reconfigure": 0,
+      "toggle": 0,
+      "turnOff": 0,
+      "turnOn": 0
+  },
+  "created": 1650223230,
+  "modified": 1717098148,
+  "sortOrder": 93
+}
 
 ```
 
