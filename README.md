@@ -12,7 +12,7 @@
 
 ### Homebridge plugin for Fibaro Home Center (2, 2 Lite, 3, 3 Lite, Yubii Home).
 
-Supports devices (Z-wave only, Zigbee not supported), scenes, global variables, security systems, climate / heating zones and exposes them to Homebridge and HomeKit (Apple Home and more).
+Supports devices (Z-wave only, Zigbee not supported), scenes, global variables, security systems, climate / heating zones. Exposes them to Homebridge and HomeKit (Apple Home and more).
 
 # How it works
 
@@ -106,17 +106,17 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 
 Exclude one or more devices:
 + add id of this device in plugin settings and select display as: 'exclude'
-+ or use a specific user (not an admin one) and grant access to only the needed devices
-+ or rename the device you want to exclude with an initial _ character.
++ or in Fibaro panel use a specific user (not an admin one) and grant access to only the needed devices
++ or in Fibaro panel rename the device you want to exclude with an initial _ character.
 
-Warning: If you exclude the device, adding it again will require reconfiguration (assignment to a room, automations, etc.).
+Warning: If you exclude the device, adding it again may require reconfiguration (assignment to a room, automations, etc.).
 
 </details>
 
 <details>
 <summary><b>Scenes</b></summary>
 
-+ Any scene with a name that start with _ will be added to HomeKit as a momentary switch
++ Any scene with a name that start with _ (in Fibaro panel) will be added to HomeKit as a momentary switch
 + Switch name will be same as scene name but without the _.
 + Momentary switch means that it will turn off itself after a while.
 
@@ -209,14 +209,140 @@ You can run this plugin as child bridge, that is an isolated process. There are 
 <details>
 <summary><b>Get API response for device</b></summary>
 
-Open in browser: http://FIBARO-IP/api/devices/DEVICE-ID (replace FIBARO-IP with your Home Center IP and DEVICE-ID with device ID) and login. Device ID you can check in Fibaro panel or directly in HomeKit device information (serial number field). 
+- Open in browser: http://FIBARO-IP/api/devices/DEVICE-ID (replace FIBARO-IP with your Home Center IP and DEVICE-ID with device ID) and login.
+- Device ID you can check in Fibaro panel or directly in HomeKit device information (serial number field).
+- Most important values are: type, baseType, deviceControlType and deviceRole.
+
+API response example:
+
+```json
+            {
+              "id": 114,
+              "name": "Bedroom",
+              "roomID": 226,
+              "view": [
+                  {
+                      "assetsPath": "dynamic-plugins/com.fibaro.binarySwitch",
+                      "name": "com.fibaro.binarySwitch",
+                      "translatesPath": "/assets/i18n/com.fibaro.binarySwitch",
+                      "type": "ts"
+                  }
+              ],
+              "type": "com.fibaro.binarySwitch",
+              "baseType": "com.fibaro.actor",
+              "enabled": true,
+              "visible": true,
+              "isPlugin": false,
+              "parentId": 110,
+              "viewXml": false,
+              "hasUIView": true,
+              "configXml": false,
+              "interfaces": [
+                  "zwave",
+                  "zwaveMultiChannelAssociation",
+                  "zwaveProtection"
+              ],
+              "properties": {
+                  "parameters": [
+                      {
+                          "id": 1,
+                          "lastReportedValue": 1,
+                          "lastSetValue": 1,
+                          "size": 1,
+                          "value": 1
+                      },
+                      {
+                          "id": 20,
+                          "lastReportedValue": 0,
+                          "lastSetValue": 0,
+                          "size": 1,
+                          "value": 0
+                      }
+                  ],
+                  "pollingTimeSec": 0,
+                  "zwaveCompany": "Fibargroup",
+                  "zwaveInfo": "3,6,4",
+                  "zwaveVersion": "5.0",
+                  "RFProtectionState": 0,
+                  "RFProtectionSupport": 3,
+                  "categories": [
+                      "other"
+                  ],
+                  "configured": true,
+                  "dead": false,
+                  "deadReason": "",
+                  "deviceControlType": 1,
+                  "deviceIcon": 2,
+                  "deviceRole": "Other",
+                  "endPointId": 2,
+                  "icon": {
+                      "path": "/assets/icon/fibaro/onoff/onoff0.png",
+                      "source": "HC"
+                  },
+                  "localProtectionState": 0,
+                  "localProtectionSupport": 5,
+                  "log": "",
+                  "logTemp": "",
+                  "manufacturer": "",
+                  "markAsDead": true,
+                  "model": "",
+                  "nodeId": 18,
+                  "parametersTemplate": "874",
+                  "productInfo": "1,15,2,4,16,0,5,0",
+                  "protectionExclusiveControl": 0,
+                  "protectionExclusiveControlSupport": false,
+                  "protectionState": 0,
+                  "protectionTimeout": 0,
+                  "protectionTimeoutSupport": false,
+                  "saveLogs": true,
+                  "serialNumber": "h'0000000000001f16",
+                  "state": false,
+                  "supportedDeviceRoles": [
+                      "Light",
+                      "Drencher",
+                      "Pin",
+                      "NightLamp",
+                      "Kettle",
+                      "Bracket",
+                      "AirConditioner",
+                      "AlarmAlarm",
+                      "Coffee",
+                      "GardenLamp",
+                      "TvSet",
+                      "CeilingFan",
+                      "Toaster",
+                      "Radio",
+                      "RoofWindow",
+                      "Other",
+                      "AlarmState",
+                      "AlarmArm",
+                      "VideoGateBell",
+                      "VideoGateOpen",
+                      "Valve"
+                  ],
+                  "useTemplate": true,
+                  "userDescription": "",
+                  "value": false
+              },
+              "actions": {
+                  "reconfigure": 0,
+                  "toggle": 0,
+                  "turnOff": 0,
+                  "turnOn": 0
+              },
+              "created": 1650223230,
+              "modified": 1717098148,
+              "sortOrder": 93
+          }
+
+```
 
 </details>
 
 <details>
 <summary><b>More logs</b></summary>
 
-If you have any issues with this plugin, enable all logs in plugin config and the debug mode in the homebridge settings and restart the homebridge / child bridge. This will show additional information in log.
+If you have any issues with this plugin, enable all logs in plugin config and the debug mode in the Homebridge settings and restart the Homebridge / child bridge. This will show additional information in log.
 
 </details>
 
