@@ -23,7 +23,9 @@ body:
       label: API response for this device
       render: code
       description: |
-        API response for device. To get API response, open in browser: http://FIBARO-IP/api/devices/DEVICE-ID (replace FIBARO-IP with your Home Center IP and DEVICE-ID with device ID) and login. Device ID you can check in Fibaro panel or directly in HomeKit device information (serial number field). Most important values are: type, baseType, deviceControlType and deviceRole.
+        * Open in browser: http://FIBARO-IP/api/devices/DEVICE-ID (replace FIBARO-IP with your Home Center IP and DEVICE-ID with device ID) and login.
+        * Device ID you can check in Fibaro panel or directly in HomeKit device information (serial number field).
+        * Most important values are: type, baseType, deviceControlType and deviceRole.
     validations:
       required: true
   - type: markdown
@@ -31,8 +33,6 @@ body:
       value: |
         <details>
         <summary>API response for device - example</summary>
-
-        Most important values are: type, baseType, deviceControlType and deviceRole.
          
           ```json
             {
@@ -72,188 +72,6 @@ body:
                       },
                       {
                           "id": 20,
-                          "lastReportedValue": 0,
-                          "lastSetValue": 0,
-                          "size": 1,
-                          "value": 0
-                      },
-                      {
-                          "id": 21,
-                          "lastReportedValue": 0,
-                          "lastSetValue": 0,
-                          "size": 1,
-                          "value": 0
-                      },
-                      {
-                          "id": 24,
-                          "lastReportedValue": 0,
-                          "lastSetValue": 0,
-                          "size": 1,
-                          "value": 0
-                      },
-                      {
-                          "id": 25,
-                          "lastReportedValue": 0,
-                          "lastSetValue": 0,
-                          "size": 1,
-                          "value": 0
-                      },
-                      {
-                          "id": 30,
-                          "lastReportedValue": 0,
-                          "lastSetValue": 0,
-                          "size": 4,
-                          "value": 0
-                      },
-                      {
-                          "id": 31,
-                          "lastReportedValue": 100597760,
-                          "lastSetValue": 100597760,
-                          "size": 4,
-                          "value": 100597760
-                      },
-                      {
-                          "id": 32,
-                          "lastReportedValue": 33488896,
-                          "lastSetValue": 33488896,
-                          "size": 4,
-                          "value": 33488896
-                      },
-                      {
-                          "id": 33,
-                          "lastReportedValue": 50266112,
-                          "lastSetValue": 50266112,
-                          "size": 4,
-                          "value": 50266112
-                      },
-                      {
-                          "id": 34,
-                          "lastReportedValue": 83820544,
-                          "lastSetValue": 83820544,
-                          "size": 4,
-                          "value": 83820544
-                      },
-                      {
-                          "id": 35,
-                          "lastReportedValue": 600,
-                          "lastSetValue": 600,
-                          "size": 2,
-                          "value": 600
-                      },
-                      {
-                          "id": 40,
-                          "lastReportedValue": 15,
-                          "lastSetValue": 15,
-                          "size": 1,
-                          "value": 15
-                      },
-                      {
-                          "id": 41,
-                          "lastReportedValue": 15,
-                          "lastSetValue": 15,
-                          "size": 1,
-                          "value": 15
-                      },
-                      {
-                          "id": 150,
-                          "lastReportedValue": 0,
-                          "lastSetValue": 0,
-                          "size": 1,
-                          "value": 0
-                      },
-                      {
-                          "id": 151,
-                          "lastReportedValue": 0,
-                          "lastSetValue": 0,
-                          "size": 1,
-                          "value": 0
-                      },
-                      {
-                          "id": 152,
-                          "lastReportedValue": 0,
-                          "lastSetValue": 0,
-                          "size": 1,
-                          "value": 0
-                      },
-                      {
-                          "id": 153,
-                          "lastReportedValue": 0,
-                          "lastSetValue": 0,
-                          "size": 1,
-                          "value": 0
-                      },
-                      {
-                          "id": 154,
-                          "lastReportedValue": 5,
-                          "lastSetValue": 5,
-                          "size": 2,
-                          "value": 5
-                      },
-                      {
-                          "id": 155,
-                          "lastReportedValue": 5,
-                          "lastSetValue": 5,
-                          "size": 2,
-                          "value": 5
-                      },
-                      {
-                          "id": 156,
-                          "lastReportedValue": 255,
-                          "lastSetValue": 255,
-                          "size": 2,
-                          "value": 255
-                      },
-                      {
-                          "id": 157,
-                          "lastReportedValue": 0,
-                          "lastSetValue": 0,
-                          "size": 2,
-                          "value": 0
-                      },
-                      {
-                          "id": 158,
-                          "lastReportedValue": 99,
-                          "lastSetValue": 99,
-                          "size": 2,
-                          "value": 99
-                      },
-                      {
-                          "id": 159,
-                          "lastReportedValue": 255,
-                          "lastSetValue": 255,
-                          "size": 2,
-                          "value": 255
-                      },
-                      {
-                          "id": 160,
-                          "lastReportedValue": 0,
-                          "lastSetValue": 0,
-                          "size": 2,
-                          "value": 0
-                      },
-                      {
-                          "id": 161,
-                          "lastReportedValue": 99,
-                          "lastSetValue": 99,
-                          "size": 2,
-                          "value": 99
-                      },
-                      {
-                          "id": 162,
-                          "lastReportedValue": 0,
-                          "lastSetValue": 0,
-                          "size": 1,
-                          "value": 0
-                      },
-                      {
-                          "id": 163,
-                          "lastReportedValue": 0,
-                          "lastSetValue": 0,
-                          "size": 1,
-                          "value": 0
-                      },
-                      {
-                          "id": 164,
                           "lastReportedValue": 0,
                           "lastSetValue": 0,
                           "size": 1,
