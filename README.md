@@ -191,7 +191,13 @@ Warning: If you exclude the device, adding it again may require reconfiguration 
 
 <details>
 <summary><b>Child bridge mode</b></summary>
-You can run this plugin as child bridge, that is an isolated process. There are several reasons/benefits of doing this. Details: https://github.com/homebridge/homebridge/wiki/Child-Bridges.
+
+It is recomended to run this plugin as child bridge, there are several reasons and benefits of doing this:
++ greater security because it is a separate, isolated process,
++ every instance / bridge can expose maximum 150 accessories due to a HomeKit limit, so if you have other plugins and don't use child bridge, you share this limit with them. 
+
+Details: https://github.com/homebridge/homebridge/wiki/Child-Bridges.
+
 </details>
 
 
