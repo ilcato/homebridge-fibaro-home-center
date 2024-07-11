@@ -1,6 +1,14 @@
 name: Support new device / incorect display of device
 description: Support new device / incorect display of device.
 body:
+  - type: markdown
+    attributes:
+      value: |
+        > [!NOTE]
+        > * Update plugin to the newest version, perhaps the device is now supported.
+        > * Check plugin homepage (readme).
+        > * Avoid duplicating any existing request regarding the same device, check existing first (opened and closed).
+        > * In the title enter the name of the device (manufacturer, model).
   - type: input
     id: product
     attributes:

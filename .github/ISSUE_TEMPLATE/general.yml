@@ -7,7 +7,7 @@ body:
         > [!NOTE]
         > * Update plugin to the newest version, perhaps the problem has already been solved.
         > * Check plugin homepage (readme).
-        > * Avoid duplicating any existing issues which already track or resolve your problem, search the existing issues first (open and closed).
+        > * Avoid duplicating any existing Issue regarding the same problem / request, check existing first (opened and closed).
         > * Aim to find a descriptive and precise title for your report.
   - type: textarea
     id: description
