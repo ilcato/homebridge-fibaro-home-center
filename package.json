@@ -14,7 +14,7 @@
     "url": "https://github.com/ilcato/homebridge-fibaro-home-center/issues"
   },
   "engines": {
-    "homebridge": "^1.6.0 || ^2.0.0-beta.0",
+    "homebridge": "^1.6.0 || ^2.0.0",
     "node": "^18.0.0 || ^20.0.0"
   },
   "main": "dist/index.js",
