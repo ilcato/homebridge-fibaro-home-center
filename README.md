@@ -353,7 +353,7 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 </details>
 
 <details>
-<summary>Fibaro HC2 Lite issues</summary>
+<summary><b>Fibaro HC2 Lite issues</b></summary>
 
 - Update firmware to the newest version, at least 4.630
 - Remove from the box (it overheats).
