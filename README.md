@@ -352,6 +352,17 @@ If you have any issues with this plugin, enable all logs in plugin config and th
 
 </details>
 
+<details>
+<summary>Fibaro HC2 Lite issues</summary>
+
+- Update firmware to the newest version, at least 4.630
+- Remove from the box (it overheats).
+- Replace the battery.
+- Disable remote access. The API works locally, so it will not affect the operation of the plugin, but the Fibaro application will not work when you are offline.
+- If any of the above does not help, it may be necessary to call support or visit the service and replace some parts.
+
+</details>
+
 # Contributing and support
 
 Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-center/issues) or [Pull Request](https://github.com/ilcato/homebridge-fibaro-home-center/pulls)
@@ -359,7 +370,8 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 # Disclaimer
 
 - This is not the official Fibaro plugin but it uses the official Fibaro API. 
-- Despite the efforts made, the operation of the plugin is without any guarantees and at your own risk.
+- Despite the efforts made, the operation of the plugin is without any guarantees.
+- All the actions is at your own risk.
 - All product and company names are trademarks™ or registered® trademarks of their respective holders. Use of them does not imply any affiliation with or endorsement by them.
 
 # Latest release notes
