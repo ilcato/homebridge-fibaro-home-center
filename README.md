@@ -371,7 +371,7 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 
 - This is not the official Fibaro plugin but it uses the official Fibaro API. 
 - Despite the efforts made, the operation of the plugin is without any guarantees.
-- All the actions is at your own risk.
+- All actions are at your own risk.
 - All product and company names are trademarks™ or registered® trademarks of their respective holders. Use of them does not imply any affiliation with or endorsement by them.
 
 # Latest release notes
@@ -380,6 +380,7 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 
 - Support for air quality sensor (PM2.5).
 - Support for presence sensor.
+- Preparation for Homebridge v2.
 - Fixes for small bugs.
 - Dependencies updates.
 
