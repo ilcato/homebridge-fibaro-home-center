@@ -103,7 +103,7 @@ export class Poller {
   manageValue(change) {
     for (let i = 0; i < this.platform.updateSubscriptions.length; i++) {
       const subscription = this.platform.updateSubscriptions[i];
-      if (!(subscription.service instanceof this.platform.Service.BatteryService) && subscription.characteristic.displayName !== 'Name') {
+      if (!(subscription.service instanceof this.platform.Service.Battery) && subscription.characteristic.displayName !== 'Name') {
 
         const property = subscription.property;
         const id = parseInt(subscription.id);
