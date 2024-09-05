@@ -542,7 +542,9 @@ export class GetFunctions {
 
   RGBtoHSV(r, g, b, w) {
     if (arguments.length === 1) {
-      g = r.g, b = r.b, r = r.r;
+      g = r.g;
+      b = r.b;
+      r = r.r;
     }
     const max = Math.max(r, g, b),
       min = Math.min(r, g, b),

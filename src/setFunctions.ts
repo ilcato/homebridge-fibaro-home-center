@@ -270,12 +270,12 @@ export class SetFunctions {
     const t = v * (1 - (1 - f) * s);
     let r, g, b;
     switch (i % 6) {
-      case 0: r = v, g = t, b = p; break;
-      case 1: r = q, g = v, b = p; break;
-      case 2: r = p, g = v, b = t; break;
-      case 3: r = p, g = q, b = v; break;
-      case 4: r = t, g = p, b = v; break;
-      case 5: r = v, g = p, b = q; break;
+      case 0: r = v; g = t; b = p; break;
+      case 1: r = q; g = v; b = p; break;
+      case 2: r = p; g = v; b = t; break;
+      case 3: r = p; g = q; b = v; break;
+      case 4: r = t; g = p; b = v; break;
+      case 5: r = v; g = p; b = q; break;
     }
     const w = Math.min(r, g, b);
     return {
@@ -295,7 +295,7 @@ export class SetFunctions {
         this.platform.log(service.displayName + ' [' + IDs[0] + ']: set ' + nc
           + ((value !== null && nc !== 'Open' && nc !== 'Close') ? '' + value + ' %' : ''));
       }
-    } catch (e) {
+    } catch {
       this.platform.log.error('There was a problem sending command ', c + ' to ' + IDs[0]);
     }
   }
@@ -303,7 +303,7 @@ export class SetFunctions {
   async scene(sceneID) {
     try {
       await this.platform.fibaroClient.executeScene(sceneID, this.platform.isOldApi());
-    } catch (e) {
+    } catch {
       this.platform.log.error('There was a problem executing scene: ', sceneID);
     }
   }
@@ -311,7 +311,7 @@ export class SetFunctions {
   async setGlobalVariable(variableID, value) {
     try {
       await this.platform.fibaroClient.setGlobalVariable(variableID, value);
-    } catch (e) {
+    } catch {
       this.platform.log.error('There was a problem setting variable: ', `${variableID} to ${value}`);
     }
   }
@@ -320,7 +320,7 @@ export class SetFunctions {
     try {
       const value = await this.platform.fibaroClient.getGlobalVariable(variableID);
       return value;
-    } catch (e) {
+    } catch {
       this.platform.log.error('There was a problem getting variable: ', `${variableID}`);
     }
   }

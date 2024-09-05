@@ -41,7 +41,10 @@
     "superagent-throttle": "^1.0.1"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.9.1",
     "@types/node": "^22.5.2",
+    "@types/superagent": "^8.1.9",
     "@typescript-eslint/eslint-plugin": "^8.4.0",
     "@typescript-eslint/parser": "^8.4.0",
     "eslint": "^9.9.1",

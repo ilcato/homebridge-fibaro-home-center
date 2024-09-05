@@ -16,8 +16,8 @@
 
 'use strict';
 
-import superagent = require('superagent');
-import Throttle = require('superagent-throttle');
+import superagent from 'superagent';
+import Throttle from 'superagent-throttle';
 import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
