@@ -4,7 +4,9 @@
   "version": "2.0.0",
   "description": "Homebridge plugin for Fibaro Home Center (2, 2 Lite, 3, 3 Lite, Yubii Home).",
   "author": "ilcato",
-  "maintainers": ["ilcato"],
+  "maintainers": [
+    "ilcato"
+  ],
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -41,7 +43,7 @@
   "devDependencies": {
     "@types/node": "^22.5.2",
     "@typescript-eslint/eslint-plugin": "^8.4.0",
-    "@typescript-eslint/parser": "^7.0.1",
+    "@typescript-eslint/parser": "^8.4.0",
     "eslint": "^8.56.0",
     "homebridge": "^1.7.0",
     "nodemon": "^3.0.2",
