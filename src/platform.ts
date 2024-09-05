@@ -183,6 +183,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
         rooms = (await this.fibaroClient.getRooms()).body;
       }
       this.LoadAccessories(devices, rooms);
+      this.log.info('Successfully logged in.');
     } catch (e) {
       this.log.error('Error getting data from Home Center: ', e);
       this.log.error('Make sure you provide the correct data: URL or IP, username and password'
@@ -211,7 +212,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
   }
 
   LoadAccessories(devices, rooms) {
-    this.log.info('Loading accessories');
+    this.log.debug('Loading accessories');
     devices.map((s) => {
       if (s.visible === true && !s.name.startsWith('_')) {
         if (rooms !== null) {
