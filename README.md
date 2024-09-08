@@ -12,7 +12,9 @@
 
 ### Homebridge plugin for Fibaro Home Center (2, 2 Lite, 3, 3 Lite, Yubii Home).
 
-Supports devices (Z-wave only, Zigbee not supported), scenes, global variables, security systems, climate / heating zones. Exposes them to Homebridge and HomeKit (Apple Home and more).
+This is an [Homebridge](https://homebridge.io) plugin.
+
+It supports devices (Z-wave only, Zigbee not supported), scenes, global variables, security systems, climate / heating zones. Exposes them to Homebridge and HomeKit (Apple Home and more).
 
 # How it works
 
@@ -24,9 +26,11 @@ Results will appear in Homebridge and via HomeKit in your Apple Home app (or oth
 
 # Installation
 
-This plugin can be easily installed through Homebridge UI or via [NPM](https://www.npmjs.com/package/homebridge-fibaro-home-center) "globally" by typing:
+This plugin can be easily installed through:
+- Homebridge UI
+- via [NPM](https://www.npmjs.com/package/homebridge-fibaro-home-center) "globally" by typing:
 
-    npm install -g homebridge-fibaro-home-center
+    `npm install -g homebridge-fibaro-home-center`
     
 # Configuration
 Configure the plugin through the settings UI or directly in the JSON editor.
