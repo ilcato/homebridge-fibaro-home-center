@@ -58,7 +58,7 @@ export class FibaroAccessory {
         this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${this.device.type}]: device found in config`);
       }
       switch (devConfig?.displayAs) {
-        case 'excluded':
+        case 'exclude':
           if (this.platform.config.logsLevel > 0) {
             this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${this.device.type}]: device excluded in config`);
           }
