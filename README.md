@@ -380,7 +380,7 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 
 # Latest release notes
 
-### Version 2.1.2
+### Version 2.1.3
 
 - fix to excluding devices feature
 - Dependencies updates.
