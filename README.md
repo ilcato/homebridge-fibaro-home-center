@@ -380,6 +380,10 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 
 # Latest release notes
 
+### Version 2.1.1
+
+- fix to excluding devices feature
+
 ### Version 2.1.0
 
 - Support for air quality sensor (PM2.5).
@@ -387,14 +391,5 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 - Preparation for Homebridge v2.
 - Fixes for small bugs.
 - Dependencies updates.
-
-### Version 2.0.0
-Warning! Read carefully before updating!
-
-- The ability to add individual settings for each device. Provide device ID and choose as which device to display. This way you can also add any device that is currently not supported or exclude device.
-- Improved mechanism of device detection to support more new devices.
-- Check device ID directly in HomeKit accessory information (in device serial number field). 
-- Removed Advanced Control. If you have Advanced Control enabled before the update, nothing will change, if not, some devices can change the way they are displayed (this may require removal from the cache in Homebridge settings and/or reconfiguration in HomeKit). Now you can individually change the way that each device display.
-- Bump dependencies.
 
 #### See all: [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)
