@@ -1,3 +1,5 @@
+// constants.ts
+
 // API constants
 export const API_URL_INFO = '/api/settings/info';
 export const API_URL_SCENES = '/api/scenes';
