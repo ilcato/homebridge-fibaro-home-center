@@ -38,12 +38,9 @@ export class FibaroAccessory {
 
     const controlType = parseInt(properties.deviceControlType);
 
-    // Check if there is individual device added in plugin settings with this device ID.
-    let devConfig;
-    if (this.platform.config.devices) {
-      devConfig = this.platform.config.devices.find((item) => item.id === this.device.id);
-    }
-
+    // Check for device-specific configuration
+    const devConfig = this.platform.config.devices?.find(item => item.id === this.device.id);
+    // Configure accessory based on config or device type
     if (devConfig) {
       this.configureAccessoryFromConfig(devConfig);
     } else {
@@ -274,6 +271,9 @@ export class FibaroAccessory {
   }
 
   configureAccessoryFromConfig(devConfig) {
+    const Service = this.platform.Service;
+    const Characteristic = this.platform.Characteristic;
+
     if (this.platform.config.logsLevel === 2) {
       this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${this.device.type}]: device found in config`);
     }
@@ -284,75 +284,77 @@ export class FibaroAccessory {
           this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${this.device.type}]: device excluded in config`);
         }
         this.isValid = false;
-        return { service: null, subtype: null };
+        return;
       case 'switch':
-        this.setMain(this.platform.Service.Switch, [this.platform.Characteristic.On]);
+        this.setMain(Service.Switch, [Characteristic.On]);
         break;
       case 'dimmer':
-        this.setMain(this.platform.Service.Lightbulb, [this.platform.Characteristic.On, this.platform.Characteristic.Brightness]);
+        this.setMain(Service.Lightbulb, [Characteristic.On, Characteristic.Brightness]);
         break;
       case 'blind':
-        this.setMain(this.platform.Service.WindowCovering, [
-          this.platform.Characteristic.CurrentPosition,
-          this.platform.Characteristic.TargetPosition,
-          this.platform.Characteristic.PositionState,
-          this.platform.Characteristic.HoldPosition,
+        this.setMain(Service.WindowCovering, [
+          Characteristic.CurrentPosition,
+          Characteristic.TargetPosition,
+          Characteristic.PositionState,
+          Characteristic.HoldPosition,
         ]);
         break;
       case 'blind2':
-        this.setMain(this.platform.Service.WindowCovering, [
-          this.platform.Characteristic.CurrentPosition,
-          this.platform.Characteristic.TargetPosition,
-          this.platform.Characteristic.PositionState,
-          this.platform.Characteristic.HoldPosition,
-          this.platform.Characteristic.CurrentHorizontalTiltAngle,
-          this.platform.Characteristic.TargetHorizontalTiltAngle,
+        this.setMain(Service.WindowCovering, [
+          Characteristic.CurrentPosition,
+          Characteristic.TargetPosition,
+          Characteristic.PositionState,
+          Characteristic.HoldPosition,
+          Characteristic.CurrentHorizontalTiltAngle,
+          Characteristic.TargetHorizontalTiltAngle,
         ]);
         break;
       case 'garage':
-        this.setMain(this.platform.Service.GarageDoorOpener, [
-          this.platform.Characteristic.CurrentDoorState,
-          this.platform.Characteristic.TargetDoorState,
-          this.platform.Characteristic.ObstructionDetected,
+        this.setMain(Service.GarageDoorOpener, [
+          Characteristic.CurrentDoorState,
+          Characteristic.TargetDoorState,
+          Characteristic.ObstructionDetected,
         ]);
         break;
       case 'temperature':
-        this.setMain(this.platform.Service.TemperatureSensor, [this.platform.Characteristic.CurrentTemperature]);
+        this.setMain(Service.TemperatureSensor, [Characteristic.CurrentTemperature]);
         break;
       case 'humidity':
-        this.setMain(this.platform.Service.HumiditySensor, [this.platform.Characteristic.CurrentRelativeHumidity]);
+        this.setMain(Service.HumiditySensor, [Characteristic.CurrentRelativeHumidity]);
         break;
       case 'lightSensor':
-        this.setMain(this.platform.Service.LightSensor, [this.platform.Characteristic.CurrentAmbientLightLevel]);
+        this.setMain(Service.LightSensor, [Characteristic.CurrentAmbientLightLevel]);
         break;
       case 'motion':
-        this.setMain(this.platform.Service.MotionSensor, [this.platform.Characteristic.MotionDetected]);
+        this.setMain(Service.MotionSensor, [Characteristic.MotionDetected]);
         break;
       case 'leak':
-        this.setMain(this.platform.Service.LeakSensor, [this.platform.Characteristic.LeakDetected]);
+        this.setMain(Service.LeakSensor, [Characteristic.LeakDetected]);
         break;
       case 'smoke':
-        this.setMain(this.platform.Service.SmokeSensor, [this.platform.Characteristic.SmokeDetected]);
+        this.setMain(Service.SmokeSensor, [Characteristic.SmokeDetected]);
         break;
       case 'security':
-        this.setMain(this.platform.Service.SecuritySystem, [
-          this.platform.Characteristic.SecuritySystemCurrentState,
-          this.platform.Characteristic.SecuritySystemTargetState,
+        this.setMain(Service.SecuritySystem, [
+          Characteristic.SecuritySystemCurrentState,
+          Characteristic.SecuritySystemTargetState,
         ], '0--');
         break;
       case 'airQualitySensorPm25':
-        this.setMain(this.platform.Service.AirQualitySensor, [
-          this.platform.Characteristic.AirQuality,
-          this.platform.Characteristic.PM2_5Density,
+        this.setMain(Service.AirQualitySensor, [
+          Characteristic.AirQuality,
+          Characteristic.PM2_5Density,
         ], this.device.id + '--PM2_5');
         break;
       default:
-        this.setMain(this.platform.Service.Switch, [this.platform.Characteristic.On]);
+        this.setMain(Service.Switch, [Characteristic.On]);
         break;
     }
   }
 
   configureAccessoryFromType(controlType, properties) {
+    const Service = this.platform.Service;
+    const Characteristic = this.platform.Characteristic;
     const type = this.device.type;
 
     switch (true) {
@@ -365,10 +367,10 @@ export class FibaroAccessory {
         switch (controlType) {
           case 2: // Lighting
           case 23: // Lighting
-            this.setMain(this.platform.Service.Lightbulb, [this.platform.Characteristic.On, this.platform.Characteristic.Brightness]);
+            this.setMain(Service.Lightbulb, [Characteristic.On, Characteristic.Brightness]);
             break;
           default:
-            this.setMain(this.platform.Service.Switch, [this.platform.Characteristic.On]);
+            this.setMain(Service.Switch, [Characteristic.On]);
             break;
         }
         break;
@@ -378,11 +380,11 @@ export class FibaroAccessory {
       case (type === 'com.fibaro.colorController'):
       case (type === 'com.fibaro.FGRGBW442'):
       case (type === 'com.fibaro.FGRGBW442CC'):
-        this.setMain(this.platform.Service.Lightbulb, [
-          this.platform.Characteristic.On,
-          this.platform.Characteristic.Brightness,
-          this.platform.Characteristic.Hue,
-          this.platform.Characteristic.Saturation,
+        this.setMain(Service.Lightbulb, [
+          Characteristic.On,
+          Characteristic.Brightness,
+          Characteristic.Hue,
+          Characteristic.Saturation,
         ]);
         break;
       // Light / Switch / Outlet / Valve
@@ -396,29 +398,29 @@ export class FibaroAccessory {
           case 2: // Lighting
           case 5: // Bedside Lamp
           case 7: // Wall Lamp
-            this.setMain(this.platform.Service.Lightbulb, [this.platform.Characteristic.On]);
+            this.setMain(Service.Lightbulb, [Characteristic.On]);
             break;
           case 1: // Other device
           case 20: // Other device
-            this.setMain(this.platform.Service.Switch, [this.platform.Characteristic.On]);
+            this.setMain(Service.Switch, [Characteristic.On]);
             break;
           case 24: // Video intercom
           case 25: // Video gate open
-            this.setMain(this.platform.Service.LockMechanism, [
-              this.platform.Characteristic.LockCurrentState,
-              this.platform.Characteristic.LockTargetState,
+            this.setMain(Service.LockMechanism, [
+              Characteristic.LockCurrentState,
+              Characteristic.LockTargetState,
             ], this.device.id + '--' + 'LOCK');
             break;
           case 3: // sprinkler
           case 26: // valve
-            this.setMain(this.platform.Service.Valve, [
-              this.platform.Characteristic.Active,
-              this.platform.Characteristic.InUse,
-              this.platform.Characteristic.ValveType,
+            this.setMain(Service.Valve, [
+              Characteristic.Active,
+              Characteristic.InUse,
+              Characteristic.ValveType,
             ]);
             break;
           default:
-            this.setMain(this.platform.Service.Outlet, [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse]);
+            this.setMain(Service.Outlet, [Characteristic.On, Characteristic.OutletInUse]);
             break;
         }
         break;
@@ -436,29 +438,29 @@ export class FibaroAccessory {
           case 2: // Lighting
           case 5: // Bedside Lamp
           case 7: // Wall Lamp
-            this.setMain(this.platform.Service.Lightbulb, [this.platform.Characteristic.On]);
+            this.setMain(Service.Lightbulb, [Characteristic.On]);
             break;
           case 1: // Other device
           case 20: // Other device
-            this.setMain(this.platform.Service.Switch, [this.platform.Characteristic.On]);
+            this.setMain(Service.Switch, [Characteristic.On]);
             break;
           case 24: // Video intercom
           case 25: // Video gate open
-            this.setMain(this.platform.Service.LockMechanism, [
-              this.platform.Characteristic.LockCurrentState,
-              this.platform.Characteristic.LockTargetState,
+            this.setMain(Service.LockMechanism, [
+              Characteristic.LockCurrentState,
+              Characteristic.LockTargetState,
             ], this.device.id + '--' + 'LOCK');
             break;
           case 3: // sprinkler
           case 26: // valve
-            this.setMain(this.platform.Service.Valve, [
-              this.platform.Characteristic.Active,
-              this.platform.Characteristic.InUse,
-              this.platform.Characteristic.ValveType,
+            this.setMain(Service.Valve, [
+              Characteristic.Active,
+              Characteristic.InUse,
+              Characteristic.ValveType,
             ]);
             break;
           default:
-            this.setMain(this.platform.Service.Outlet, [this.platform.Characteristic.On, this.platform.Characteristic.OutletInUse]);
+            this.setMain(Service.Outlet, [Characteristic.On, Characteristic.OutletInUse]);
             break;
         }
         break;
@@ -477,25 +479,25 @@ export class FibaroAccessory {
         // it's a garage door
         // case 57 - gate with positioning
         if (controlType === 56 || controlType === 57) {
-          this.setMain(this.platform.Service.GarageDoorOpener, [
-            this.platform.Characteristic.CurrentDoorState,
-            this.platform.Characteristic.TargetDoorState,
-            this.platform.Characteristic.ObstructionDetected,
+          this.setMain(Service.GarageDoorOpener, [
+            Characteristic.CurrentDoorState,
+            Characteristic.TargetDoorState,
+            Characteristic.ObstructionDetected,
           ]);
           break;
         } else if (this.device.type !== 'com.fibaro.baseShutter' ||
                    this.device.type === 'com.fibaro.baseShutter' && properties.favoritePositionsNativeSupport) {
-          const service = this.platform.Service.WindowCovering;
+          const service = Service.WindowCovering;
           const characteristics = [
-            this.platform.Characteristic.CurrentPosition,
-            this.platform.Characteristic.TargetPosition,
-            this.platform.Characteristic.PositionState,
-            this.platform.Characteristic.HoldPosition,
+            Characteristic.CurrentPosition,
+            Characteristic.TargetPosition,
+            Characteristic.PositionState,
+            Characteristic.HoldPosition,
           ];
           if (controlType === 55) {
             characteristics.push(
-              this.platform.Characteristic.CurrentHorizontalTiltAngle,
-              this.platform.Characteristic.TargetHorizontalTiltAngle,
+              Characteristic.CurrentHorizontalTiltAngle,
+              Characteristic.TargetHorizontalTiltAngle,
             );
           }
           let subtype = '';
@@ -509,36 +511,36 @@ export class FibaroAccessory {
       // eslint-disable-next-line no-duplicate-case, no-fallthrough
       case (type === 'com.fibaro.baseShutter'):
       case (type === 'com.fibaro.barrier'):
-        this.setMain(this.platform.Service.GarageDoorOpener, [
-          this.platform.Characteristic.CurrentDoorState,
-          this.platform.Characteristic.TargetDoorState,
-          this.platform.Characteristic.ObstructionDetected,
+        this.setMain(Service.GarageDoorOpener, [
+          Characteristic.CurrentDoorState,
+          Characteristic.TargetDoorState,
+          Characteristic.ObstructionDetected,
         ]);
         break;
       // Temperature sensor
       case (type === 'com.fibaro.temperatureSensor'):
-        this.setMain(this.platform.Service.TemperatureSensor, [this.platform.Characteristic.CurrentTemperature]);
+        this.setMain(Service.TemperatureSensor, [Characteristic.CurrentTemperature]);
         break;
       // Humidity sensor
       case (type === 'com.fibaro.humiditySensor'):
-        this.setMain(this.platform.Service.HumiditySensor, [this.platform.Characteristic.CurrentRelativeHumidity]);
+        this.setMain(Service.HumiditySensor, [Characteristic.CurrentRelativeHumidity]);
         break;
       // Light sensor
       case (type === 'com.fibaro.lightSensor'):
-        this.setMain(this.platform.Service.LightSensor, [this.platform.Characteristic.CurrentAmbientLightLevel]);
+        this.setMain(Service.LightSensor, [Characteristic.CurrentAmbientLightLevel]);
         break;
       // Temperature sensor / Humidity sensor / Light sensor
       case (type === 'com.fibaro.multilevelSensor'):
         switch (properties.deviceRole) {
           case 'TemperatureSensor':
-            this.setMain(this.platform.Service.TemperatureSensor, [this.platform.Characteristic.CurrentTemperature]);
+            this.setMain(Service.TemperatureSensor, [Characteristic.CurrentTemperature]);
             break;
           case 'HumiditySensor':
-            this.setMain(this.platform.Service.HumiditySensor, [this.platform.Characteristic.CurrentRelativeHumidity]);
+            this.setMain(Service.HumiditySensor, [Characteristic.CurrentRelativeHumidity]);
             break;
           case 'LightSensor':
           case 'MultilevelSensor':
-            this.setMain(this.platform.Service.LightSensor, [this.platform.Characteristic.CurrentAmbientLightLevel]);
+            this.setMain(Service.LightSensor, [Characteristic.CurrentAmbientLightLevel]);
             break;
           default:
             this.isValid = false;
@@ -550,7 +552,7 @@ export class FibaroAccessory {
       case (type === 'com.fibaro.FGMS001'):
       case (type === 'com.fibaro.FGMS001v2'):
       case (type === 'com.fibaro.motionSensor'):
-        this.setMain(this.platform.Service.MotionSensor, [this.platform.Characteristic.MotionDetected]);
+        this.setMain(Service.MotionSensor, [Characteristic.MotionDetected]);
         break;
       // Doorbell / Contact sensor
       case (type.startsWith('com.fibaro.FGDW')):
@@ -561,13 +563,13 @@ export class FibaroAccessory {
       case (type === 'com.fibaro.satelZone'):
       case (type === 'com.fibaro.doorWindowSensor'):
         if (properties.deviceRole === 'MotionSensor') {
-          this.setMain(this.platform.Service.MotionSensor, [this.platform.Characteristic.MotionDetected]);
+          this.setMain(Service.MotionSensor, [Characteristic.MotionDetected]);
         } else if (properties.deviceRole === 'PresenceSensor') {
-          this.setMain(this.platform.Service.OccupancySensor, [this.platform.Characteristic.OccupancyDetected]);
-        } else if (this.device.id === this.platform.config.doorbellDeviceId) {
-          this.setMain(this.platform.Service.Doorbell, [this.platform.Characteristic.ProgrammableSwitchEvent]);
+          this.setMain(Service.OccupancySensor, [Characteristic.OccupancyDetected]);
+        } else if (this.device.id === this.platform.config.config.doorbellDeviceId) {
+          this.setMain(Service.Doorbell, [Characteristic.ProgrammableSwitchEvent]);
         } else {
-          this.setMain(this.platform.Service.ContactSensor, [this.platform.Characteristic.ContactSensorState]);
+          this.setMain(Service.ContactSensor, [Characteristic.ContactSensorState]);
         }
         break;
       // Leak sensor
