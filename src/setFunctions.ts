@@ -41,65 +41,83 @@ export class SetFunctions {
   }
 
   async setOn(value, context, characteristic, service, IDs) {
+    const setValue = (delay = 100) => {
+      setTimeout(() => {
+        characteristic.setValue(0, undefined, 'fromSetValue');
+      }, delay);
+    };
+
     if (service.isVirtual && !service.isGlobalVariableSwitch && !service.isGlobalVariableDimmer) {
       // It's a virtual device so the command is pressButton and not turnOn or Off
-      this.command('pressButton', [IDs[1]], service, IDs);
+      await this.command('pressButton', [IDs[1]], service, IDs);
       // In order to behave like a push button reset the status to off
-      setTimeout(() => {
-        characteristic.setValue(0, undefined, 'fromSetValue');
-      }, 100);
+      setValue();
     } else if (service.isScene) {
       // It's a scene so the command is execute scene
-      this.scene(IDs[0]);
+      await this.scene(IDs[0]);
       // In order to behave like a push button reset the status to off
-      setTimeout(() => {
-        characteristic.setValue(0, undefined, 'fromSetValue');
-      }, 100);
+      setValue();
     } else if (service.isGlobalVariableSwitch) {
-      this.setGlobalVariable(IDs[1], value === true ? 'true' : 'false');
+      await this.setGlobalVariable(IDs[1], value ? 'true' : 'false');
     } else if (service.isGlobalVariableDimmer) {
       const currentDimmerValue = (await this.getGlobalVariable(IDs[1])).body.value;
-      if (currentDimmerValue !== '0' && value === true) {
+      if (currentDimmerValue !== '0' && value) {
         return;
       }
-      this.setGlobalVariable(IDs[1], value === true ? '100' : '0');
-    } else {
-      if (!this.timeoutsUpdating[IDs[0]]) { // see in setBrightness function
-        await this.command(value ? 'turnOn' : 'turnOff', null, service, IDs);
-      }
+      await this.setGlobalVariable(IDs[1], value ? '100' : '0');
+    } else if (!this.timeoutsUpdating[IDs[0]]) {
+      // Only execute if there's no ongoing update for this device
+      await this.command(value ? 'turnOn' : 'turnOff', null, service, IDs);
     }
   }
 
   async setBrightness(value, context, characteristic, service, IDs) {
+    // Handle global variable dimmer separately
     if (service.isGlobalVariableDimmer) {
       await this.setGlobalVariable(IDs[1], value.toString());
-    } else {
-      clearTimeout(this.timeoutsUpdating[IDs[0]]);
-      this.timeoutsUpdating[IDs[0]] = null;
-      this.timeoutsUpdating[IDs[0]] = setTimeout(async () => {
-        await this.command('setValue', [value], service, IDs);
-        clearTimeout(this.timeoutsUpdating[IDs[0]]);
-        this.timeoutsUpdating[IDs[0]] = null;
-      }, 500);
+      return;
     }
+
+    // Clear any existing timeout for this device
+    clearTimeout(this.timeoutsUpdating[IDs[0]]);
+
+    // Set a new timeout to update the brightness
+    this.timeoutsUpdating[IDs[0]] = setTimeout(async () => {
+      try {
+        await this.command('setValue', [value], service, IDs);
+      } catch (error) {
+        this.platform.log.error(`Error setting brightness for device ${IDs[0]}:`, error);
+      } finally {
+        // Clear the timeout reference after execution
+        this.timeoutsUpdating[IDs[0]] = null;
+      }
+    }, 500);
   }
 
   async setTargetPosition(value, context, characteristic, service, IDs) {
     if (service.isOpenCloseOnly) {
-      if (value === 0) {
-        await this.command('close', [0], service, IDs);
-      } else if (value >= 99) {
-        await this.command('open', [0], service, IDs);
+      // For open/close only devices, use specific commands based on the target position
+      const action = value === 0 ? 'close' : value >= 99 ? 'open' : null;
+      if (action) {
+        await this.command(action, [0], service, IDs);
       }
-    } else {
-      clearTimeout(this.timeoutsUpdating[IDs[0]]);
-      this.timeoutsUpdating[IDs[0]] = null;
-      this.timeoutsUpdating[IDs[0]] = setTimeout(async () => {
-        await this.command('setValue', [value], service, IDs);
-        clearTimeout(this.timeoutsUpdating[IDs[0]]);
-        this.timeoutsUpdating[IDs[0]] = null;
-      }, 1200);
+      return;
     }
+
+    // Clear any existing timeout for this device
+    clearTimeout(this.timeoutsUpdating[IDs[0]]);
+
+    // Set a new timeout to update the target position
+    this.timeoutsUpdating[IDs[0]] = setTimeout(async () => {
+      try {
+        await this.command('setValue', [value], service, IDs);
+      } catch (error) {
+        this.platform.log.error(`Error setting target position for device ${IDs[0]}:`, error);
+      } finally {
+        // Clear the timeout reference after execution
+        this.timeoutsUpdating[IDs[0]] = null;
+      }
+    }, 1200);
   }
 
   async setHoldPosition(value, context, characteristic, service, IDs) {
@@ -114,90 +132,90 @@ export class SetFunctions {
   }
 
   async setLockTargetState(value, context, characteristic, service, IDs) {
+    const Characteristic = this.platform.Characteristic;
+    const isUnsecured = value === Characteristic.LockTargetState.UNSECURED;
+
     if (service.isLockSwitch) {
-      const action = (value === this.platform.Characteristic.LockTargetState.UNSECURED) ? 'turnOn' : 'turnOff';
+      // Handle lock switch
+      const action = isUnsecured ? 'turnOn' : 'turnOff';
       await this.command(action, null, service, IDs);
-      const lockCurrentStateCharacteristic = service.getCharacteristic(this.platform.Characteristic.LockCurrentState);
-      lockCurrentStateCharacteristic.updateValue(value, undefined, 'fromSetValue');
+      service.getCharacteristic(Characteristic.LockCurrentState).updateValue(value, undefined, 'fromSetValue');
       return;
     }
 
-    const action = (value === this.platform.Characteristic.LockTargetState.UNSECURED) ? 'unsecure' : 'secure';
+    // Handle regular lock
+    const action = isUnsecured ? 'unsecure' : 'secure';
     await this.command(action, [0], service, IDs);
+
+    // Update lock current state after a delay
     setTimeout(() => {
-      const lockCurrentStateCharacteristic = service.getCharacteristic(this.platform.Characteristic.LockCurrentState);
-      lockCurrentStateCharacteristic.updateValue(value, undefined, 'fromSetValue');
+      service.getCharacteristic(Characteristic.LockCurrentState).updateValue(value, undefined, 'fromSetValue');
     }, 1000);
-    // check if the action is correctly executed by reading the state after a specified timeout.
-    // If the lock is not active after the timeout an IFTTT message is generated
+
+    // Check if the action is correctly executed after a specified timeout
     if (this.platform.config.doorlocktimeout !== '0') {
       const timeout = parseInt(this.platform.config.doorlocktimeout) * 1000;
-      setTimeout(() => {
-        this.checkLockCurrentState(IDs, value);
-      }, timeout);
+      setTimeout(() => this.checkLockCurrentState(IDs, value), timeout);
     }
   }
 
   async setTargetDoorState(value, context, characteristic, service, IDs) {
-    const action = value === 1 ? 'close' : 'open';
+    const action = value === this.platform.Characteristic.TargetDoorState.CLOSED ? 'close' : 'open';
     await this.command(action, [0], service, IDs);
+
     setTimeout(() => {
       characteristic.setValue(value, undefined, 'fromSetValue');
-      // set also current state
-      const currentDoorStateCharacteristic = service.getCharacteristic(this.platform.Characteristic.CurrentDoorState);
-      currentDoorStateCharacteristic.setValue(value, undefined, 'fromSetValue');
+      service.getCharacteristic(this.platform.Characteristic.CurrentDoorState)
+        .setValue(value, undefined, 'fromSetValue');
     }, 100);
   }
 
   async setTargetHeatingCoolingState(value, context, characteristic, service, IDs) {
-    if (service.isClimateZone) {
-      const currentTemperature = service.getCharacteristic(this.platform.Characteristic.CurrentTemperature).value;
-      let mode = '';
-      switch (value) {
-        case this.platform.Characteristic.TargetHeatingCoolingState.OFF:
-          mode = 'Off';
-          break;
-        case this.platform.Characteristic.TargetHeatingCoolingState.HEAT:
-          mode = 'Heat';
-          break;
-        case this.platform.Characteristic.TargetHeatingCoolingState.COOL:
-          mode = 'Cool';
-          break;
-        case this.platform.Characteristic.TargetHeatingCoolingState.AUTO:
-          mode = 'Auto';
-          break;
-        default:
-          return;
-      }
-      const timestamp = parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000);
-      await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, currentTemperature, timestamp);
-    } else if (service.isHeatingZone) {
+    if (!service.isClimateZone && !service.isHeatingZone) {
       return;
     }
+
+    if (service.isHeatingZone) {
+      return; // Early return for heating zones as they don't support mode changes
+    }
+
+    const { Characteristic } = this.platform;
+    const modeMap = {
+      [Characteristic.TargetHeatingCoolingState.OFF]: 'Off',
+      [Characteristic.TargetHeatingCoolingState.HEAT]: 'Heat',
+      [Characteristic.TargetHeatingCoolingState.COOL]: 'Cool',
+      [Characteristic.TargetHeatingCoolingState.AUTO]: 'Auto',
+    };
+
+    const mode = modeMap[value];
+    if (!mode) {
+      return;
+    }
+
+    const currentTemperature = service.getCharacteristic(Characteristic.CurrentTemperature).value;
+    const timestamp = Math.trunc(Date.now() / 1000) + parseInt(this.platform.config.thermostattimeout);
+
+    await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, currentTemperature, timestamp);
   }
 
   async setTargetTemperature(value, context, characteristic, service, IDs) {
-    const timestamp = parseInt(this.platform.config.thermostattimeout) + Math.trunc((new Date()).getTime() / 1000);
+    const timestamp = Math.trunc(Date.now() / 1000) + parseInt(this.platform.config.thermostattimeout);
+
     if (service.isClimateZone) {
-      let mode = '';
-      const currentHeatingCoolingState = service.getCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState).value;
-      switch (currentHeatingCoolingState) {
-        case this.platform.Characteristic.CurrentHeatingCoolingState.OFF:
-          mode = 'Off';
-          break;
-        case this.platform.Characteristic.CurrentHeatingCoolingState.HEAT:
-          mode = 'Heat';
-          break;
-        case this.platform.Characteristic.CurrentHeatingCoolingState.COOL:
-          mode = 'Cool';
-          break;
-        case this.platform.Characteristic.CurrentHeatingCoolingState.AUTO:
-          mode = 'Auto';
-          break;
-        default:
-          return;
+      const { Characteristic } = this.platform;
+      const modeMap = {
+        [Characteristic.CurrentHeatingCoolingState.OFF]: 'Off',
+        [Characteristic.CurrentHeatingCoolingState.HEAT]: 'Heat',
+        [Characteristic.CurrentHeatingCoolingState.COOL]: 'Cool',
+        [Characteristic.CurrentHeatingCoolingState.AUTO]: 'Auto',
+      };
+
+      const currentState = service.getCharacteristic(Characteristic.CurrentHeatingCoolingState).value;
+      const mode = modeMap[currentState];
+
+      if (mode) {
+        await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, value, timestamp);
       }
-      await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, value, timestamp);
     } else if (service.isHeatingZone) {
       await this.platform.fibaroClient.setHeatingZoneHandTemperature(IDs[0], value, timestamp);
     }
@@ -211,15 +229,26 @@ export class SetFunctions {
     this.updateHomeCenterColorFromHomeKit(null, value, service, IDs);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async setSecuritySystemTargetState(value, context, characteristic, service, IDs) {
-    const sceneID = this.getTargetSecuritySystemSceneMapping.get(value);
-    if (value === this.platform.Characteristic.SecuritySystemTargetState.DISARM) {
-      value = this.platform.Characteristic.SecuritySystemCurrentState.DISARMED;
-    }
+  async setSecuritySystemTargetState(value) {
+    const { Characteristic } = this.platform;
+
+    const sceneMap = new Map([
+      [Characteristic.SecuritySystemTargetState.AWAY_ARM, this.platform.scenes.SetAwayArmed],
+      [Characteristic.SecuritySystemTargetState.DISARM, this.platform.scenes.SetDisarmed],
+      [Characteristic.SecuritySystemTargetState.NIGHT_ARM, this.platform.scenes.SetNightArmed],
+      [Characteristic.SecuritySystemTargetState.STAY_ARM, this.platform.scenes.SetStayArmed],
+    ]);
+
+    const sceneID = sceneMap.get(value);
+
     if (sceneID === undefined) {
       return;
     }
+
+    if (value === Characteristic.SecuritySystemTargetState.DISARM) {
+      value = Characteristic.SecuritySystemCurrentState.DISARMED;
+    }
+
     await this.scene(sceneID);
   }
 
@@ -275,14 +304,27 @@ export class SetFunctions {
   async command(c, value, service, IDs) {
     try {
       await this.platform.fibaroClient.executeDeviceAction(IDs[0], c, value);
+
       if (this.platform.config.logsLevel >= 1) {
-        const nc = c.replaceAll('turnOn', 'On').replaceAll('turnOff', 'Off').replaceAll('setValue', '')
-          .replaceAll('open', 'Open').replaceAll('close', 'Close');
-        this.platform.log(service.displayName + ' [' + IDs[0] + ']: set ' + nc
-          + ((value !== null && nc !== 'Open' && nc !== 'Close') ? '' + value + ' %' : ''));
+        const nc = c.replace(/turnOn|turnOff|setValue|open|close/g, match => {
+          const replacements = {
+            turnOn: 'On',
+            turnOff: 'Off',
+            setValue: '',
+            open: 'Open',
+            close: 'Close',
+          };
+          return replacements[match] || match;
+        });
+
+        const logMessage = `${service.displayName} [${IDs[0]}]: set ${nc}${
+          value !== null && nc !== 'Open' && nc !== 'Close' ? ` ${value}%` : ''
+        }`;
+
+        this.platform.log(logMessage);
       }
-    } catch {
-      this.platform.log.error('There was a problem sending command ', c + ' to ' + IDs[0]);
+    } catch (error) {
+      this.platform.log.error(`There was a problem sending command ${c} to ${IDs[0]}:`, error);
     }
   }
 
@@ -324,14 +366,6 @@ export class SetFunctions {
     }
   }
 
-  /***
-   *  Scale the value from input range to output range as integer
-   * @param num value to be scaled
-   * @param in_min input value range minimum
-   * @param in_max input value range maximum
-   * @param out_min output value range minimum
-   * @param out_max output value range maximum
-   */
   static scale(num: number, in_min: number, in_max: number, out_min: number, out_max: number): number {
     return Math.trunc((num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
   }
