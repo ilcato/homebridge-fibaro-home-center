@@ -574,11 +574,80 @@ export class FibaroAccessory {
         break;
       // Leak sensor
       case (type.startsWith('com.fibaro.FGFS')):
-        this.isValid = false;
+      case (type === 'com.fibaro.FGFS101'):
+      case (type === 'com.fibaro.floodSensor'):
+        this.setMain(Service.LeakSensor, [Characteristic.LeakDetected]);
+        break;
+      // Smoke sensor
+      case (type.startsWith('com.fibaro.FGSS')):
+      case (type === 'com.fibaro.FGSS001'):
+      case (type === 'com.fibaro.smokeSensor'):
+      case (type === 'com.fibaro.gasDetector'):
+        this.setMain(Service.SmokeSensor, [Characteristic.SmokeDetected]);
+        break;
+      // Carbon Monoxide Sensor
+      case (type.startsWith('com.fibaro.FGCD')):
+      case (type === 'com.fibaro.FGCD001'):
+        this.setMain(Service.CarbonMonoxideSensor, [
+          Characteristic.CarbonMonoxideDetected,
+          Characteristic.CarbonMonoxideLevel,
+          Characteristic.CarbonMonoxidePeakLevel,
+          Characteristic.BatteryLevel,
+        ]);
+        break;
+      // Lock Mechanism
+      case (type === 'com.fibaro.doorLock'):
+      case (type === 'com.fibaro.gerda'):
+        this.setMain(Service.LockMechanism, [
+          Characteristic.LockCurrentState,
+          Characteristic.LockTargetState,
+        ]);
+        break;
+        // Security system
+      case (type === 'securitySystem'):
+        this.setMain(Service.SecuritySystem, [
+          Characteristic.SecuritySystemCurrentState,
+          Characteristic.SecuritySystemTargetState,
+        ], '0--');
+        break;
+      // Scene
+      case (type === 'scene'):
+        this.setMain(Service.Switch, [Characteristic.On], this.device.id + '--SC');
+        break;
+      // Climate zone (HC3)
+      case (type === 'climateZone'):
+        this.setMain(Service.Thermostat, [
+          Characteristic.CurrentTemperature,
+          Characteristic.TargetTemperature,
+          Characteristic.CurrentHeatingCoolingState,
+          Characteristic.TargetHeatingCoolingState,
+          Characteristic.TemperatureDisplayUnits,
+        ], this.device.id + '--CZ');
+        break;
+      // Heating zone (HC2 and HCL)
+      case (type === 'heatingZone'):
+        this.setMain(Service.Thermostat, [
+          Characteristic.CurrentTemperature,
+          Characteristic.TargetTemperature,
+          Characteristic.CurrentHeatingCoolingState,
+          Characteristic.TargetHeatingCoolingState,
+          Characteristic.TemperatureDisplayUnits,
+        ], this.device.id + '--HZ');
+        break;
+      // Global variables
+      case (type === 'G'):
+        this.setMain(Service.Switch, [Characteristic.On], this.device.type + '-' + this.device.name + '-');
+        break;
+        // Dimmer global variables
+      case (type === 'D'):
+        this.setMain(Service.Lightbulb, [Characteristic.On, Characteristic.Brightness], this.device.type + '-' + this.device.name + '-');
         break;
       default:
+        if (this.platform.config.logsLevel > 0) {
+          this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${this.device.type}]: device not supported`);
+        }
         this.isValid = false;
-        break;
+        return;
     }
   }
 
