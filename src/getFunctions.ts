@@ -72,50 +72,33 @@ export class GetFunctions {
 
   // Boolean getter
   getBool(characteristic, service, IDs, properties) {
-    let v = properties.value;
-    if (v !== undefined) {
-      v = this.getBoolean(v);
-    } else {
-      v = properties['ui.startStopActivitySwitch.value'];
-      if (v === undefined) {
-        v = false;
-      }
-    }
-    characteristic.updateValue(v);
+    const v = properties.value ?? properties['ui.startStopActivitySwitch.value'] ?? false;
+    characteristic.updateValue(this.getBoolean(v));
   }
 
   // Float getter
   getFloat(characteristic, _service, _IDs, properties) {
-    if (isNaN(properties.value)) {
-      return;
+    const value = properties.value;
+    if (value !== undefined && !isNaN(value)) {
+      characteristic.updateValue(parseFloat(value));
     }
-    const r = parseFloat(properties.value);
-    characteristic.updateValue(r);
   }
 
-  getBrightness(characteristic, service, _IDs, properties) {
-    if (isNaN(properties.value)) {
+  getBrightness(characteristic, service, _IDs, { value }) {
+    if (isNaN(value)) {
       return;
     }
-    let r = parseFloat(properties.value);
-    if (r > 100) {
+    let r = Math.min(Math.max(parseFloat(value), 0), 100);
+
+    if (service && !service.isGlobalVariableDimmer && r === 99) {
       r = 100;
     }
-    if (r < 0) {
-      r = 0;
+
+    const onCharacteristic = service?.getCharacteristic(this.platform.Characteristic.On);
+    if (onCharacteristic?.value === false) {
+      return;
     }
-    if (service !== null && !service.isGlobalVariableDimmer) { // For real dimmers
-      if (r === 99) {
-        r = 100;
-      }
-    }
-    // If "On" charatecreristic is false, brightness update is skipped
-    if (service) {
-      const onCharacteristic = service.getCharacteristic(this.platform.Characteristic.On);
-      if (onCharacteristic && onCharacteristic.value === false) {
-        return;
-      }
-    }
+
     characteristic.updateValue(r);
   }
 
@@ -125,103 +108,86 @@ export class GetFunctions {
   }
 
   getCurrentPosition(characteristic, _service, _IDs, properties) {
-    let r = 0;
+    const value = properties.value;
+    const state = properties.state;
+    let position;
 
-    if (isNaN(properties.value)) {
-      if (properties.state === 'Closed') {
-        r = 0;
-      } else {
-        r = 100;
-      }
+    if (value !== undefined && !isNaN(value)) {
+      position = Math.min(Math.max(parseInt(value), characteristic.props.minValue), characteristic.props.maxValue);
+      position = position === 99 ? 100 : position === 1 ? 0 : position;
     } else {
-      r = parseInt(properties.value);
-      if (r >= characteristic.props.minValue && r <= characteristic.props.maxValue) {
-        if (r === 99) {
-          r = 100;
-        } else if (r === 1) {
-          r = 0;
-        }
-      } else {
-        r = characteristic.props.minValue;
-      }
+      position = state === 'Closed' ? 0 : 100;
     }
-    characteristic.updateValue(r);
+
+    characteristic.updateValue(position);
   }
 
   getCurrentTiltAngle(characteristic, _service, _IDs, properties) {
-    let value2 = parseInt(properties.value2);
-    if (value2 >= 0 && value2 <= 100) {
-      if (value2 === 99) {
-        value2 = 100;
-      } else if (value2 === 1) {
-        value2 = 0;
+    const value2 = parseInt(properties.value2 ?? '');
+    const angle = (() => {
+      if (value2 >= 0 && value2 <= 100) {
+        const adjustedValue = value2 === 99 ? 100 : value2 === 1 ? 0 : value2;
+        return SetFunctions.scale(adjustedValue, 0, 100, characteristic.props.minValue, characteristic.props.maxValue);
       }
-    } else {
-      value2 = characteristic.props.minValue;
-    }
-    const angle = SetFunctions.scale(value2, 0, 100, characteristic.props.minValue, characteristic.props.maxValue);
+      return characteristic.props.minValue;
+    })();
+
     characteristic.updateValue(angle);
   }
 
   async getCurrentTemperature(characteristic, service, IDs, properties) {
-    if (service.isClimateZone) { // used in new API (not in HC2 and HCL)
-      try {
-        const properties = (await this.platform.fibaroClient.getClimateZone(IDs[0])).body.properties;
-        if (!Object.prototype.hasOwnProperty.call(properties, 'currentTemperatureHeating')) {
-          this.platform.log('No value for Temperature (Current - Climate zone).', '');
-          return;
+    try {
+      let temperature;
+
+      if (service.isClimateZone || service.isHeatingZone) {
+        const zoneType = service.isClimateZone ? 'Climate' : 'Heating';
+        const getZoneFunction = service.isClimateZone ?
+          this.platform.fibaroClient.getClimateZone :
+          this.platform.fibaroClient.getHeatingZone;
+
+        const { body: { properties: zoneProperties } } = await getZoneFunction(IDs[0]);
+
+        const tempProperty = service.isClimateZone ? 'currentTemperatureHeating' : 'currentTemperature';
+        temperature = zoneProperties[tempProperty];
+
+        if (temperature === undefined) {
+          throw new Error(`No value for Temperature (Current - ${zoneType} zone).`);
         }
-        characteristic.updateValue(properties.currentTemperatureHeating);
-      } catch (e) {
-        this.platform.log('Error getting Current Temperature Climate Zone: ', `${service.IDs[0]} - Err: ${e}`);
-        return;
+      } else {
+        temperature = properties.value;
       }
-    } else if (service.isHeatingZone) { // used in old API (HC2 and HCL)
-      try {
-        const properties = (await this.platform.fibaroClient.getHeatingZone(IDs[0])).body.properties;
-        if (!Object.prototype.hasOwnProperty.call(properties, 'currentTemperature')) {
-          this.platform.log('No value for Temperature (Current - Heating zone).', '');
-          return;
-        }
-        characteristic.updateValue(properties.currentTemperature);
-      } catch (e) {
-        this.platform.log('Error getting Current Temperature Heating Zone: ', `${service.IDs[0]} - Err: ${e}`);
-        return;
-      }
-    } else {
-      const value = properties.value;
-      characteristic.updateValue(value);
+
+      characteristic.updateValue(temperature);
+    } catch (e) {
+      this.platform.log(`Error getting Current Temperature: ${service.IDs[0]} - Err: ${e}`);
     }
   }
 
   async getTargetTemperature(characteristic, service, IDs, properties) {
-    if (service.isClimateZone) {
-      try {
-        const properties = (await this.platform.fibaroClient.getClimateZone(IDs[0])).body.properties;
-        if (!properties.currentTemperatureHeating) {
-          this.platform.log('No value for Temperature (Target - Climate zone).', '');
-          return;
+    try {
+      let temperature;
+
+      if (service.isClimateZone || service.isHeatingZone) {
+        const zoneType = service.isClimateZone ? 'Climate' : 'Heating';
+        const getZoneFunction = service.isClimateZone ?
+          this.platform.fibaroClient.getClimateZone :
+          this.platform.fibaroClient.getHeatingZone;
+
+        const { body: { properties: zoneProperties } } = await getZoneFunction(IDs[0]);
+
+        const tempProperty = service.isClimateZone ? 'currentTemperatureHeating' : 'currentTemperature';
+        temperature = zoneProperties[tempProperty];
+
+        if (temperature === undefined) {
+          throw new Error(`No value for Temperature (Target - ${zoneType} zone).`);
         }
-        characteristic.updateValue(properties.currentTemperatureHeating);
-      } catch (e) {
-        this.platform.log('Error getting Target Temperature Climate Zone: ', `${service.IDs[0]} - Err: ${e}`);
-        return;
+      } else {
+        temperature = properties.value;
       }
-    } else if (service.isHeatingZone) {
-      try {
-        const properties = (await this.platform.fibaroClient.getHeatingZone(IDs[0])).body.properties;
-        if (!Object.prototype.hasOwnProperty.call(properties, 'currentTemperature')) {
-          this.platform.log('No value for Temperature (Target - Heating zone).', '');
-          return;
-        }
-        characteristic.updateValue(properties.currentTemperature);
-      } catch (e) {
-        this.platform.log('Error getting Target Temperature Heating Zone: ', `${service.IDs[0]} - Err: ${e}`);
-        return;
-      }
-    } else {
-      const value = properties.value;
-      characteristic.updateValue(value);
+
+      characteristic.updateValue(temperature);
+    } catch (e) {
+      this.platform.log(`Error getting Target Temperature: ${service.IDs[0]} - Err: ${e}`);
     }
   }
 
@@ -264,85 +230,76 @@ export class GetFunctions {
   }
 
   getOutletInUse(characteristic, _service, _IDs, properties) {
-    if (isNaN(properties.power)) {
-      this.platform.log('power is not a number.', '');
-      return;
+    const power = properties.power;
+    if (power !== undefined && !isNaN(power)) {
+      characteristic.updateValue(parseFloat(power) > 1.0);
     }
-    characteristic.updateValue(parseFloat(properties.power) > 1.0 ? true : false);
   }
 
   getLockCurrentState(characteristic, service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
-    if (service.isLockSwitch) {
-      characteristic.updateValue(v === false ?
-        this.platform.Characteristic.LockCurrentState.SECURED :
-        this.platform.Characteristic.LockCurrentState.UNSECURED);
-      return;
-    }
-    characteristic.updateValue(v === true ?
-      this.platform.Characteristic.LockCurrentState.SECURED :
-      this.platform.Characteristic.LockCurrentState.UNSECURED);
+    const { LockCurrentState } = this.platform.Characteristic;
+
+    const state = service.isLockSwitch
+      ? (v ? LockCurrentState.UNSECURED : LockCurrentState.SECURED)
+      : (v ? LockCurrentState.SECURED : LockCurrentState.UNSECURED);
+
+    characteristic.updateValue(state);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getCurrentHeatingCoolingState(characteristic, service, IDs, _properties) {
-    if (service.isClimateZone) {
-      try {
-        const properties = (await this.platform.fibaroClient.getClimateZone(IDs[0])).body.properties;
+    try {
+      if (service.isClimateZone) {
+        const { body: { properties } } = await this.platform.fibaroClient.getClimateZone(IDs[0]);
         if (!properties.mode) {
-          this.platform.log('No value for heating cooling steate.', '');
-          return;
+          throw new Error('No value for heating cooling state.');
         }
-        switch (properties.mode) {
-          case 'Off': // OFF
-            characteristic.updateValue(this.platform.Characteristic.CurrentHeatingCoolingState.OFF);
-            break;
-          case 'Heat': // HEAT
-            characteristic.updateValue(this.platform.Characteristic.CurrentHeatingCoolingState.HEAT);
-            break;
-          case 'Cool': // COOL
-            characteristic.updateValue(this.platform.Characteristic.CurrentHeatingCoolingState.COOL);
-            break;
-          default:
-            break;
+
+        const { CurrentHeatingCoolingState } = this.platform.Characteristic;
+        const modeMap = {
+          'Off': CurrentHeatingCoolingState.OFF,
+          'Heat': CurrentHeatingCoolingState.HEAT,
+          'Cool': CurrentHeatingCoolingState.COOL,
+        };
+
+        const state = modeMap[properties.mode];
+        if (state !== undefined) {
+          characteristic.updateValue(state);
         }
-      } catch (e) {
-        this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
-        return;
+      } else if (service.isHeatingZone) {
+        characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
       }
-    } else if (service.isHeatingZone) {
-      characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
+    } catch (e) {
+      this.platform.log(`Error getting Current Heating Cooling State: ${service.IDs[0]} - Err: ${e}`);
     }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getTargetHeatingCoolingState(characteristic, service, IDs, _properties) {
-    if (service.isClimateZone) {
-      try {
-        const properties = (await this.platform.fibaroClient.getClimateZone(IDs[0])).body.properties;
+    try {
+      if (service.isClimateZone) {
+        const { body: { properties } } = await this.platform.fibaroClient.getClimateZone(IDs[0]);
         if (!properties.mode) {
-          this.platform.log('No value for heating cooling steate.', '');
-          return;
+          throw new Error('No value for heating cooling state.');
         }
-        switch (properties.mode) {
-          case 'Off': // OFF
-            characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.OFF);
-            break;
-          case 'Heat': // HEAT
-            characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
-            break;
-          case 'Cool': // COOL
-            characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.COOL);
-            break;
-          default:
-            break;
+
+        const { TargetHeatingCoolingState } = this.platform.Characteristic;
+        const modeMap = {
+          'Off': TargetHeatingCoolingState.OFF,
+          'Heat': TargetHeatingCoolingState.HEAT,
+          'Cool': TargetHeatingCoolingState.COOL,
+        };
+
+        const state = modeMap[properties.mode];
+        if (state !== undefined) {
+          characteristic.updateValue(state);
         }
-      } catch (e) {
-        this.platform.log('There was a problem getting value from: ', `${service.IDs[0]} - Err: ${e}`);
-        return;
+      } else if (service.isHeatingZone) {
+        characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
       }
-    } else if (service.isHeatingZone) {
-      characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
+    } catch (e) {
+      this.platform.log(`Error getting Target Heating Cooling State: ${service.IDs[0]} - Err: ${e}`);
     }
   }
 
@@ -360,75 +317,63 @@ export class GetFunctions {
   }
 
   getCurrentDoorState(characteristic, _service, _IDs, properties) {
+    const { CurrentDoorState } = this.platform.Characteristic;
+    const stateMap = {
+      'Opened': CurrentDoorState.OPEN,
+      'Opening': CurrentDoorState.OPENING,
+      'Closing': CurrentDoorState.CLOSING,
+      'Closed': CurrentDoorState.CLOSED,
+    };
+
     const v = parseInt(properties.value);
+
     if (!isNaN(v)) {
       this.platform.log('getCurrentDoorState value:', v);
-    } else if (properties.state !== undefined) {
+      if (v === 0) {
+        return characteristic.updateValue(CurrentDoorState.CLOSED);
+      }
+      if (v === 99) {
+        return characteristic.updateValue(CurrentDoorState.OPEN);
+      }
+      return characteristic.updateValue(CurrentDoorState.STOPPED);
+    }
+
+    if (properties.state !== undefined) {
       this.platform.log('getCurrentDoorState:', properties.state);
+      const mappedState = stateMap[properties.state];
+      if (mappedState !== undefined) {
+        return characteristic.updateValue(mappedState);
+      }
     }
-    switch (properties.state) {
-      case 'Opened':
-        characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
-        break;
-      case 'Opening':
-        characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
-        break;
-      case 'Closing':
-        characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
-        break;
-      case 'Closed':
-        characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
-        break;
-      case 'Unknown':
-      case undefined:
-        if (v === 0) {
-          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
-        } else if (v === 99) {
-          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
-        } else {
-          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.STOPPED);
-        }
-        break;
-      default:
-        characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.STOPPED);
-        break;
-    }
+
+    characteristic.updateValue(CurrentDoorState.STOPPED);
   }
 
   getTargetDoorState(characteristic, _service, _IDs, properties) {
+    const { TargetDoorState } = this.platform.Characteristic;
+    const stateMap = {
+      'Opened': TargetDoorState.OPEN,
+      'Opening': TargetDoorState.OPEN,
+      'Closing': TargetDoorState.CLOSED,
+      'Closed': TargetDoorState.CLOSED,
+    };
+
     const v = parseInt(properties.value);
+
     if (!isNaN(v)) {
       this.platform.log('getTargetDoorState value:', v);
-    } else if (properties.state !== undefined) {
+      return characteristic.updateValue(v === 0 ? TargetDoorState.CLOSED : TargetDoorState.OPEN);
+    }
+
+    if (properties.state) {
       this.platform.log('getTargetDoorState:', properties.state);
+      const mappedState = stateMap[properties.state];
+      if (mappedState !== undefined) {
+        return characteristic.updateValue(mappedState);
+      }
     }
-    switch (properties.state) {
-      case 'Opened':
-        characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
-        break;
-      case 'Opening':
-        characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
-        break;
-      case 'Closing':
-        characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
-        break;
-      case 'Closed':
-        characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
-        break;
-      case 'Unknown':
-      case undefined:
-        if (v === 0) {
-          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
-        } else if (v === 99) {
-          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.OPEN);
-        } else {
-          characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
-        }
-        break;
-      default:
-        characteristic.updateValue(this.platform.Characteristic.CurrentDoorState.CLOSED);
-        break;
-    }
+
+    characteristic.updateValue(TargetDoorState.CLOSED);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -437,15 +382,15 @@ export class GetFunctions {
   }
 
   getBatteryLevel(characteristic, _service, _IDs, properties) {
-    if (isNaN(properties.batteryLevel)) {
-      this.platform.log('batteryLevel is not a number.', '');
+    const batteryLevel = parseFloat(properties.batteryLevel);
+
+    if (isNaN(batteryLevel)) {
+      this.platform.log('batteryLevel is not a number.');
       return;
     }
-    let r = parseFloat(properties.batteryLevel);
-    if (r > 100) {
-      r = 0;
-    }
-    characteristic.updateValue(r);
+
+    const level = batteryLevel > 100 ? 0 : batteryLevel;
+    characteristic.updateValue(level);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -554,32 +499,15 @@ export class GetFunctions {
   }
 
   getBoolean(value) {
-    if (typeof value === 'number') {
-      if (value === 0) {
-        return false;
-      } else {
-        return true;
+    switch (typeof value) {
+      case 'number':
+        return value !== 0;
+      case 'string': {
+        const vNum = parseInt(value);
+        return !isNaN(vNum) && vNum !== 0;
       }
-    }
-    if (typeof value === 'string') {
-      const vNum = parseInt(value);
-      if (!isNaN(vNum)) {
-        if (vNum === 0) {
-          return false;
-        } else {
-          return true;
-        }
-      }
-    }
-
-    switch (value) {
-      case true:
-      case 'true':
-      case 'on':
-      case 'yes':
-        return true;
       default:
-        return false;
+        return value === true || value === 'true' || value === 'on' || value === 'yes';
     }
   }
 }
