@@ -189,77 +189,58 @@ export class FibaroAccessory {
       this.platform.log.info(`${this.device.name} [${IDs[0]}]:`, 'getting', `${characteristic.displayName}`);
     }
     callback(undefined, characteristic.value);
-    try {
-      if (!this.platform.fibaroClient) {
-        this.platform.log.error('No Fibaro client available.');
-        return;
-      }
-      // Manage security system status
-      if (service.isSecuritySystem) {
-        const securitySystemStatus = (await this.platform.fibaroClient.getGlobalVariable(constants.SECURITY_SYSTEM_GLOBAL_VARIABLE)).body;
-        if (this.platform.getFunctions) {
-          this.platform.getFunctions.getSecuritySystemState(characteristic, service, IDs, securitySystemStatus);
-        }
-        return;
-      }
-      // Manage global variable switches
-      if (service.isGlobalVariableSwitch) {
-        const switchStatus = (await this.platform.fibaroClient.getGlobalVariable(IDs[1])).body;
-        if (this.platform.getFunctions) {
-          this.platform.getFunctions.getBool(characteristic, service, IDs, switchStatus);
-        }
-        return;
-      }
-      // Manage global variable dimmers
-      if (service.isGlobalVariableDimmer) {
-        const value = (await this.platform.fibaroClient.getGlobalVariable(IDs[1])).body;
-        if (this.platform.getFunctions) {
-          if (characteristic.UUID === this.platform.Characteristic.Brightness.UUID) {
-            this.platform.getFunctions.getBrightness(characteristic, service, IDs, value);
-          } else if (characteristic.UUID === this.platform.Characteristic.On.UUID) {
-            this.platform.getFunctions.getBool(characteristic, service, IDs, value);
-          }
-        }
-        return;
-      }
-    } catch (e) {
-      this.platform.log.error('There was a problem getting value from Global Variables', ` - Err: ${e}`);
-      return;
-    }
-    if (!this.platform.getFunctions) {
+
+    if (!this.platform.fibaroClient) {
+      this.platform.log.error('No Fibaro client available.');
       return;
     }
 
-    const getFunction = this.platform.getFunctions.getFunctionsMapping.get(characteristic.UUID);
-    if (getFunction) {
-      if (!this.platform.fibaroClient) {
+    try {
+      // Handle special cases
+      if (service.isSecuritySystem) {
+        const securitySystemStatus = (await this.platform.fibaroClient.getGlobalVariable(constants.SECURITY_SYSTEM_GLOBAL_VARIABLE)).body;
+        this.platform.getFunctions?.getSecuritySystemState(characteristic, service, IDs, securitySystemStatus);
+        return;
+      } else if (service.isGlobalVariableSwitch) {
+        const switchStatus = (await this.platform.fibaroClient.getGlobalVariable(IDs[1])).body;
+        this.platform.getFunctions?.getBool(characteristic, service, IDs, switchStatus);
+        return;
+      } else if (service.isGlobalVariableDimmer) {
+        const value = (await this.platform.fibaroClient.getGlobalVariable(IDs[1])).body;
+        if (characteristic.UUID === this.platform.Characteristic.Brightness.UUID) {
+          this.platform.getFunctions?.getBrightness(characteristic, service, IDs, value);
+        } else if (characteristic.UUID === this.platform.Characteristic.On.UUID) {
+          this.platform.getFunctions?.getBool(characteristic, service, IDs, value);
+        }
         return;
       }
-      try {
+
+      // Get mapped function and call it
+      const getFunction = this.platform.getFunctions?.getFunctionsMapping.get(characteristic.UUID);
+      if (getFunction) {
         let properties;
         if (!service.isClimateZone && !service.isHeatingZone) {
           properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
-        } else {
-          properties = {};
         }
-        if (this.platform.config.FibaroTemperatureUnit === 'F') {
-          if (Object.prototype.hasOwnProperty.call(properties, 'value') && characteristic.displayName === 'Current Temperature') {
-            properties.value = (properties.value - 32) * 5 / 9;
-          }
+
+        if (this.platform.config.FibaroTemperatureUnit === 'F' &&
+            properties.value && characteristic.displayName === 'Current Temperature') {
+          properties.value = (properties.value - 32) * 5 / 9;
         }
-        if (Object.prototype.hasOwnProperty.call(properties, 'dead') && properties.dead === 'true') {
+
+        if (properties.dead === 'true') {
           service.dead = true;
           this.platform.log.info('Device dead: ', `${IDs[0]}  parameter: ${characteristic.displayName}`);
         } else {
           service.dead = false;
           getFunction.call(this.platform.getFunctions, characteristic, service, IDs, properties);
         }
-      } catch (e) {
-        service.dead = true;
-        this.platform.log.error('G1 - There was a problem getting value from: ', `${IDs[0]} - Err: ${e}`);
+      } else {
+        this.platform.log.error('No get function defined for: ', `${characteristic.displayName}`);
       }
-    } else {
-      this.platform.log.error('No get function defined for: ', `${characteristic.displayName}`);
+    } catch (e) {
+      service.dead = true;
+      this.platform.log.error('G1 - There was a problem getting value from: ', `${IDs[0]} - Err: ${e}`);
     }
   }
 
