@@ -9,7 +9,6 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as constants from './constants';
 
-
 declare const Buffer;
 
 // fix HC2 - 503-error (devices > 100)
@@ -21,60 +20,58 @@ const throttle = new Throttle({
 });
 
 export class FibaroClient {
+  private baseUrl: string;
+  private auth: string;
+  private adminAuth: string;
+  private https: boolean;
+  private ca: Buffer | null;
+  public status: boolean;
 
-  baseUrl: string;
-  auth: string;
-  adminAuth : string;
-  https: boolean;
-  ca: unknown;
-  status: boolean;
-
-  constructor(baseUrl, username, password, log, adminUsername, adminPassword) {
+  constructor(
+    baseUrl: string,
+    username: string,
+    password: string,
+    log: (message: string, error?: Error) => void,
+    adminUsername?: string,
+    adminPassword?: string,
+  ) {
     this.baseUrl = baseUrl;
-    this.auth = 'Basic ' + new Buffer.from(username + ':' + password).toString('base64');
-    if (adminUsername) {
-      this.adminAuth = 'Basic ' + new Buffer(adminUsername + ':' + adminPassword).toString('base64');
-    } else {
-      this.adminAuth = '';
+    this.auth = this.createAuthString(username, password);
+    this.adminAuth = adminUsername ? this.createAuthString(adminUsername, adminPassword!) : '';
+    this.https = baseUrl?.includes('https:') ?? false;
+    this.ca = this.loadCertificate(log);
+    this.status = this.https && !this.ca ? false : true;
+
+    if (this.https && !this.ca) {
+      log('Put a valid ca.cer file in config.json folder.');
     }
-    this.https = (this.baseUrl) ? this.baseUrl.indexOf('https:') !== -1 : false;
-    this.ca = null;
+  }
 
-    if (this.baseUrl && this.https) {
+  private createAuthString(username: string, password: string): string {
+    return 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
+  }
 
-      const localConfigPath = '/homebridge';
-      const localFile = localConfigPath + '/ca.cer';
-      // Check that the file exists locally
-      if(fs.existsSync(localFile)) {
-        try {
-          this.ca = fs.readFileSync(localFile);
-        } catch (e) {
-          log('Error reading ca.cer from /homebridge: ', e);
+  private loadCertificate(log: (message: string, error?: Error) => void): Buffer | null {
+    if (!this.baseUrl || !this.https) {
+      return null;
+    }
+
+    const certPaths = [
+      '/homebridge/ca.cer',
+      path.resolve(process.env.UIX_CONFIG_PATH?.replace(/\/config\.json$/, '') || path.join(os.homedir(), '.homebridge'), 'ca.cer'),
+    ];
+
+    for (const certPath of certPaths) {
+      try {
+        if (fs.existsSync(certPath)) {
+          return fs.readFileSync(certPath);
         }
-      } else {
-        // Check if the file exists in the config.json folder
-        let configPath = process.env.UIX_CONFIG_PATH;
-        if (configPath) {
-          configPath = configPath.substring(0, configPath.lastIndexOf('/config.json'));
-        } else {
-          configPath = path.resolve(os.homedir(), '.homebridge');
-        }
-        const file = configPath + '/ca.cer';
-        if(fs.existsSync(file)) {
-          try {
-            this.ca = fs.readFileSync(file);
-          } catch (e) {
-            log('Error reading ca.cer from config.json folder: ', e);
-          }
-        }
+      } catch (e) {
+        log(`Error reading ca.cer from ${certPath}:`, e as Error);
       }
     }
-    if (this.baseUrl && this.https && !this.ca) {
-      log('Put a valid ca.cer file in config.json folder.');
-      this.status = false;
-    } else {
-      this.status = true;
-    }
+
+    return null;
   }
 
   composeURL(service) {
@@ -89,7 +86,7 @@ export class FibaroClient {
         .use(throttle.plugin())
         .set('Authorization', this.auth)
         .set('accept', 'json')
-        .ca(this.ca as string);
+        .ca(this.ca as Buffer);
     } else {
       return superagent
         .get(url)
@@ -108,7 +105,7 @@ export class FibaroClient {
         .send(body)
         .set('Authorization', this.auth)
         .set('accept', 'json')
-        .ca(this.ca as string);
+        .ca(this.ca as Buffer);
     } else {
       return superagent
         .post(url)
@@ -128,7 +125,7 @@ export class FibaroClient {
         .send(body)
         .set('Authorization', this.auth)
         .set('accept', 'json')
-        .ca(this.ca as string);
+        .ca(this.ca as Buffer);
     } else {
       return superagent
         .put(url)
@@ -148,7 +145,7 @@ export class FibaroClient {
         .send(body)
         .set('Authorization', this.adminAuth)
         .set('accept', 'json')
-        .ca(this.ca as string);
+        .ca(this.ca as Buffer);
     } else {
       return superagent
         .put(url)

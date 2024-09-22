@@ -33,104 +33,105 @@ export class FibaroHC implements DynamicPlatformPlugin {
   // this is used to track restored cached accessories
   public readonly accessories: PlatformAccessory[] = [];
 
-  public updateSubscriptions: Array<unknown>;
+  public updateSubscriptions: Array<unknown> = [];
   public poller?: Poller;
-  public scenes: Record<string, string>;
-  public climateZones: Record<string, string>;
-  public info: Record<string, string>;
+  public scenes: Record<string, string> = {};
+  public climateZones: Record<string, string> = {};
+  public info: Record<string, string> = {};
   public fibaroClient?: FibaroClient;
   public setFunctions?: SetFunctions;
   public getFunctions?: GetFunctions;
-  public mutex;
-  public timeout;
-
+  public mutex = new Mutex();
+  public loginTimeout: NodeJS.Timeout | null = null;
 
   constructor(
     public readonly log: Logging,
     public readonly config: PlatformConfig,
     public readonly api: API,
   ) {
-    this.updateSubscriptions = [];
-    this.scenes = {};
-    this.climateZones = {};
-    this.mutex = new Mutex();
-    this.info = {};
-    this.timeout = null;
+    if (!this.setupConfig()) {
+      return;
+    }
+    this.initializeFibaroClient();
 
-    if (!config) {
-      this.log.error('Fibaro HC configuration: cannot find configuration for the plugin');
-      return;
-    }
-    let pollerPeriod = this.config.pollerperiod ? parseInt(this.config.pollerperiod) : defaultPollerPeriod;
-    if (isNaN(pollerPeriod) || pollerPeriod < 0 || pollerPeriod > 100) {
-      pollerPeriod = defaultPollerPeriod;
-    }
-    const thermostatMaxTemp = this.config.thermostatmaxtemperature ?
-      parseInt(this.config.thermostatmaxtemperature) :
-      defaultThermostatMaxTemp;
-    if (isNaN(thermostatMaxTemp) || thermostatMaxTemp < 0 || thermostatMaxTemp > defaultThermostatMaxTemp) {
-      this.config.thermostatmaxtemperature = defaultThermostatMaxTemp;
-    }
-    if (this.config.thermostattimeout === undefined) {
-      this.config.thermostattimeout = timeOffset.toString();
-    }
-    if (this.config.switchglobalvariables === undefined) {
-      this.config.switchglobalvariables = '';
-    }
-    if (this.config.dimmerglobalvariables === undefined) {
-      this.config.dimmerglobalvariables = '';
-    }
-    if (this.config.securitysystem === undefined ||
-      (this.config.securitysystem !== 'enabled' && this.config.securitysystem !== 'disabled')) {
-      this.config.securitysystem = 'disabled';
-    }
-    if (this.config.FibaroTemperatureUnit === undefined) {
-      this.config.FibaroTemperatureUnit = 'C';
-    }
-    if (this.config.addRoomNameToDeviceName === undefined) {
-      this.config.addRoomNameToDeviceName = 'disabled';
-    }
-    if (this.config.logsLevel === undefined) {
-      this.config.logsLevel = '1';
-    }
-    if (validUrl(this.config.url)) {
-      if (!this.config.url.startsWith('http') ) {
-        // add http if no protocol specified
-        this.config.url = 'http://' + this.config.url;
-      }
-    } else if (validUrl(this.config.host)) {
-      // if url is not specified or not valid, try to use host
-      if (!this.config.host.startsWith('http')) {
-        // add http if no protocol specified
-        this.config.url = 'http://' + this.config.host;
-      }
-    } else {
-      this.log.error('Fibaro HC configuration: cannot find valid url in configuration file.');
-      return;
-    }
-
-    this.fibaroClient = new FibaroClient(this.config.url, this.config.username, this.config.password, this.log,
-      this.config.adminUsername, this.config.adminPassword);
-    if (!this.fibaroClient || this.fibaroClient.status === false) {
-      this.log.error('Cannot connect to Fibaro Home Center. Check credentials, url or ca.cer file');
-      return;
-    }
-    if (pollerPeriod > 0) {
-      this.poller = new Poller(this, pollerPeriod);
+    if (this.config.pollerperiod > 0) {
+      this.poller = new Poller(this, this.config.pollerperiod);
     }
 
     this.getFunctions = new GetFunctions(this);
 
     this.log.debug('Finished initializing platform:', this.config.name);
 
-    // When this event is fired it means Homebridge has restored all cached accessories from disk.
-    // Dynamic Platform plugins should only register new accessories after this event was fired,
-    // in order to ensure they weren't added to homebridge already. This event can also be used
-    // to start discovery of new accessories.
     api.on(APIEvent.DID_FINISH_LAUNCHING, async () => {
       log.debug('Executed didFinishLaunching callback');
       this.login();
     });
+  }
+
+  private setupConfig() : boolean {
+    if (!this.config) {
+      this.log.error('Fibaro HC configuration: cannot find configuration for the plugin');
+      return false;
+    }
+    this.setupPollerPeriod();
+    this.setupThermostatMaxTemp();
+    this.setupDefaultConfigValues();
+    this.setupUrl();
+    return true;
+  }
+
+  private setupPollerPeriod() {
+    let pollerPeriod = this.config.pollerperiod ? parseInt(this.config.pollerperiod) : defaultPollerPeriod;
+    if (isNaN(pollerPeriod) || pollerPeriod < 0 || pollerPeriod > 100) {
+      pollerPeriod = defaultPollerPeriod;
+    }
+    this.config.pollerperiod = pollerPeriod;
+  }
+
+  private setupThermostatMaxTemp() {
+    const thermostatMaxTemp = this.config.thermostatmaxtemperature ?
+      parseInt(this.config.thermostatmaxtemperature) :
+      defaultThermostatMaxTemp;
+    if (isNaN(thermostatMaxTemp) || thermostatMaxTemp < 0 || thermostatMaxTemp > defaultThermostatMaxTemp) {
+      this.config.thermostatmaxtemperature = defaultThermostatMaxTemp;
+    }
+  }
+
+  private setupDefaultConfigValues() {
+    this.config.thermostattimeout = this.config.thermostattimeout ?? timeOffset.toString();
+    this.config.switchglobalvariables = this.config.switchglobalvariables ?? '';
+    this.config.dimmerglobalvariables = this.config.dimmerglobalvariables ?? '';
+    this.config.securitysystem = this.config.securitysystem === 'enabled' ? 'enabled' : 'disabled';
+    this.config.FibaroTemperatureUnit = this.config.FibaroTemperatureUnit ?? 'C';
+    this.config.addRoomNameToDeviceName = this.config.addRoomNameToDeviceName ?? 'disabled';
+    this.config.logsLevel = this.config.logsLevel ?? '1';
+  }
+
+  private setupUrl() {
+    if (validUrl(this.config.url)) {
+      this.config.url = this.config.url.startsWith('http') ? this.config.url : 'http://' + this.config.url;
+    } else if (validUrl(this.config.host)) {
+      this.config.url = this.config.host.startsWith('http') ? this.config.host : 'http://' + this.config.host;
+    } else {
+      this.log.error('Fibaro HC configuration: cannot find valid url in configuration file.');
+      throw new Error('Invalid URL configuration');
+    }
+  }
+
+  private initializeFibaroClient() {
+    this.fibaroClient = new FibaroClient(
+      this.config.url,
+      this.config.username,
+      this.config.password,
+      this.log,
+      this.config.adminUsername,
+      this.config.adminPassword,
+    );
+
+    if (!this.fibaroClient || this.fibaroClient.status === false) {
+      this.log.error('Cannot connect to Fibaro Home Center. Check credentials, url or ca.cer file');
+      throw new Error('Failed to initialize Fibaro Client');
+    }
   }
 
   async login() {
@@ -176,8 +177,10 @@ export class FibaroHC implements DynamicPlatformPlugin {
                      + ' and that HC is enabled and available on the same network as Homebridge.'
                      + ' Using https may be mandatory if you configured HC to use it.');
       this.log.error('Next try in 5 minutes');
-      clearTimeout(this.timeout);
-      this.timeout = setTimeout(() => {
+      if (this.loginTimeout) {
+        clearTimeout(this.loginTimeout);
+      }
+      this.loginTimeout = setTimeout(() => {
         this.login();
       }, 300000);
     }
@@ -226,7 +229,6 @@ export class FibaroHC implements DynamicPlatformPlugin {
     };
     createGlobalVariableDevices(this.config.switchglobalvariables, 'G');
     createGlobalVariableDevices(this.config.dimmerglobalvariables, 'D');
-
 
     // Create Security System accessory
     if (this.config.securitysystem === 'enabled') {
