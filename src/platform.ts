@@ -105,6 +105,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
     this.config.FibaroTemperatureUnit = this.config.FibaroTemperatureUnit ?? 'C';
     this.config.addRoomNameToDeviceName = this.config.addRoomNameToDeviceName ?? 'disabled';
     this.config.logsLevel = this.config.logsLevel ?? '1';
+    this.config.doorbellDeviceId = this.config.doorbellDeviceId ?? '0';
   }
 
   private setupUrl() {
@@ -140,7 +141,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
         return;
       }
       this.info = (await this.fibaroClient.getInfo()).body;
-      const scenes = (await this.fibaroClient.getScenes()).body;
+      const { body: scenes } = await this.fibaroClient.getScenes();
       scenes.map((s) => {
         this.scenes[s.name] = s.id;
         if (s.name.startsWith('_')) {
@@ -149,14 +150,14 @@ export class FibaroHC implements DynamicPlatformPlugin {
         }
       });
       if (this.isOldApi()) {
-        const heatingZones = (await this.fibaroClient.getHeatingZones()).body;
+        const { body: heatingZones } = await this.fibaroClient.getHeatingZones();
         heatingZones.map((s) => {
           this.climateZones[s.name] = s.id;
           const device = { name: s.name, roomID: 0, id: s.id, type: 'heatingZone', properties: s.properties };
           this.addAccessory(device);
         });
       } else {
-        const climateZones = (await this.fibaroClient.getClimateZones()).body;
+        const { body: climateZones } = await this.fibaroClient.getClimateZones();
         climateZones.map((s) => {
           this.climateZones[s.name] = s.id;
           const device = { name: s.name, roomID: 0, id: s.id, type: 'climateZone', properties: s.properties };

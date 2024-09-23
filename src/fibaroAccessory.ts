@@ -47,6 +47,10 @@ export class FibaroAccessory {
       this.configureAccessoryFromType(controlType, properties);
     }
 
+    if (!this.isValid) {
+      return;
+    }
+
     this.bindCharactersticsEvent(this.mainService, this.mainCharacteristics);
 
     if (this.device.interfaces && this.device.interfaces.includes('battery')) {
@@ -547,7 +551,7 @@ export class FibaroAccessory {
           this.setMain(Service.MotionSensor, [Characteristic.MotionDetected]);
         } else if (properties.deviceRole === 'PresenceSensor') {
           this.setMain(Service.OccupancySensor, [Characteristic.OccupancyDetected]);
-        } else if (this.device.id === this.platform.config.config.doorbellDeviceId) {
+        } else if (this.device.id === this.platform.config.doorbellDeviceId) {
           this.setMain(Service.Doorbell, [Characteristic.ProgrammableSwitchEvent]);
         } else {
           this.setMain(Service.ContactSensor, [Characteristic.ContactSensorState]);

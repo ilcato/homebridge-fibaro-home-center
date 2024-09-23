@@ -380,17 +380,14 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 
 # Latest release notes
 
-### Version 2.1.3
+### Version 2.2.0
 
-- fix to excluding devices feature
+- Main refactoring.
 - Dependencies updates.
 
 ### Version 2.1.0
 
-- Support for air quality sensor (PM2.5).
-- Support for presence sensor.
-- Preparation for Homebridge v2.
-- Fixes for small bugs.
+- fix to excluding devices feature
 - Dependencies updates.
 
 #### See all: [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)

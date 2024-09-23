@@ -504,11 +504,12 @@ export class GetFunctions {
         return value !== 0;
       case 'string': {
         const vNum = parseInt(value);
-        return !isNaN(vNum) && vNum !== 0;
+        return !isNaN(vNum) && vNum !== 0 || value === 'true' || value === 'on' || value === 'yes';
       }
+      case 'boolean':
+        return value;
       default:
-        return value === true || value === 'true' || value === 'on' || value === 'yes';
+        return false;
     }
   }
 }
-
