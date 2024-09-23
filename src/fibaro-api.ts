@@ -14,8 +14,8 @@ declare const Buffer;
 // fix HC2 - 503-error (devices > 100)
 const throttle = new Throttle({
   active: true,
-  rate: 1000,
-  ratePer: 3000,
+  rate: 100,
+  ratePer: 1000,
   concurrent: 50, // how many requests can be sent concurrently
 });
 

@@ -504,7 +504,15 @@ export class GetFunctions {
         return value !== 0;
       case 'string': {
         const vNum = parseInt(value);
-        return !isNaN(vNum) && vNum !== 0 || value === 'true' || value === 'on' || value === 'yes';
+        if (!isNaN(vNum) && vNum !== 0) {
+          return true;
+        } else if (!isNaN(vNum) && vNum === 0) {
+          return false;
+        } else if (value === 'true' || value === 'on' || value === 'yes') {
+          return true;
+        } else {
+          return false;
+        }
       }
       case 'boolean':
         return value;
