@@ -145,7 +145,11 @@ export class GetFunctions {
           this.platform.fibaroClient.getClimateZone :
           this.platform.fibaroClient.getHeatingZone;
 
-        const { body: { properties: zoneProperties } } = await getZoneFunction(IDs[0]);
+        const response = await getZoneFunction.call(this.platform.fibaroClient, IDs[0]);
+        if (!response || !response.body || !response.body.properties) {
+          throw new Error(`No valid response for ${zoneType} zone.`);
+        }
+        const { body: { properties: zoneProperties } } = response;
 
         const tempProperty = service.isClimateZone ? 'currentTemperatureHeating' : 'currentTemperature';
         temperature = zoneProperties[tempProperty];
@@ -173,7 +177,11 @@ export class GetFunctions {
           this.platform.fibaroClient.getClimateZone :
           this.platform.fibaroClient.getHeatingZone;
 
-        const { body: { properties: zoneProperties } } = await getZoneFunction(IDs[0]);
+        const response = await getZoneFunction.call(this.platform.fibaroClient, IDs[0]);
+        if (!response || !response.body || !response.body.properties) {
+          throw new Error(`No valid response for ${zoneType} zone.`);
+        }
+        const { body: { properties: zoneProperties } } = response;
 
         const tempProperty = service.isClimateZone ? 'currentTemperatureHeating' : 'currentTemperature';
         temperature = zoneProperties[tempProperty];

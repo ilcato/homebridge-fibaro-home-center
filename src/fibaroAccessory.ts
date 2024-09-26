@@ -225,6 +225,8 @@ export class FibaroAccessory {
         let properties;
         if (!service.isClimateZone && !service.isHeatingZone) {
           properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
+        } else {
+          properties = {};
         }
 
         if (this.platform.config.FibaroTemperatureUnit === 'F' &&
