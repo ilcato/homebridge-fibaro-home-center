@@ -1,3 +1,5 @@
+// settings.ts
+
 /**
  * This is the name of the platform that users will use to register the plugin in the Homebridge config.json
  */
