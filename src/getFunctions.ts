@@ -506,25 +506,40 @@ export class GetFunctions {
     };
   }
 
-  getBoolean(value) {
+  /**
+   * Converts various input types to a boolean value.
+   * @param value - The input value to convert.
+   * @returns A boolean representation of the input value.
+   */
+  getBoolean(value: number | string | boolean): boolean {
     switch (typeof value) {
       case 'number':
+        // Any non-zero number is true
         return value !== 0;
-      case 'string': {
-        const vNum = parseInt(value);
-        if (!isNaN(vNum) && vNum !== 0) {
+
+      case 'string':
+      {
+      // Convert string to lowercase for case-insensitive comparison
+        const lowercaseValue = value.toLowerCase().trim();
+        // Check for truthy string values
+        if (['true', 'on', 'yes'].includes(lowercaseValue)) {
           return true;
-        } else if (!isNaN(vNum) && vNum === 0) {
-          return false;
-        } else if (value === 'true' || value === 'on' || value === 'yes') {
-          return true;
-        } else {
+        }
+        // Check for falsy string values
+        if (['false', 'off', 'no'].includes(lowercaseValue)) {
           return false;
         }
+        // If it's a number string, convert to integer and check if it's non-zero
+        const numValue = parseInt(value, 10);
+        return !isNaN(numValue) && numValue !== 0;
       }
+
       case 'boolean':
+        // Boolean values are returned as-is
         return value;
+
       default:
+        // For any other type, return false
         return false;
     }
   }
