@@ -140,23 +140,7 @@ export class GetFunctions {
       let temperature;
 
       if (service.isClimateZone || service.isHeatingZone) {
-        const zoneType = service.isClimateZone ? 'Climate' : 'Heating';
-        const getZoneFunction = service.isClimateZone ?
-          this.platform.fibaroClient.getClimateZone :
-          this.platform.fibaroClient.getHeatingZone;
-
-        const response = await getZoneFunction.call(this.platform.fibaroClient, IDs[0]);
-        if (!response || !response.body || !response.body.properties) {
-          throw new Error(`No valid response for ${zoneType} zone.`);
-        }
-        const { body: { properties: zoneProperties } } = response;
-
-        const tempProperty = service.isClimateZone ? 'currentTemperatureHeating' : 'currentTemperature';
-        temperature = zoneProperties[tempProperty];
-
-        if (temperature === undefined) {
-          throw new Error(`No value for Temperature (Current - ${zoneType} zone).`);
-        }
+        temperature = await this.getZoneTemperature(service, IDs[0]);
       } else {
         temperature = properties.value;
       }
@@ -172,23 +156,7 @@ export class GetFunctions {
       let temperature;
 
       if (service.isClimateZone || service.isHeatingZone) {
-        const zoneType = service.isClimateZone ? 'Climate' : 'Heating';
-        const getZoneFunction = service.isClimateZone ?
-          this.platform.fibaroClient.getClimateZone :
-          this.platform.fibaroClient.getHeatingZone;
-
-        const response = await getZoneFunction.call(this.platform.fibaroClient, IDs[0]);
-        if (!response || !response.body || !response.body.properties) {
-          throw new Error(`No valid response for ${zoneType} zone.`);
-        }
-        const { body: { properties: zoneProperties } } = response;
-
-        const tempProperty = service.isClimateZone ? 'currentTemperatureHeating' : 'currentTemperature';
-        temperature = zoneProperties[tempProperty];
-
-        if (temperature === undefined) {
-          throw new Error(`No value for Temperature (Target - ${zoneType} zone).`);
-        }
+        temperature = await this.getZoneTemperature(service, IDs[0]);
       } else {
         temperature = properties.value;
       }
@@ -197,6 +165,28 @@ export class GetFunctions {
     } catch (e) {
       this.platform.log(`Error getting Target Temperature: ${service.IDs[0]} - Err: ${e}`);
     }
+  }
+
+  async getZoneTemperature(service, zoneId) {
+    const getZoneFunction = service.isClimateZone ?
+      this.platform.fibaroClient.getClimateZone :
+      this.platform.fibaroClient.getHeatingZone;
+
+    const response = await getZoneFunction.call(this.platform.fibaroClient, zoneId);
+    if (!response || !response.body || !response.body.properties) {
+      throw new Error(`No valid response for zone ${zoneId}.`);
+    }
+    const { body: { properties: zoneProperties } } = response;
+
+    const tempProperty = service.isClimateZone ? 'currentTemperatureHeating' : 'currentTemperature';
+
+    const temperature = zoneProperties[tempProperty];
+
+    if (temperature === undefined) {
+      throw new Error(`No value for Temperature in zone: ${zoneId}.`);
+    }
+
+    return temperature;
   }
 
   getContactSensorState(characteristic, _service, _IDs, properties) {
