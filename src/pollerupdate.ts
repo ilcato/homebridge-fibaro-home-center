@@ -104,7 +104,8 @@ export class Poller {
         if (parseInt(id) === change.id &&
             ((property === 'value' && change.value !== undefined) || (property === 'value2' && change.value2 !== undefined))) {
 
-          if (this.platform.config.FibaroTemperatureUnit === 'F' && characteristic.displayName === 'Current Temperature') {
+          if (this.platform.config.FibaroTemperatureUnit === constants.CONFIG_FIBARO_TEMPERATURE_UNIT_FAHRENHEIT &&
+              characteristic.displayName === 'Current Temperature') {
             change.value = (change.value - 32) * 5 / 9;
           }
 
@@ -125,7 +126,8 @@ export class Poller {
       switch (characteristic.displayName) {
         case 'Current Temperature':
           val1 = characteristic.value.toFixed(1);
-          val2 = this.platform.config.FibaroTemperatureUnit === 'F' ? 'F' : 'C';
+          val2 = this.platform.config.FibaroTemperatureUnit === constants.CONFIG_FIBARO_TEMPERATURE_UNIT_FAHRENHEIT ?
+            constants.CONFIG_FIBARO_TEMPERATURE_UNIT_FAHRENHEIT : constants.CONFIG_FIBARO_TEMPERATURE_UNIT_CELSIUS;
           break;
         case 'Current Relative Humidity':
         case 'Brightness':

@@ -14,9 +14,9 @@ declare const Buffer;
 // fix HC2 - 503-error (devices > 100)
 const throttle = new Throttle({
   active: true,
-  rate: 100,
-  ratePer: 1000,
-  concurrent: 50, // how many requests can be sent concurrently
+  rate: constants.DEFAULT_THROTTLE_RATE,
+  ratePer: constants.DEFAULT_THROTTLE_RATE_PER,
+  concurrent: constants.DEFAULT_THROTTLE_CONCURRENT,
 });
 
 export class FibaroClient {
@@ -57,8 +57,11 @@ export class FibaroClient {
     }
 
     const certPaths = [
-      '/homebridge/ca.cer',
-      path.resolve(process.env.UIX_CONFIG_PATH?.replace(/\/config\.json$/, '') || path.join(os.homedir(), '.homebridge'), 'ca.cer'),
+      ...constants.CERTIFICATE_PATHS,
+      path.resolve(
+        process.env.UIX_CONFIG_PATH?.replace(/\/config\.json$/, '') || path.join(os.homedir(), '.homebridge'),
+        constants.CERTIFICATE_FILE_NAME,
+      ),
     ];
 
     for (const certPath of certPaths) {
@@ -67,7 +70,7 @@ export class FibaroClient {
           return fs.readFileSync(certPath);
         }
       } catch (e) {
-        log(`Error reading ca.cer from ${certPath}:`, e as Error);
+        log(`Error reading ${constants.CERTIFICATE_FILE_NAME} from ${certPath}:`, e as Error);
       }
     }
 
@@ -85,14 +88,14 @@ export class FibaroClient {
         .get(url)
         .use(throttle.plugin())
         .set('Authorization', this.auth)
-        .set('accept', 'json')
+        .set('accept', constants.HTTP_ACCEPT_HEADER)
         .ca(this.ca as Buffer);
     } else {
       return superagent
         .get(url)
         .use(throttle.plugin())
         .set('Authorization', this.auth)
-        .set('accept', 'json');
+        .set('accept', constants.HTTP_ACCEPT_HEADER);
     }
   }
 
@@ -104,7 +107,7 @@ export class FibaroClient {
         .use(throttle.plugin())
         .send(body)
         .set('Authorization', this.auth)
-        .set('accept', 'json')
+        .set('accept', constants.HTTP_ACCEPT_HEADER)
         .ca(this.ca as Buffer);
     } else {
       return superagent
@@ -112,7 +115,7 @@ export class FibaroClient {
         .use(throttle.plugin())
         .send(body)
         .set('Authorization', this.auth)
-        .set('accept', 'json');
+        .set('accept', constants.HTTP_ACCEPT_HEADER);
     }
   }
 
@@ -124,7 +127,7 @@ export class FibaroClient {
         .use(throttle.plugin())
         .send(body)
         .set('Authorization', this.auth)
-        .set('accept', 'json')
+        .set('accept', constants.HTTP_ACCEPT_HEADER)
         .ca(this.ca as Buffer);
     } else {
       return superagent
@@ -132,7 +135,7 @@ export class FibaroClient {
         .use(throttle.plugin())
         .send(body)
         .set('Authorization', this.auth)
-        .set('accept', 'json');
+        .set('accept', constants.HTTP_ACCEPT_HEADER);
     }
   }
 
@@ -144,7 +147,7 @@ export class FibaroClient {
         .use(throttle.plugin())
         .send(body)
         .set('Authorization', this.adminAuth)
-        .set('accept', 'json')
+        .set('accept', constants.HTTP_ACCEPT_HEADER)
         .ca(this.ca as Buffer);
     } else {
       return superagent
@@ -152,7 +155,7 @@ export class FibaroClient {
         .use(throttle.plugin())
         .send(body)
         .set('Authorization', this.adminAuth)
-        .set('accept', 'json');
+        .set('accept', constants.HTTP_ACCEPT_HEADER);
     }
   }
 

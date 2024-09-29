@@ -14,6 +14,7 @@ import { FibaroAccessory } from './fibaroAccessory';
 import { FibaroClient } from './fibaro-api';
 import { SetFunctions } from './setFunctions';
 import { GetFunctions } from './getFunctions';
+import * as constants from './constants';
 import { Poller } from './pollerupdate';
 import { Mutex } from 'async-mutex';
 
@@ -192,7 +193,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
    * It should be used to setup event handlers for characteristics and update respective values.
    */
   configureAccessory(accessory: PlatformAccessory) {
-    if (this.config.logsLevel === 2){
+    if (this.config.logsLevel === constants.CONFIG_LOGS_LEVEL_VERBOSE){
       this.log.info('Loading accessory from cache:', accessory.displayName);
     }
     // To enable the removing of cached accessories no more present on Fibaro Home Center
@@ -268,7 +269,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
     const existingAccessory = existingAccessoryV1 ? existingAccessoryV1 : existingAccessoryV2;
     if (existingAccessory) {
       // the accessory already exists
-      if (this.config.logsLevel === 2){
+      if (this.config.logsLevel === constants.CONFIG_LOGS_LEVEL_VERBOSE){
         this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
       }
 
