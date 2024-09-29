@@ -49,6 +49,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
       "username": "mail@domain.com",
       "password": "your-password",
       "pollerperiod": 3,
+      "markDeadDevices": true,
       "thermostattimeout": 7200
       "thermostatmaxtemperature": 100,
       "switchglobalvariables": "name1,name2,name3"
@@ -85,6 +86,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 
 #### Advanced
 + `pollerperiod` (integer) : Polling interval (refresh interval) for querying Fibaro Home Center (0: disabled, recomended: 3, 1 or 2 seconds allows for a more responsive update of the Home app when changes appear outside the HomeKit environment). If it is disabled the Home app is not updated automatically when such a change happen but only when you close a panel and reopen it. Enabling this option is useful to read the new state when controlling devices outside HomeKit, E.G.: via Fibaro, physical buttons, scenes and automations.
++ `markDeadDevices` (boolean) : Show dead devices as not responding in HomeKit. Dead devices are devices that have connection problems. Warning: Not responding devices will break HomeKit automations.
 + `thermostatmaxtemperature` (integer) : Set max temperature for thermostatic devices (default 100 C).
 + `thermostattimeout` (integer) : Number of seconds for the thermostat timeout, default: 7200 (2 hours).
 + `switchglobalvariables` (string) : Comma separated list of home center global variables names acting like a bistable switch.

@@ -44,7 +44,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
   public getFunctions?: GetFunctions;
   public mutex = new Mutex();
   public loginTimeout: NodeJS.Timeout | null = null;
-
+  public markDeadDevices: boolean = false;
   constructor(
     public readonly log: Logging,
     public readonly config: PlatformConfig,

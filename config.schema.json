@@ -41,6 +41,14 @@
         "placeholder": 3,
         "minimum": 0
       },
+      "markDeadDevices": {
+        "description": "Show dead devices as not responding in HomeKit. Dead devices are devices that have connection problems. Warning: Not responding devices will break HomeKit automations.",
+        "title": "Mark dead devices",
+        "type": "boolean",
+        "required": false,
+        "default": false,
+        "placeholder": false
+      },
       "thermostattimeout": {
         "description": "Set the duration in seconds (60 - 1 minute, 3600 - 1 hour) of the manual setting for the thermostatic controls (defaults to 7200, 2 hours)",
         "title": "Number of seconds for the thermostat timeout",
@@ -302,6 +310,7 @@
           "flex-flow": "row wrap",
           "items": [
             "pollerperiod",
+            "markDeadDevices",
             "securitysystem"
           ]
         },
