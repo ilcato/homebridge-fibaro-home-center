@@ -383,12 +383,13 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 ### Version 2.2.0
 
 - Main refactoring.
-- Fix dead devices management
+- Option to mark dead devices as not responding in HomeKit.
+- Log dead devices.
 - Dependencies updates.
 
 ### Version 2.1.0
 
-- fix to excluding devices feature
+- Fix to excluding devices feature
 - Dependencies updates.
 
 #### See all: [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)
