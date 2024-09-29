@@ -192,10 +192,9 @@ export class FibaroAccessory {
     if (this.platform.config.logsLevel === 2) {
       this.platform.log.info(`${this.device.name} [${IDs[0]}]:`, 'getting', `${characteristic.displayName}`);
     }
-    callback(undefined, characteristic.value);
-
     if (!this.platform.fibaroClient) {
       this.platform.log.error('No Fibaro client available.');
+      callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
       return;
     }
 
@@ -204,11 +203,11 @@ export class FibaroAccessory {
       if (service.isSecuritySystem) {
         const securitySystemStatus = (await this.platform.fibaroClient.getGlobalVariable(constants.SECURITY_SYSTEM_GLOBAL_VARIABLE)).body;
         this.platform.getFunctions?.getSecuritySystemState(characteristic, service, IDs, securitySystemStatus);
-        return;
+        callback(undefined, characteristic.value);
       } else if (service.isGlobalVariableSwitch) {
         const switchStatus = (await this.platform.fibaroClient.getGlobalVariable(IDs[1])).body;
         this.platform.getFunctions?.getBool(characteristic, service, IDs, switchStatus);
-        return;
+        callback(undefined, characteristic.value);
       } else if (service.isGlobalVariableDimmer) {
         const value = (await this.platform.fibaroClient.getGlobalVariable(IDs[1])).body;
         if (characteristic.UUID === this.platform.Characteristic.Brightness.UUID) {
@@ -216,36 +215,36 @@ export class FibaroAccessory {
         } else if (characteristic.UUID === this.platform.Characteristic.On.UUID) {
           this.platform.getFunctions?.getBool(characteristic, service, IDs, value);
         }
-        return;
-      }
-
-      // Get mapped function and call it
-      const getFunction = this.platform.getFunctions?.getFunctionsMapping.get(characteristic.UUID);
-      if (getFunction) {
-        let properties;
-        if (!service.isClimateZone && !service.isHeatingZone) {
-          properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
-        } else {
-          properties = {};
-        }
-
-        if (this.platform.config.FibaroTemperatureUnit === 'F' &&
-            properties.value && characteristic.displayName === 'Current Temperature') {
-          properties.value = (properties.value - 32) * 5 / 9;
-        }
-
-        if (properties.dead === 'true') {
-          service.dead = true;
-          this.platform.log.info('Device dead: ', `${IDs[0]}  parameter: ${characteristic.displayName}`);
-        } else {
-          service.dead = false;
-          getFunction.call(this.platform.getFunctions, characteristic, service, IDs, properties);
-        }
+        callback(undefined, characteristic.value);
       } else {
-        this.platform.log.error('No get function defined for: ', `${characteristic.displayName}`);
+        // Get mapped function and call it
+        const getFunction = this.platform.getFunctions?.getFunctionsMapping.get(characteristic.UUID);
+        if (getFunction) {
+          let properties;
+          if (!service.isClimateZone && !service.isHeatingZone) {
+            properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
+          } else {
+            properties = {};
+          }
+          if (this.platform.config.FibaroTemperatureUnit === 'F' &&
+              properties.value && characteristic.displayName === 'Current Temperature') {
+            properties.value = (properties.value - 32) * 5 / 9;
+          }
+          if (properties.dead === true) {
+            callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+            this.platform.log.warn('Device dead: ',
+              `${IDs[0]}  parameter: ${characteristic.displayName}, reason: ${properties.deadReason}`);
+          } else {
+            callback(undefined, characteristic.value); // The get function call may update the value with updatValue api
+            getFunction.call(this.platform.getFunctions, characteristic, service, IDs, properties);
+          }
+        } else {
+          callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+          this.platform.log.error('No get function defined for: ', `${characteristic.displayName}`);
+        }
       }
     } catch (e) {
-      service.dead = true;
+      callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
       this.platform.log.error('G1 - There was a problem getting value from: ', `${IDs[0]} - Err: ${e}`);
     }
   }

@@ -383,6 +383,7 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 ### Version 2.2.0
 
 - Main refactoring.
+- Fix dead devices management
 - Dependencies updates.
 
 ### Version 2.1.0
