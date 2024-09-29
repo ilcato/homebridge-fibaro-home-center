@@ -243,9 +243,9 @@ export class FibaroAccessory {
             service.deadLogged = true; // Mark that we've logged for this service
           }
           // Report dead status to HomeKit if markDeadDevices is true
-          if (properties.dead === true && this.platform.markDeadDevices) {
+          if (properties.dead === true && this.platform.config.markDeadDevices) {
             callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-          } else if (properties.dead === true && !this.platform.markDeadDevices) {
+          } else if (properties.dead === true && !this.platform.config.markDeadDevices) {
             callback(undefined, characteristic.value); // Return the last known value
           } else {
             callback(undefined, characteristic.value); // The get function call may update the value with updatValue api
