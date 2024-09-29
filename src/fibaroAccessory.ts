@@ -17,6 +17,7 @@ export class FibaroAccessory {
   mainCharacteristics;
   batteryCharacteristics;
   isValid;
+  lastServiceChecked;
 
   constructor(
     private readonly platform: FibaroHC,
@@ -230,10 +231,20 @@ export class FibaroAccessory {
               properties.value && characteristic.displayName === 'Current Temperature') {
             properties.value = (properties.value - 32) * 5 / 9;
           }
+          // Reset deadLogged flag if this is a different service
+          if (this.lastServiceChecked !== service) {
+            this.lastServiceChecked = service;
+            service.deadLogged = false;
+          }
+          // Log dead status once per service
+          if (properties.dead === true && !service.deadLogged) {
+            this.platform.log.warn('Device dead: ',
+              `${IDs[0]}  service: ${service.displayName}, reason: ${properties.deadReason}`);
+            service.deadLogged = true; // Mark that we've logged for this service
+          }
+          // Report dead status to HomeKit always
           if (properties.dead === true) {
             callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-            this.platform.log.warn('Device dead: ',
-              `${IDs[0]}  parameter: ${characteristic.displayName}, reason: ${properties.deadReason}`);
           } else {
             callback(undefined, characteristic.value); // The get function call may update the value with updatValue api
             getFunction.call(this.platform.getFunctions, characteristic, service, IDs, properties);
