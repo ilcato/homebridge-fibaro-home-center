@@ -67,3 +67,17 @@ export const SUBTYPE_PM2_5 = 'PM2_5';
 export const CONFIG_LOGS_LEVEL_VERBOSE = 2;
 export const CONFIG_FIBARO_TEMPERATURE_UNIT_FAHRENHEIT = 'F';
 export const CONFIG_FIBARO_TEMPERATURE_UNIT_CELSIUS = 'C';
+
+export const MANUAL_DEVICE_TYPES = {
+  SWITCH: 'switch',
+  DIMMER: 'dimmer',
+  BLIND: 'blind',
+  BLIND_WITH_TILT: 'blind2',
+  GARAGE: 'garage',
+  TEMPERATURE: 'temperature',
+  HUMIDITY: 'humidity',
+  LIGHT_SENSOR: 'lightSensor',
+  MOTION: 'motion',
+  LEAK: 'leak',
+  SMOKE: 'smoke',
+} as const;

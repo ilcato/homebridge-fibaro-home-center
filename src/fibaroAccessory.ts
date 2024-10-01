@@ -9,8 +9,8 @@ import {
 } from 'homebridge';
 import { FibaroHC } from './platform';
 import * as constants from './constants';
-import { deviceConfigs, manualDeviceConfigs } from './deviceConfigurations';
-
+import { manualDeviceConfigs } from './manualDeviceConfigurations';
+import { autoDeviceConfigs } from './autoDeviceConfigurations';
 
 export class FibaroAccessory {
   mainService;
@@ -304,7 +304,7 @@ export class FibaroAccessory {
     let deviceConfigFunction;
 
     // Iterate through the deviceConfigs map
-    for (const [key, value] of deviceConfigs) {
+    for (const [key, value] of autoDeviceConfigs) {
       // Check if the key is a RegExp and matches the type, or if the key exactly matches the type
       if ((key instanceof RegExp && key.test(type)) || key === type) {
         deviceConfigFunction = value;
