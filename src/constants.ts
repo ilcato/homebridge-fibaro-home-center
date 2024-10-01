@@ -68,6 +68,7 @@ export const CONFIG_LOGS_LEVEL_VERBOSE = 2;
 export const CONFIG_FIBARO_TEMPERATURE_UNIT_FAHRENHEIT = 'F';
 export const CONFIG_FIBARO_TEMPERATURE_UNIT_CELSIUS = 'C';
 
+// Manual device types
 export const MANUAL_DEVICE_TYPES = {
   SWITCH: 'switch',
   DIMMER: 'dimmer',

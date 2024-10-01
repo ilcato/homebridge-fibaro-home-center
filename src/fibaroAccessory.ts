@@ -228,6 +228,7 @@ export class FibaroAccessory {
           } else {
             properties = {};
           }
+          // Convert temperature from Fahrenheit to Celsius
           if (this.platform.config.FibaroTemperatureUnit === constants.CONFIG_FIBARO_TEMPERATURE_UNIT_FAHRENHEIT &&
               properties.value && characteristic.displayName === 'Current Temperature') {
             properties.value = (properties.value - 32) * 5 / 9;
@@ -278,11 +279,15 @@ export class FibaroAccessory {
       this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${this.device.type}]: device found in config`);
     }
 
+    // Find a matching function based on the name
     const deviceConfigFunction = manualDeviceConfigs.get(devConfig?.displayAs);
 
+    // If a matching deviceConfigFunction was found
     if (deviceConfigFunction) {
-      deviceConfigFunction(Service, Characteristic, this.device, this.setMain.bind(this));
+      // Set the configuration for this device by calling deviceConfigFunction
+      deviceConfigFunction.call(null, Service, Characteristic, this.device, this.setMain.bind(this));
 
+      // If the device is excluded in config
       if (devConfig?.displayAs === 'exclude') {
         if (this.platform.config.logsLevel > 0) {
           this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${this.device.type}]: device excluded in config`);
