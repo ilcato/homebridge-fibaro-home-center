@@ -11,6 +11,15 @@ function DeviceType(type: RegExp | string) {
   };
 }
 
+// Configuration for manual device setup
+const manualDeviceConfigs = new Map<string, (Service, Characteristic, device, setMain) => void>();
+
+function ManualType(displayAs: string) {
+  return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
+    manualDeviceConfigs.set(displayAs, target[propertyKey]);
+  };
+}
+
 class DeviceConfigurations {
   // Light / Dimmer
   @DeviceType(/^com\.fibaro\.FGD(?!W)/) // Exclude 'com.fibaro.FGDW'
@@ -338,4 +347,77 @@ class DeviceConfigurations {
   }
 }
 
-export { deviceConfigs };
+class ManualDeviceConfigurations {
+  @ManualType('switch')
+  static configureSwitch(Service, Characteristic, device, setMain) {
+    setMain(Service.Switch, [Characteristic.On]);
+  }
+
+  @ManualType('dimmer')
+  static configureDimmer(Service, Characteristic, device, setMain) {
+    setMain(Service.Lightbulb, [Characteristic.On, Characteristic.Brightness]);
+  }
+
+  @ManualType('blind')
+  static configureBlind(Service, Characteristic, device, setMain) {
+    setMain(Service.WindowCovering, [
+      Characteristic.CurrentPosition,
+      Characteristic.TargetPosition,
+      Characteristic.PositionState,
+      Characteristic.HoldPosition,
+    ]);
+  }
+
+  @ManualType('blind2')
+  static configureBlindWithTilt(Service, Characteristic, device, setMain) {
+    setMain(Service.WindowCovering, [
+      Characteristic.CurrentPosition,
+      Characteristic.TargetPosition,
+      Characteristic.PositionState,
+      Characteristic.HoldPosition,
+      Characteristic.CurrentHorizontalTiltAngle,
+      Characteristic.TargetHorizontalTiltAngle,
+    ]);
+  }
+
+  @ManualType('garage')
+  static configureGarage(Service, Characteristic, device, setMain) {
+    setMain(Service.GarageDoorOpener, [
+      Characteristic.CurrentDoorState,
+      Characteristic.TargetDoorState,
+      Characteristic.ObstructionDetected,
+    ]);
+  }
+
+  @ManualType('temperature')
+  static configureTemperature(Service, Characteristic, device, setMain) {
+    setMain(Service.TemperatureSensor, [Characteristic.CurrentTemperature]);
+  }
+
+  @ManualType('humidity')
+  static configureHumidity(Service, Characteristic, device, setMain) {
+    setMain(Service.HumiditySensor, [Characteristic.CurrentRelativeHumidity]);
+  }
+
+  @ManualType('lightSensor')
+  static configureLightSensor(Service, Characteristic, device, setMain) {
+    setMain(Service.LightSensor, [Characteristic.CurrentAmbientLightLevel]);
+  }
+
+  @ManualType('motion')
+  static configureMotion(Service, Characteristic, device, setMain) {
+    setMain(Service.MotionSensor, [Characteristic.MotionDetected]);
+  }
+
+  @ManualType('leak')
+  static configureLeak(Service, Characteristic, device, setMain) {
+    setMain(Service.LeakSensor, [Characteristic.LeakDetected]);
+  }
+
+  @ManualType('smoke')
+  static configureSmoke(Service, Characteristic, device, setMain) {
+    setMain(Service.SmokeSensor, [Characteristic.SmokeDetected]);
+  }
+}
+
+export { deviceConfigs, manualDeviceConfigs };

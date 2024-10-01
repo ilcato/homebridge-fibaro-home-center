@@ -9,7 +9,7 @@ import {
 } from 'homebridge';
 import { FibaroHC } from './platform';
 import * as constants from './constants';
-import { deviceConfigs } from './deviceConfigurations';
+import { deviceConfigs, manualDeviceConfigs } from './deviceConfigurations';
 
 
 export class FibaroAccessory {
@@ -278,81 +278,26 @@ export class FibaroAccessory {
       this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${this.device.type}]: device found in config`);
     }
 
-    switch (devConfig?.displayAs) {
-      case 'exclude':
+    const deviceConfigFunction = manualDeviceConfigs.get(devConfig?.displayAs);
+
+    if (deviceConfigFunction) {
+      deviceConfigFunction(Service, Characteristic, this.device, this.setMain.bind(this));
+
+      if (devConfig?.displayAs === 'exclude') {
         if (this.platform.config.logsLevel > 0) {
           this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${this.device.type}]: device excluded in config`);
         }
         this.isValid = false;
-        return;
-      case 'switch':
-        this.setMain(Service.Switch, [Characteristic.On]);
-        break;
-      case 'dimmer':
-        this.setMain(Service.Lightbulb, [Characteristic.On, Characteristic.Brightness]);
-        break;
-      case 'blind':
-        this.setMain(Service.WindowCovering, [
-          Characteristic.CurrentPosition,
-          Characteristic.TargetPosition,
-          Characteristic.PositionState,
-          Characteristic.HoldPosition,
-        ]);
-        break;
-      case 'blind2':
-        this.setMain(Service.WindowCovering, [
-          Characteristic.CurrentPosition,
-          Characteristic.TargetPosition,
-          Characteristic.PositionState,
-          Characteristic.HoldPosition,
-          Characteristic.CurrentHorizontalTiltAngle,
-          Characteristic.TargetHorizontalTiltAngle,
-        ]);
-        break;
-      case 'garage':
-        this.setMain(Service.GarageDoorOpener, [
-          Characteristic.CurrentDoorState,
-          Characteristic.TargetDoorState,
-          Characteristic.ObstructionDetected,
-        ]);
-        break;
-      case 'temperature':
-        this.setMain(Service.TemperatureSensor, [Characteristic.CurrentTemperature]);
-        break;
-      case 'humidity':
-        this.setMain(Service.HumiditySensor, [Characteristic.CurrentRelativeHumidity]);
-        break;
-      case 'lightSensor':
-        this.setMain(Service.LightSensor, [Characteristic.CurrentAmbientLightLevel]);
-        break;
-      case 'motion':
-        this.setMain(Service.MotionSensor, [Characteristic.MotionDetected]);
-        break;
-      case 'leak':
-        this.setMain(Service.LeakSensor, [Characteristic.LeakDetected]);
-        break;
-      case 'smoke':
-        this.setMain(Service.SmokeSensor, [Characteristic.SmokeDetected]);
-        break;
-      case 'security':
-        this.setMain(Service.SecuritySystem, [
-          Characteristic.SecuritySystemCurrentState,
-          Characteristic.SecuritySystemTargetState,
-        ], '0--');
-        break;
-      case 'airQualitySensorPm25':
-        this.setMain(Service.AirQualitySensor, [
-          Characteristic.AirQuality,
-          Characteristic.PM2_5Density,
-        ], this.device.id + '--' + constants.SUBTYPE_PM2_5);
-        break;
-      default:
-        this.setMain(Service.Switch, [Characteristic.On]);
-        break;
+      }
+    } else {
+      // Default to switch if no matching configuration is found
+      this.setMain(Service.Switch, [Characteristic.On]);
     }
   }
 
   configureAccessoryFromType() {
+    const Service = this.platform.Service;
+    const Characteristic = this.platform.Characteristic;
     const type = this.device.type;
 
     // Attempt to find a matching function based on the device type
@@ -370,8 +315,7 @@ export class FibaroAccessory {
     // If a matching deviceConfigFunction was found
     if (deviceConfigFunction) {
       // Set the configuration for this device by calling deviceConfigFunction
-      deviceConfigFunction.call(null,
-        this.platform.Service, this.platform.Characteristic, this.device, this.setMain.bind(this), this.platform.config);
+      deviceConfigFunction.call(null, Service, Characteristic, this.device, this.setMain.bind(this), this.platform.config);
     } else {
       // If no matching DeviceClass was found, log that the device is not supported
       if (this.platform.config.logsLevel > 0) {
