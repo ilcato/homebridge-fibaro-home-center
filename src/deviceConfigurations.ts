@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // deviceConfigurations.ts
 
 import * as constants from './constants';
@@ -6,7 +5,7 @@ import * as constants from './constants';
 const deviceConfigs = new Map<string | RegExp, (Service, Characteristic, device, setMain) => void>();
 
 function DeviceType(type: RegExp | string) {
-  return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (target, propertyKey: string) {
     deviceConfigs.set(type, target[propertyKey]);
   };
 }
@@ -15,12 +14,12 @@ function DeviceType(type: RegExp | string) {
 const manualDeviceConfigs = new Map<string, (Service, Characteristic, device, setMain) => void>();
 
 function ManualType(displayAs: string) {
-  return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function(target, propertyKey: string) {
     manualDeviceConfigs.set(displayAs, target[propertyKey]);
   };
 }
 
-class DeviceConfigurations {
+export class DeviceConfigurations {
   // Light / Dimmer
   @DeviceType(/^com\.fibaro\.FGD(?!W)/) // Exclude 'com.fibaro.FGDW'
   @DeviceType(/^com\.fibaro\.FGWD/)
@@ -347,7 +346,7 @@ class DeviceConfigurations {
   }
 }
 
-class ManualDeviceConfigurations {
+export class ManualDeviceConfigurations {
   @ManualType('switch')
   static configureSwitch(Service, Characteristic, device, setMain) {
     setMain(Service.Switch, [Characteristic.On]);
