@@ -3,7 +3,13 @@
 import * as constants from './constants';
 
 // Configuration for automatic device setup
-const autoDeviceConfigs = new Map<string | RegExp, (Service, Characteristic, device) => object>();
+type DeviceConfigFunction = (Service, Characteristic, device, config?) => {
+  service;
+  characteristics;
+  subtype?: string;
+};
+
+const autoDeviceConfigs = new Map<string | RegExp, DeviceConfigFunction>();
 
 function DeviceType(type: RegExp | string) {
   return function (target, propertyKey: string) {

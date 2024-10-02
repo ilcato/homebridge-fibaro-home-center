@@ -308,12 +308,13 @@ export class FibaroAccessory {
     }
 
     // Find a matching function based on the name
-    const deviceConfigFunction = manualDeviceConfigs.get(devConfig?.displayAs);
+    const manualConfigFunc = manualDeviceConfigs.get(devConfig?.displayAs);
 
-    // If a matching deviceConfigFunction was found
-    if (deviceConfigFunction) {
-      // Set the configuration for this device by calling deviceConfigFunction
-      deviceConfigFunction.call(null, Service, Characteristic, this.device, this.setMain.bind(this));
+    // If a matching manualConfigFunc was found
+    if (manualConfigFunc) {
+      // Set the configuration for this device by calling manualConfigFunc
+      const serviceConfig = manualConfigFunc.call(null, Service, Characteristic, this.device);
+      this.setMain(serviceConfig.service, serviceConfig.characteristics, serviceConfig.subtype);
 
       // If the device is excluded in config
       if (devConfig?.displayAs === 'exclude') {
