@@ -222,37 +222,18 @@ export class FibaroAccessory {
         // Get mapped function and call it
         const getFunction = this.platform.getFunctions?.getFunctionsMapping.get(characteristic.UUID);
         if (getFunction) {
-          let properties;
-          if (!service.isClimateZone && !service.isHeatingZone) {
-            properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
-          } else {
-            properties = {};
+          const properties = await this.getDeviceProperties(service, IDs[0]);
+
+          // Convert temperature if necessary
+          if (this.shouldConvertTemperature(characteristic)) {
+            properties.value = this.convertFahrenheitToCelsius(properties.value);
           }
-          // Convert temperature from Fahrenheit to Celsius
-          if (this.platform.config.FibaroTemperatureUnit === constants.CONFIG_FIBARO_TEMPERATURE_UNIT_FAHRENHEIT &&
-              properties.value && characteristic.displayName === 'Current Temperature') {
-            properties.value = (properties.value - 32) * 5 / 9;
-          }
-          // Reset deadLogged flag if this is a different service
-          if (this.lastServiceChecked !== service) {
-            this.lastServiceChecked = service;
-            service.deadLogged = false;
-          }
-          // Log dead status once per service
-          if (properties.dead === true && !service.deadLogged) {
-            this.platform.log.warn('Device dead: ',
-              `${IDs[0]}  service: ${service.displayName}, reason: ${properties.deadReason}`);
-            service.deadLogged = true; // Mark that we've logged for this service
-          }
-          // Report dead status to HomeKit if markDeadDevices is true
-          if (properties.dead === true && this.platform.config.markDeadDevices) {
-            callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-          } else if (properties.dead === true && !this.platform.config.markDeadDevices) {
-            callback(undefined, characteristic.value); // Return the last known value
-          } else {
-            callback(undefined, characteristic.value); // The get function call may update the value with updatValue api
-            getFunction.call(this.platform.getFunctions, characteristic, service, IDs, properties);
-          }
+
+          // Handle dead device status
+          this.handleDeadDeviceStatus(service, properties, IDs[0]);
+
+          // Call the get function and handle the result
+          this.callGetFunctionAndHandleResult(getFunction, characteristic, service, IDs, properties, callback);
         } else {
           callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
           this.platform.log.error('No get function defined for: ', `${characteristic.displayName}`);
@@ -261,6 +242,53 @@ export class FibaroAccessory {
     } catch (e) {
       callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
       this.platform.log.error('G1 - There was a problem getting value from: ', `${IDs[0]} - Err: ${e}`);
+    }
+  }
+
+  private async getDeviceProperties(service, deviceId) {
+    if (!service.isClimateZone && !service.isHeatingZone && this.platform.fibaroClient) {
+      return (await this.platform.fibaroClient.getDeviceProperties(deviceId)).body.properties;
+    }
+    return {};
+  }
+
+  private shouldConvertTemperature(characteristic) {
+    return this.platform.config.FibaroTemperatureUnit === constants.CONFIG_FIBARO_TEMPERATURE_UNIT_FAHRENHEIT &&
+           characteristic.displayName === 'Current Temperature';
+  }
+
+  private convertFahrenheitToCelsius(value) {
+    return (value - 32) * 5 / 9;
+  }
+
+  private handleDeadDeviceStatus(service, properties, deviceId) {
+    // Reset deadLogged flag if this is a different service
+    if (this.lastServiceChecked !== service) {
+      this.lastServiceChecked = service;
+      service.deadLogged = false;
+    }
+
+    // Log dead status once per service
+    if (properties.dead === true && !service.deadLogged) {
+      this.platform.log.warn('Device dead: ',
+        `${deviceId}  service: ${service.displayName}, reason: ${properties.deadReason}`);
+      service.deadLogged = true;
+    }
+  }
+
+  private callGetFunctionAndHandleResult(getFunction, characteristic, service, IDs, properties, callback) {
+    if (properties.dead === true) {
+      if (this.platform.config.markDeadDevices) {
+        // Report dead status to HomeKit
+        callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+      } else {
+        // Return the last known value
+        callback(undefined, characteristic.value);
+      }
+    } else {
+      callback(undefined, characteristic.value);
+      // The get function call may update the value with updatValue api
+      getFunction.call(this.platform.getFunctions, characteristic, service, IDs, properties);
     }
   }
 
