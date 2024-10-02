@@ -95,6 +95,7 @@
         "description": "Enable or disable the Security system, see homepage for detail.",
         "title": "Security system",
         "type": "string",
+	"required": true,      
         "oneOf": [
           {
             "title": "Enabled",
@@ -115,6 +116,7 @@
         "description": "If enabled, to each device name will be added the name of the room in which it is located. Default: disabled.",
         "title": "Add room name to device name.",
         "type": "string",
+	"required": true,      
         "oneOf": [
           {
             "title": "Enabled",
