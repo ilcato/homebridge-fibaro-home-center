@@ -93,7 +93,7 @@ export class FibaroAccessory {
 
       // Case 1: Ambient Light Sensor
       // Set the range for light level measurements
-      if (characteristic.UUID === this.platform.Characteristic.CurrentAmbientLightLevel.UUID) {
+      if (characteristic.constructor === this.platform.Characteristic.CurrentAmbientLightLevel) {
         characteristic.props.maxValue = 100000;
         characteristic.props.minStep = 1;
         characteristic.props.minValue = 0;
@@ -101,25 +101,25 @@ export class FibaroAccessory {
 
       // Case 2: Temperature Sensor
       // Set the minimum temperature that can be reported
-      if (characteristic.UUID === this.platform.Characteristic.CurrentTemperature.UUID) {
+      if (characteristic.constructor === this.platform.Characteristic.CurrentTemperature) {
         characteristic.props.minValue = -50;
       }
 
       // Case 3: Thermostat
       // Set the maximum target temperature based on configuration
-      if (characteristic.UUID === this.platform.Characteristic.TargetTemperature.UUID) {
+      if (characteristic.constructor === this.platform.Characteristic.TargetTemperature) {
         characteristic.props.maxValue = this.platform.config.thermostatmaxtemperature;
       }
 
       // Case 4: Valve
       // Set the default valve type to generic
-      if (characteristic.UUID === this.platform.Characteristic.ValveType.UUID) {
+      if (characteristic.constructor === this.platform.Characteristic.ValveType) {
         characteristic.value = this.platform.Characteristic.ValveType.GENERIC_VALVE;
       }
 
       // Case 5: Air Quality Sensor
       // Set the initial air quality status to unknown
-      if (characteristic.UUID === this.platform.Characteristic.AirQuality.UUID) {
+      if (characteristic.constructor === this.platform.Characteristic.AirQuality) {
         characteristic.value = this.platform.Characteristic.AirQuality.UNKNOWN;
       }
 
@@ -163,24 +163,24 @@ export class FibaroAccessory {
 
   private shouldSubscribeToUpdates(service, characteristic) {
     return !service.isVirtual && !service.isScene
-      && characteristic.UUID !== this.platform.Characteristic.ValveType.UUID;
+      && characteristic.constructor !== this.platform.Characteristic.ValveType;
   }
 
   private getPropertyToSubscribe(service, characteristic) {
-    if (characteristic.UUID === this.platform.Characteristic.Hue.UUID
-      || characteristic.UUID === this.platform.Characteristic.Saturation.UUID) {
+    if (characteristic.constructor === this.platform.Characteristic.Hue
+      || characteristic.constructor === this.platform.Characteristic.Saturation) {
       return 'color';
     }
-    if (characteristic.UUID === this.platform.Characteristic.CurrentHeatingCoolingState.UUID ||
-      characteristic.UUID === this.platform.Characteristic.TargetHeatingCoolingState.UUID) {
+    if (characteristic.constructor === this.platform.Characteristic.CurrentHeatingCoolingState ||
+      characteristic.constructor === this.platform.Characteristic.TargetHeatingCoolingState) {
       return 'mode';
     }
-    if (characteristic.UUID === this.platform.Characteristic.TargetTemperature.UUID) {
+    if (characteristic.constructor === this.platform.Characteristic.TargetTemperature) {
       return 'targettemperature';
     }
     if (service.UUID === this.platform.Service.WindowCovering.UUID
-      && (characteristic.UUID === this.platform.Characteristic.CurrentHorizontalTiltAngle.UUID
-      || characteristic.UUID === this.platform.Characteristic.TargetHorizontalTiltAngle.UUID)) {
+      && (characteristic.constructor === this.platform.Characteristic.CurrentHorizontalTiltAngle
+      || characteristic.constructor === this.platform.Characteristic.TargetHorizontalTiltAngle)) {
       return 'value2';
     }
     return 'value';
@@ -206,8 +206,8 @@ export class FibaroAccessory {
   }
 
   private isStaticCharacteristic(characteristic) {
-    return characteristic.UUID === this.platform.Characteristic.Name.UUID
-      || characteristic.UUID === this.platform.Characteristic.ValveType.UUID;
+    return characteristic.constructor === this.platform.Characteristic.Name
+      || characteristic.constructor === this.platform.Characteristic.ValveType;
   }
 
   private isVirtualButtonOrScene(service) {
@@ -217,7 +217,7 @@ export class FibaroAccessory {
   async setCharacteristicValue(value, context, characteristic, service, IDs) {
     if (context !== 'fromFibaro' && context !== 'fromSetValue') {
       if (this.platform.setFunctions) {
-        const setFunction = SetFunctions.setFunctionsMapping.get(characteristic.UUID);
+        const setFunction = SetFunctions.setFunctionsMapping.get(characteristic.constructor);
         const platform = this.platform;
         await this.platform.mutex.runExclusive(async () => {
           if (platform.poller) {
@@ -267,7 +267,7 @@ export class FibaroAccessory {
   private async handleGlobalVariable(characteristic, service, IDs, callback) {
     const value = (await this.platform.fibaroClient!.getGlobalVariable(IDs[1])).body;
 
-    const getFunction = GetFunctions.getFunctionsMapping.get(characteristic.UUID);
+    const getFunction = GetFunctions.getFunctionsMapping.get(characteristic.constructor);
     if (getFunction) {
       getFunction.call(this.platform.getFunctions, characteristic, service, IDs, value);
     }
@@ -276,7 +276,7 @@ export class FibaroAccessory {
   }
 
   private async handleDefaultCase(characteristic, service, IDs, callback) {
-    const getFunction = GetFunctions.getFunctionsMapping.get(characteristic.UUID);
+    const getFunction = GetFunctions.getFunctionsMapping.get(characteristic.constructor);
     if (getFunction) {
       const properties = await this.getDeviceProperties(service, IDs[0]);
 

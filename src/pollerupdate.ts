@@ -110,7 +110,7 @@ export class Poller {
             change.value = (change.value - 32) * 5 / 9;
           }
 
-          const getFunction = GetFunctions.getFunctionsMapping.get(characteristic.UUID);
+          const getFunction = GetFunctions.getFunctionsMapping.get(characteristic.constructor);
           if (getFunction) {
             const IDs = service.subtype.split('-');
             getFunction.call(this.platform.getFunctions, characteristic, service, IDs, change);
@@ -201,13 +201,13 @@ export class Poller {
       if (parseInt(subscription.id) === change.id && subscription.property === 'color') {
         const hsv = this.platform.getFunctions.updateHomeKitColorFromHomeCenter(change.color, subscription.service);
         const { characteristic } = subscription;
-        if (characteristic.UUID === (new this.platform.Characteristic.On()).UUID) {
+        if (characteristic.constructor === this.platform.Characteristic.On) {
           characteristic.updateValue(hsv.v === 0 ? false : true);
-        } else if (characteristic.UUID === (new this.platform.Characteristic.Hue()).UUID) {
+        } else if (characteristic.constructor === this.platform.Characteristic.Hue) {
           characteristic.updateValue(Math.round(hsv.h));
-        } else if (characteristic.UUID === (new this.platform.Characteristic.Saturation()).UUID) {
+        } else if (characteristic.constructor === this.platform.Characteristic.Saturation) {
           characteristic.updateValue(Math.round(hsv.s));
-        } else if (characteristic.UUID === (new this.platform.Characteristic.Brightness()).UUID) {
+        } else if (characteristic.constructor === this.platform.Characteristic.Brightness) {
           characteristic.updateValue(Math.round(hsv.v));
         }
       }
@@ -219,7 +219,7 @@ export class Poller {
       if (parseInt(subscription.id) === change.id && subscription.property === 'mode') {
         this.platform.log.info('Updating value for device: ',
           `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.thermostatMode}`);
-        const getFunction = this.platform.getFunctions.getFunctionsMapping.get(subscription.characteristic.UUID);
+        const getFunction = GetFunctions.getFunctionsMapping.get(subscription.characteristic.constructor);
         if (getFunction) {
           getFunction.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
         }
@@ -232,7 +232,7 @@ export class Poller {
       if (parseInt(subscription.id) === change.id && subscription.property === 'targettemperature') {
         this.platform.log.info('Updating value for device: ',
           `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.heatingThermostatSetpoint}`);
-        const getFunction = this.platform.getFunctions.getFunctionsMapping.get(subscription.characteristic.UUID);
+        const getFunction = GetFunctions.getFunctionsMapping.get(subscription.characteristic.constructor);
         if (getFunction) {
           getFunction.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
         }
