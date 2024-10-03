@@ -1,7 +1,5 @@
 // pollerupdate.ts
 
-'use strict';
-
 import * as constants from './constants';
 import { GetFunctions } from './getFunctions';
 

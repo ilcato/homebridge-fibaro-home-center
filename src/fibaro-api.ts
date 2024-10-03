@@ -1,7 +1,5 @@
 // fibaro-api.ts
 
-'use strict';
-
 import superagent from 'superagent';
 import Throttle from 'superagent-throttle';
 import * as os from 'os';

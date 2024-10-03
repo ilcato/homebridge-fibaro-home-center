@@ -1,7 +1,5 @@
 // getFunctions.ts
 
-'use strict';
-
 import { Characteristic } from 'hap-nodejs';
 import { Utils } from './utils';
 
