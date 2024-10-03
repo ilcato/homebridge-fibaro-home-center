@@ -1,47 +1,34 @@
 // setFunctions.ts
 
-'use strict';
-
 import { Utils } from './utils';
+import { Characteristic } from 'hap-nodejs';
 
-export const lowestTemp = 12;
-export const stdTemp = 21;
+// Decorator function
+function characteristicSetter(...characteristics: string[]) {
+  return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
+    if (!target.constructor.setFunctionsMapping) {
+      target.constructor.setFunctionsMapping = new Map();
+    }
+    characteristics.forEach(char => {
+      target.constructor.setFunctionsMapping.set(char, descriptor.value);
+    });
+  };
+}
 
 export class SetFunctions {
-  setFunctionsMapping;
-  getTargetSecuritySystemSceneMapping;
-  platform;
-  timeoutsUpdating;
+  static setFunctionsMapping: Map<string, (...args: unknown[]) => unknown>;
+  private timeoutsUpdating;
 
-  constructor(platform) {
-    this.platform = platform;
+  constructor(private platform) {
     this.timeoutsUpdating = [];
 
-    const Characteristic = this.platform.Characteristic;
-    this.setFunctionsMapping = new Map([
-      [Characteristic.On.UUID, this.setOn],
-      [Characteristic.Brightness.UUID, this.setBrightness],
-      [Characteristic.TargetPosition.UUID, this.setTargetPosition],
-      [Characteristic.HoldPosition.UUID, this.setHoldPosition],
-      [Characteristic.TargetHorizontalTiltAngle.UUID, this.setTargetTiltAngle],
-      [Characteristic.LockTargetState.UUID, this.setLockTargetState],
-      [Characteristic.TargetHeatingCoolingState.UUID, this.setTargetHeatingCoolingState],
-      [Characteristic.TargetTemperature.UUID, this.setTargetTemperature],
-      [Characteristic.TargetDoorState.UUID, this.setTargetDoorState],
-      [Characteristic.Hue.UUID, this.setHue],
-      [Characteristic.Saturation.UUID, this.setSaturation],
-      [Characteristic.SecuritySystemTargetState.UUID, this.setSecuritySystemTargetState],
-      [Characteristic.Active.UUID, this.setActive],
-    ]);
-
-    this.getTargetSecuritySystemSceneMapping = new Map([
-      [Characteristic.SecuritySystemTargetState.AWAY_ARM, this.platform.scenes.SetAwayArmed],
-      [Characteristic.SecuritySystemTargetState.DISARM, this.platform.scenes.SetDisarmed],
-      [Characteristic.SecuritySystemTargetState.NIGHT_ARM, this.platform.scenes.SetNightArmed],
-      [Characteristic.SecuritySystemTargetState.STAY_ARM, this.platform.scenes.SetStayArmed],
-    ]);
+    // Initialize the static mapping if not already done
+    if (!SetFunctions.setFunctionsMapping) {
+      SetFunctions.setFunctionsMapping = new Map();
+    }
   }
 
+  @characteristicSetter(Characteristic.On.UUID)
   async setOn(value, context, characteristic, service, IDs) {
     const setValue = (delay = 100) => {
       setTimeout(() => {
@@ -73,6 +60,7 @@ export class SetFunctions {
     }
   }
 
+  @characteristicSetter(Characteristic.Brightness.UUID)
   async setBrightness(value, context, characteristic, service, IDs) {
     // Handle global variable dimmer separately
     if (service.isGlobalVariableDimmer) {
@@ -96,6 +84,7 @@ export class SetFunctions {
     }, 500);
   }
 
+  @characteristicSetter(Characteristic.TargetPosition.UUID)
   async setTargetPosition(value, context, characteristic, service, IDs) {
     if (service.isOpenCloseOnly) {
       // For open/close only devices, use specific commands based on the target position
@@ -122,17 +111,20 @@ export class SetFunctions {
     }, 1200);
   }
 
+  @characteristicSetter(Characteristic.HoldPosition.UUID)
   async setHoldPosition(value, context, characteristic, service, IDs) {
     if (value) {
       await this.command('stop', [0], service, IDs);
     }
   }
 
+  @characteristicSetter(Characteristic.TargetHorizontalTiltAngle.UUID)
   async setTargetTiltAngle(angle, context, characteristic, service, IDs) {
     const value2 = Utils.scale(angle, characteristic.props.minValue, characteristic.props.maxValue, 0, 100);
     await this.command('setValue2', [value2], service, IDs);
   }
 
+  @characteristicSetter(Characteristic.LockTargetState.UUID)
   async setLockTargetState(value, context, characteristic, service, IDs) {
     const Characteristic = this.platform.Characteristic;
     const isUnsecured = value === Characteristic.LockTargetState.UNSECURED;
@@ -161,6 +153,7 @@ export class SetFunctions {
     }
   }
 
+  @characteristicSetter(Characteristic.TargetDoorState.UUID)
   async setTargetDoorState(value, context, characteristic, service, IDs) {
     const action = value === this.platform.Characteristic.TargetDoorState.CLOSED ? 'close' : 'open';
     await this.command(action, [0], service, IDs);
@@ -172,6 +165,7 @@ export class SetFunctions {
     }, 100);
   }
 
+  @characteristicSetter(Characteristic.TargetHeatingCoolingState.UUID)
   async setTargetHeatingCoolingState(value, context, characteristic, service, IDs) {
     if (!service.isClimateZone && !service.isHeatingZone) {
       return;
@@ -200,6 +194,7 @@ export class SetFunctions {
     await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, currentTemperature, timestamp);
   }
 
+  @characteristicSetter(Characteristic.TargetTemperature.UUID)
   async setTargetTemperature(value, context, characteristic, service, IDs) {
     const timestamp = Math.trunc(Date.now() / 1000) + parseInt(this.platform.config.thermostattimeout);
 
@@ -223,14 +218,17 @@ export class SetFunctions {
     }
   }
 
-  setHue(value, context, characteristic, service, IDs) {
+  @characteristicSetter(Characteristic.Hue.UUID)
+  async setHue(value, context, characteristic, service, IDs) {
     this.updateHomeCenterColorFromHomeKit(value, null, service, IDs);
   }
 
-  setSaturation(value, context, characteristic, service, IDs) {
+  @characteristicSetter(Characteristic.Saturation.UUID)
+  async setSaturation(value, context, characteristic, service, IDs) {
     this.updateHomeCenterColorFromHomeKit(null, value, service, IDs);
   }
 
+  @characteristicSetter(Characteristic.SecuritySystemTargetState.UUID)
   async setSecuritySystemTargetState(value) {
     const { Characteristic } = this.platform;
 
@@ -254,6 +252,7 @@ export class SetFunctions {
     await this.scene(sceneID);
   }
 
+  @characteristicSetter(Characteristic.Active.UUID)
   async setActive(value, context, characteristic, service, IDs) {
     const action = (value === this.platform.Characteristic.Active.ACTIVE) ? 'turnOn' : 'turnOff';
     await this.command(action, null, service, IDs);
@@ -341,4 +340,3 @@ export class SetFunctions {
     }
   }
 }
-

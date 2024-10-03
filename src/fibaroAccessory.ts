@@ -12,6 +12,7 @@ import * as constants from './constants';
 import { manualDeviceConfigs } from './manualDeviceConfigurations';
 import { autoDeviceConfigs } from './autoDeviceConfigurations';
 import { GetFunctions } from './getFunctions';
+import { SetFunctions } from './setFunctions';
 
 
 export class FibaroAccessory {
@@ -216,7 +217,7 @@ export class FibaroAccessory {
   async setCharacteristicValue(value, context, characteristic, service, IDs) {
     if (context !== 'fromFibaro' && context !== 'fromSetValue') {
       if (this.platform.setFunctions) {
-        const setFunction = this.platform.setFunctions.setFunctionsMapping.get(characteristic.UUID);
+        const setFunction = SetFunctions.setFunctionsMapping.get(characteristic.UUID);
         const platform = this.platform;
         await this.platform.mutex.runExclusive(async () => {
           if (platform.poller) {
@@ -268,7 +269,7 @@ export class FibaroAccessory {
 
     const getFunction = GetFunctions.getFunctionsMapping.get(characteristic.UUID);
     if (getFunction) {
-      getFunction.call(null, characteristic, service, IDs, value);
+      getFunction.call(this.platform.getFunctions, characteristic, service, IDs, value);
     }
 
     callback(undefined, characteristic.value);

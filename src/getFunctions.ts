@@ -35,7 +35,12 @@ export class GetFunctions {
     ['StayArmed', Characteristic.SecuritySystemTargetState.STAY_ARM],
   ]);
 
-  constructor(private platform) {}
+  constructor(private platform) {
+    // Initialize the static mapping if not already done
+    if (!GetFunctions.getFunctionsMapping) {
+      GetFunctions.getFunctionsMapping = new Map();
+    }
+  }
 
   @characteristicGetter(Characteristic.On.UUID, Characteristic.MotionDetected.UUID, Characteristic.OccupancyDetected.UUID)
   getBool(characteristic, service, IDs, properties) {
