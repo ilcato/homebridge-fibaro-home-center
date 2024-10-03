@@ -11,6 +11,7 @@ type ManualConfigFunction = (Service, Characteristic, device) => {
 
 const manualDeviceConfigs = new Map<string, ManualConfigFunction>();
 
+// Decorator function for mapping manual device configurations to the device type
 function ManualType(displayAs: string) {
   return function(target, propertyKey: string) {
     manualDeviceConfigs.set(displayAs, target[propertyKey]);

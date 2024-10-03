@@ -3,7 +3,7 @@
 import { Utils } from './utils';
 import { Characteristic } from 'hap-nodejs';
 
-// Decorator function
+// Decorator function for mapping setCharacteristicValue to the Characteristic
 function characteristicSetter(...characteristics: typeof Characteristic[keyof typeof Characteristic][]) {
   return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
     if (!target.constructor.setFunctionsMapping) {

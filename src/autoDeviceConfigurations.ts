@@ -14,6 +14,7 @@ type DeviceConfigFunction = (device, config?) => {
 
 const autoDeviceConfigs = new Map<string | RegExp, DeviceConfigFunction>();
 
+// Decorator function for mapping device configurations to the device type
 function DeviceType(type: RegExp | string) {
   return function (target, propertyKey: string) {
     autoDeviceConfigs.set(type, target[propertyKey]);

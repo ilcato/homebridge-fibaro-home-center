@@ -3,7 +3,7 @@
 import { Characteristic } from 'hap-nodejs';
 import { Utils } from './utils';
 
-// Decorator function
+// Decorator function for mapping getCharacteristicValue to the Characteristic
 function characteristicGetter(...characteristics: typeof Characteristic[keyof typeof Characteristic][]) {
   return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
     if (!target.constructor.getFunctionsMapping) {
