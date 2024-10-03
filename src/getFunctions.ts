@@ -3,6 +3,7 @@
 'use strict';
 
 import { SetFunctions } from './setFunctions';
+import { Characteristic } from 'hap-nodejs';
 
 export class GetFunctions {
   getFunctionsMapping;
@@ -13,7 +14,6 @@ export class GetFunctions {
   constructor(platform) {
     this.platform = platform;
 
-    const Characteristic = this.platform.Characteristic;
     this.getFunctionsMapping = new Map([
       [Characteristic.On.UUID, this.getBool],
       [Characteristic.Brightness.UUID, this.getBrightness],
@@ -56,17 +56,17 @@ export class GetFunctions {
     ]);
 
     this.getCurrentSecuritySystemStateMapping = new Map([
-      ['AwayArmed', this.platform.Characteristic.SecuritySystemCurrentState.AWAY_ARM],
-      ['Disarmed', this.platform.Characteristic.SecuritySystemCurrentState.DISARMED],
-      ['NightArmed', this.platform.Characteristic.SecuritySystemCurrentState.NIGHT_ARM],
-      ['StayArmed', this.platform.Characteristic.SecuritySystemCurrentState.STAY_ARM],
-      ['AlarmTriggered', this.platform.Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED],
+      ['AwayArmed', Characteristic.SecuritySystemCurrentState.AWAY_ARM],
+      ['Disarmed', Characteristic.SecuritySystemCurrentState.DISARMED],
+      ['NightArmed', Characteristic.SecuritySystemCurrentState.NIGHT_ARM],
+      ['StayArmed', Characteristic.SecuritySystemCurrentState.STAY_ARM],
+      ['AlarmTriggered', Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED],
     ]);
     this.getTargetSecuritySystemStateMapping = new Map([
-      ['AwayArmed', this.platform.Characteristic.SecuritySystemTargetState.AWAY_ARM],
-      ['Disarmed', this.platform.Characteristic.SecuritySystemTargetState.DISARM],
-      ['NightArmed', this.platform.Characteristic.SecuritySystemTargetState.NIGHT_ARM],
-      ['StayArmed', this.platform.Characteristic.SecuritySystemTargetState.STAY_ARM],
+      ['AwayArmed', Characteristic.SecuritySystemTargetState.AWAY_ARM],
+      ['Disarmed', Characteristic.SecuritySystemTargetState.DISARM],
+      ['NightArmed', Characteristic.SecuritySystemTargetState.NIGHT_ARM],
+      ['StayArmed', Characteristic.SecuritySystemTargetState.STAY_ARM],
     ]);
   }
 
@@ -94,7 +94,7 @@ export class GetFunctions {
       r = 100;
     }
 
-    const onCharacteristic = service?.getCharacteristic(this.platform.Characteristic.On);
+    const onCharacteristic = service?.getCharacteristic(Characteristic.On);
     if (onCharacteristic?.value === false) {
       return;
     }
@@ -103,7 +103,7 @@ export class GetFunctions {
   }
 
   getPositionState(characteristic) {
-    characteristic.updateValue(this.platform.Characteristic.PositionState.STOPPED);
+    characteristic.updateValue(Characteristic.PositionState.STOPPED);
   }
 
   getCurrentPosition(characteristic, _service, _IDs, properties) {
@@ -191,29 +191,29 @@ export class GetFunctions {
   getContactSensorState(characteristic, _service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
     characteristic.updateValue(v === false ?
-      this.platform.Characteristic.ContactSensorState.CONTACT_DETECTED :
-      this.platform.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
+      Characteristic.ContactSensorState.CONTACT_DETECTED :
+      Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
   }
 
   getLeakDetected(characteristic, _service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
     characteristic.updateValue(v === true ?
-      this.platform.Characteristic.LeakDetected.LEAK_DETECTED :
-      this.platform.Characteristic.LeakDetected.LEAK_NOT_DETECTED);
+      Characteristic.LeakDetected.LEAK_DETECTED :
+      Characteristic.LeakDetected.LEAK_NOT_DETECTED);
   }
 
   getSmokeDetected(characteristic, _service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
     characteristic.updateValue(v === true ?
-      this.platform.Characteristic.SmokeDetected.SMOKE_DETECTED :
-      this.platform.Characteristic.SmokeDetected.SMOKE_NOT_DETECTED);
+      Characteristic.SmokeDetected.SMOKE_DETECTED :
+      Characteristic.SmokeDetected.SMOKE_NOT_DETECTED);
   }
 
   getCarbonMonoxideDetected(characteristic, _service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
     characteristic.updateValue(v === true ?
-      this.platform.Characteristic.CarbonMonoxideDetected.CO_LEVELS_ABNORMAL :
-      this.platform.Characteristic.CarbonMonoxideDetected.CO_LEVELS_NORMAL);
+      Characteristic.CarbonMonoxideDetected.CO_LEVELS_ABNORMAL :
+      Characteristic.CarbonMonoxideDetected.CO_LEVELS_NORMAL);
   }
 
   getCarbonMonoxideLevel(characteristic, _service, _IDs, properties) {
@@ -235,7 +235,7 @@ export class GetFunctions {
 
   getLockCurrentState(characteristic, service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
-    const { LockCurrentState } = this.platform.Characteristic;
+    const { LockCurrentState } = Characteristic;
 
     const state = service.isLockSwitch
       ? (v ? LockCurrentState.UNSECURED : LockCurrentState.SECURED)
@@ -252,7 +252,7 @@ export class GetFunctions {
           throw new Error('No value for heating cooling state.');
         }
 
-        const { CurrentHeatingCoolingState } = this.platform.Characteristic;
+        const { CurrentHeatingCoolingState } = Characteristic;
         const modeMap = {
           'Off': CurrentHeatingCoolingState.OFF,
           'Heat': CurrentHeatingCoolingState.HEAT,
@@ -264,7 +264,7 @@ export class GetFunctions {
           characteristic.updateValue(state);
         }
       } else if (service.isHeatingZone) {
-        characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
+        characteristic.updateValue(Characteristic.TargetHeatingCoolingState.HEAT);
       }
     } catch (e) {
       this.platform.log(`Error getting Current Heating Cooling State: ${service.IDs[0]} - Err: ${e}`);
@@ -279,7 +279,7 @@ export class GetFunctions {
           throw new Error('No value for heating cooling state.');
         }
 
-        const { TargetHeatingCoolingState } = this.platform.Characteristic;
+        const { TargetHeatingCoolingState } = Characteristic;
         const modeMap = {
           'Off': TargetHeatingCoolingState.OFF,
           'Heat': TargetHeatingCoolingState.HEAT,
@@ -291,7 +291,7 @@ export class GetFunctions {
           characteristic.updateValue(state);
         }
       } else if (service.isHeatingZone) {
-        characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
+        characteristic.updateValue(Characteristic.TargetHeatingCoolingState.HEAT);
       }
     } catch (e) {
       this.platform.log(`Error getting Target Heating Cooling State: ${service.IDs[0]} - Err: ${e}`);
@@ -299,7 +299,7 @@ export class GetFunctions {
   }
 
   getTemperatureDisplayUnits(characteristic) {
-    characteristic.updateValue(this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS);
+    characteristic.updateValue(Characteristic.TemperatureDisplayUnits.CELSIUS);
   }
 
   getHue(characteristic, service, _IDs, properties) {
@@ -311,7 +311,7 @@ export class GetFunctions {
   }
 
   getCurrentDoorState(characteristic, _service, _IDs, properties) {
-    const { CurrentDoorState } = this.platform.Characteristic;
+    const { CurrentDoorState } = Characteristic;
     const stateMap = {
       'Opened': CurrentDoorState.OPEN,
       'Opening': CurrentDoorState.OPENING,
@@ -344,7 +344,7 @@ export class GetFunctions {
   }
 
   getTargetDoorState(characteristic, _service, _IDs, properties) {
-    const { TargetDoorState } = this.platform.Characteristic;
+    const { TargetDoorState } = Characteristic;
     const stateMap = {
       'Opened': TargetDoorState.OPEN,
       'Opening': TargetDoorState.OPEN,
@@ -401,10 +401,10 @@ export class GetFunctions {
   }
 
   getSecuritySystemState(characteristic, _service, _IDs, securitySystemStatus) {
-    let r = this.platform.Characteristic.SecuritySystemTargetState.DISARMED;
-    if (characteristic.UUID === (new this.platform.Characteristic.SecuritySystemCurrentState()).UUID) {
+    let r = Characteristic.SecuritySystemTargetState.DISARM;
+    if (characteristic.UUID === (new Characteristic.SecuritySystemCurrentState()).UUID) {
       r = this.getCurrentSecuritySystemStateMapping.get(securitySystemStatus.value);
-    } else if (characteristic.UUID === (new this.platform.Characteristic.SecuritySystemTargetState()).UUID) {
+    } else if (characteristic.UUID === (new Characteristic.SecuritySystemTargetState()).UUID) {
       r = this.getTargetSecuritySystemStateMapping.get(securitySystemStatus.value);
     }
     if (r !== undefined) {
@@ -415,21 +415,21 @@ export class GetFunctions {
   getActive(characteristic, _service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
     characteristic.updateValue(v === false ?
-      this.platform.Characteristic.Active.INACTIVE :
-      this.platform.Characteristic.Active.ACTIVE);
+      Characteristic.Active.INACTIVE :
+      Characteristic.Active.ACTIVE);
   }
 
   getInUse(characteristic, _service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
     characteristic.updateValue(v === false ?
-      this.platform.Characteristic.InUse.NOT_IN_USE :
-      this.platform.Characteristic.InUse.IN_USE);
+      Characteristic.InUse.NOT_IN_USE :
+      Characteristic.InUse.IN_USE);
   }
 
   getProgrammableSwitchEvent(characteristic, _service, _IDs, properties) {
     const v = this.getBoolean(properties.value);
     if (v) {
-      characteristic.updateValue(this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
+      characteristic.updateValue(Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
     }
   }
 
@@ -439,15 +439,15 @@ export class GetFunctions {
     // https://www.epa.gov/system/files/documents/2024-02/pm-naaqs-air-quality-index-fact-sheet.pdf
     if (_service.isPM2_5Sensor) {
       if (v <= 5) {
-        characteristic.updateValue(this.platform.Characteristic.AirQuality.EXCELLENT);
+        characteristic.updateValue(Characteristic.AirQuality.EXCELLENT);
       } else if (v < 9.1) {
-        characteristic.updateValue(this.platform.Characteristic.AirQuality.GOOD);
+        characteristic.updateValue(Characteristic.AirQuality.GOOD);
       } else if ( v < 35.5) {
-        characteristic.updateValue(this.platform.Characteristic.AirQuality.FAIR);
+        characteristic.updateValue(Characteristic.AirQuality.FAIR);
       } else if ( v < 55.5) {
-        characteristic.updateValue(this.platform.Characteristic.AirQuality.INFERIOR);
+        characteristic.updateValue(Characteristic.AirQuality.INFERIOR);
       } else {
-        characteristic.updateValue(this.platform.Characteristic.AirQuality.POOR);
+        characteristic.updateValue(Characteristic.AirQuality.POOR);
       }
     }
   }

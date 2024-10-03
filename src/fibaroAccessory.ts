@@ -375,8 +375,6 @@ export class FibaroAccessory {
   }
 
   configureAccessoryFromType() {
-    const Service = this.platform.Service;
-    const Characteristic = this.platform.Characteristic;
     const type = this.device.type;
 
     // Find the matching device configuration function
@@ -387,7 +385,7 @@ export class FibaroAccessory {
     // If a matching deviceConfigFunction was found
     if (deviceConfigFunction) {
       // Set the configuration for this device by calling deviceConfigFunction
-      const config = deviceConfigFunction.call(null, Service, Characteristic, this.device, this.platform.config);
+      const config = deviceConfigFunction.call(null, this.device, this.platform.config);
       this.setMain(config.service, config.characteristics, config.subtype);
     } else {
       // If no matching DeviceClass was found, log that the device is not supported
