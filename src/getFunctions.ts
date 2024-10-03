@@ -102,8 +102,7 @@ export class GetFunctions {
     characteristic.updateValue(r);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getPositionState(characteristic, _service, _IDs, _properties) {
+  getPositionState(characteristic) {
     characteristic.updateValue(this.platform.Characteristic.PositionState.STOPPED);
   }
 
@@ -245,8 +244,7 @@ export class GetFunctions {
     characteristic.updateValue(state);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getCurrentHeatingCoolingState(characteristic, service, IDs, _properties) {
+  async getCurrentHeatingCoolingState(characteristic, service, IDs) {
     try {
       if (service.isClimateZone) {
         const { body: { properties } } = await this.platform.fibaroClient.getClimateZone(IDs[0]);
@@ -273,8 +271,7 @@ export class GetFunctions {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getTargetHeatingCoolingState(characteristic, service, IDs, _properties) {
+  async getTargetHeatingCoolingState(characteristic, service, IDs) {
     try {
       if (service.isClimateZone) {
         const { body: { properties } } = await this.platform.fibaroClient.getClimateZone(IDs[0]);
@@ -301,8 +298,7 @@ export class GetFunctions {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getTemperatureDisplayUnits(characteristic, _service, _IDs, _properties) {
+  getTemperatureDisplayUnits(characteristic) {
     characteristic.updateValue(this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS);
   }
 
@@ -374,8 +370,7 @@ export class GetFunctions {
     characteristic.updateValue(TargetDoorState.CLOSED);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getObstructionDetected(characteristic, _service, _IDs, _properties) {
+  getObstructionDetected(characteristic) {
     characteristic.updateValue(0);
   }
 
@@ -391,8 +386,7 @@ export class GetFunctions {
     characteristic.updateValue(level);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getChargingState(characteristic, _service, _IDs, _properties) {
+  getChargingState(characteristic) {
     characteristic.updateValue(0);
   }
 
@@ -496,11 +490,7 @@ export class GetFunctions {
     };
   }
 
-  /**
-   * Converts various input types to a boolean value.
-   * @param value - The input value to convert.
-   * @returns A boolean representation of the input value.
-   */
+  // Converts various input types to a boolean value.
   getBoolean(value: number | string | boolean): boolean {
     switch (typeof value) {
       case 'number':
