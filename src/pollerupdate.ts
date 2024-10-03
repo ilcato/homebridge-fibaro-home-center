@@ -1,7 +1,6 @@
 // pollerupdate.ts
 
 import * as constants from './constants';
-import { GetFunctions } from './getFunctions';
 
 export class Poller {
   private pollingUpdateRunning: boolean = false;
@@ -100,7 +99,7 @@ export class Poller {
             change.value = (change.value - 32) * 5 / 9;
           }
 
-          const getFunction = GetFunctions.getFunctionsMapping.get(characteristic.constructor);
+          const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(characteristic.constructor);
           if (getFunction) {
             const IDs = service.subtype.split('-');
             getFunction.call(this.platform.getFunctions, characteristic, service, IDs, change);
@@ -157,7 +156,7 @@ export class Poller {
           // Iterate through all characteristics of the service
           service.characteristics.forEach(characteristic => {
             // Get the function to call dynamically
-            const getFunction = GetFunctions.getFunctionsMapping.get(characteristic.constructor);
+            const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(characteristic.constructor);
             if (getFunction) {
               // Call the function dynamically
               getFunction.call(this.platform.getFunctions, characteristic, service, null, value);
@@ -174,7 +173,7 @@ export class Poller {
     const service = this.platform.findServiceByName('FibaroSecuritySystem', this.platform.Service.SecuritySystem);
 
     if (service !== undefined) {
-      const state = GetFunctions.CurrentSecuritySystemStateMapping.get(securitySystemStatus.value);
+      const state = this.platform.getFunctions.CurrentSecuritySystemStateMapping.get(securitySystemStatus.value);
       if (state !== undefined) {
         const characteristic = service.getCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState);
         if (characteristic.value !== state) {
@@ -207,7 +206,7 @@ export class Poller {
       if (parseInt(subscription.id) === change.id && subscription.property === 'mode') {
         this.platform.log.info('Updating value for device: ',
           `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.thermostatMode}`);
-        const getFunction = GetFunctions.getFunctionsMapping.get(subscription.characteristic.constructor);
+        const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(subscription.characteristic.constructor);
         if (getFunction) {
           getFunction.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
         }
@@ -220,7 +219,7 @@ export class Poller {
       if (parseInt(subscription.id) === change.id && subscription.property === 'targettemperature') {
         this.platform.log.info('Updating value for device: ',
           `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.heatingThermostatSetpoint}`);
-        const getFunction = GetFunctions.getFunctionsMapping.get(subscription.characteristic.constructor);
+        const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(subscription.characteristic.constructor);
         if (getFunction) {
           getFunction.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
         }

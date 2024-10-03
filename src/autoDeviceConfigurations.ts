@@ -1,12 +1,9 @@
 // deviceConfigurations.ts
 
 import * as constants from './constants';
-import { Service } from 'hap-nodejs';
-import { Characteristic } from 'hap-nodejs';
-
 
 // Configuration for automatic device setup
-type DeviceConfigFunction = (device, config?) => {
+type DeviceConfigFunction = (Service, Characteristic, device, config?) => {
   service;
   characteristics;
   subtype?: string;
@@ -22,13 +19,16 @@ function DeviceType(type: RegExp | string) {
 }
 
 export class DeviceConfigurations {
+  constructor() {
+  }
+
   // Light / Dimmer
   @DeviceType(/^com\.fibaro\.FGD(?!W)/) // Exclude 'com.fibaro.FGDW'
   @DeviceType(/^com\.fibaro\.FGWD/)
   @DeviceType('com.fibaro.multilevelSwitch')
   @DeviceType('com.fibaro.FGD212')
   @DeviceType('com.fibaro.FGWD111')
-  static lightWithSwitchOrDimmer(device) {
+  private static lightWithSwitchOrDimmer(Service, Characteristic, device) {
     const { deviceControlType } = device.properties || {};
 
     const isLightingControl =
@@ -52,7 +52,7 @@ export class DeviceConfigurations {
   @DeviceType(/^com\.fibaro\.FGRGBW/)
   @DeviceType('com.fibaro.FGRGBW441M')
   @DeviceType('com.fibaro.colorController')
-  static lightWithRGBW() {
+  private static lightWithRGBW(Service, Characteristic) {
     return {
       service: Service.Lightbulb,
       characteristics: [Characteristic.On, Characteristic.Brightness, Characteristic.Hue, Characteristic.Saturation],
@@ -67,7 +67,7 @@ export class DeviceConfigurations {
   @DeviceType('com.fibaro.satelOutput')
   @DeviceType(/^com\.fibaro\.FGWP/)
   @DeviceType(/^com\.fibaro\.FGWOEF/)
-  static variousSwitches(device) {
+  private static variousSwitches(Service, Characteristic, device) {
     const { deviceControlType } = device.properties || {};
 
     const isLightingDevice =
@@ -124,7 +124,7 @@ export class DeviceConfigurations {
   @DeviceType('com.fibaro.remoteBaseShutter')
   @DeviceType('com.fibaro.baseShutter')
   @DeviceType('com.fibaro.barrier')
-  static windowCoveringAndGarageDoor(device) {
+  private static windowCoveringAndGarageDoor(Service, Characteristic, device) {
     const properties = device.properties || {};
     const { deviceControlType } = properties;
 
@@ -181,7 +181,7 @@ export class DeviceConfigurations {
 
   // Temperature sensor
   @DeviceType('com.fibaro.temperatureSensor')
-  static temperatureSensor() {
+  private static temperatureSensor(Service, Characteristic) {
     return {
       service: Service.TemperatureSensor,
       characteristics: [Characteristic.CurrentTemperature],
@@ -190,7 +190,7 @@ export class DeviceConfigurations {
 
   // Humidity sensor
   @DeviceType('com.fibaro.humiditySensor')
-  static humiditySensor() {
+  private static humiditySensor(Service, Characteristic) {
     return {
       service: Service.HumiditySensor,
       characteristics: [Characteristic.CurrentRelativeHumidity],
@@ -199,7 +199,7 @@ export class DeviceConfigurations {
 
   // Light sensor
   @DeviceType('com.fibaro.lightSensor')
-  static lightSensor() {
+  private static lightSensor(Service, Characteristic) {
     return {
       service: Service.LightSensor,
       characteristics: [Characteristic.CurrentAmbientLightLevel],
@@ -208,7 +208,7 @@ export class DeviceConfigurations {
 
   // Multilevel sensor
   @DeviceType('com.fibaro.multilevelSensor')
-  static multilevelSensor(device) {
+  private static multilevelSensor(Service, Characteristic, device) {
     const properties = device.properties || {};
     const { deviceRole } = properties;
 
@@ -241,7 +241,7 @@ export class DeviceConfigurations {
   // Motion sensor
   @DeviceType(/^com\.fibaro\.FGMS/)
   @DeviceType('com.fibaro.motionSensor')
-  static motionSensor() {
+  private static motionSensor(Service, Characteristic) {
     return {
       service: Service.MotionSensor,
       characteristics: [Characteristic.MotionDetected],
@@ -255,7 +255,7 @@ export class DeviceConfigurations {
   @DeviceType('com.fibaro.windowSensor')
   @DeviceType('com.fibaro.satelZone')
   @DeviceType('com.fibaro.doorWindowSensor')
-  static doorbellContactSensor(device, config) {
+  private static doorbellContactSensor(Service, Characteristic, device, config) {
     const properties = device.properties || {};
     const { deviceRole } = properties;
 
@@ -289,7 +289,7 @@ export class DeviceConfigurations {
   // Leak sensor
   @DeviceType(/^com\.fibaro\.FGFS/)
   @DeviceType('com.fibaro.floodSensor')
-  static leakSensor() {
+  private static leakSensor(Service, Characteristic) {
     return {
       service: Service.LeakSensor,
       characteristics: [Characteristic.LeakDetected],
@@ -300,7 +300,7 @@ export class DeviceConfigurations {
   @DeviceType(/^com\.fibaro\.FGSS/)
   @DeviceType('com.fibaro.smokeSensor')
   @DeviceType('com.fibaro.gasDetector')
-  static smokeSensor() {
+  private static smokeSensor(Service, Characteristic) {
     return {
       service: Service.SmokeSensor,
       characteristics: [Characteristic.SmokeDetected],
@@ -309,7 +309,7 @@ export class DeviceConfigurations {
 
   // Carbon Monoxide Sensor
   @DeviceType(/^com\.fibaro\.FGCD/)
-  static carbonMonoxideSensor() {
+  private static carbonMonoxideSensor(Service, Characteristic) {
     return {
       service: Service.CarbonMonoxideSensor,
       characteristics: [
@@ -324,7 +324,7 @@ export class DeviceConfigurations {
   // Lock Mechanism
   @DeviceType('com.fibaro.doorLock')
   @DeviceType('com.fibaro.gerda')
-  static lockMechanism() {
+  private static lockMechanism(Service, Characteristic) {
     return {
       service: Service.LockMechanism,
       characteristics: [
@@ -336,7 +336,7 @@ export class DeviceConfigurations {
 
   // Security system
   @DeviceType(constants.DEVICE_TYPE_SECURITY_SYSTEM)
-  static securitySystem() {
+  private static securitySystem(Service, Characteristic) {
     return {
       service: Service.SecuritySystem,
       characteristics: [
@@ -349,7 +349,7 @@ export class DeviceConfigurations {
 
   // Scene
   @DeviceType(constants.DEVICE_TYPE_SCENE)
-  static scene(device) {
+  private static scene(Service, Characteristic, device) {
     return {
       service: Service.Switch,
       characteristics: [Characteristic.On],
@@ -359,7 +359,7 @@ export class DeviceConfigurations {
 
   // Climate zone (HC3)
   @DeviceType(constants.DEVICE_TYPE_CLIMATE_ZONE)
-  static climateZone(device) {
+  private static climateZone(Service, Characteristic, device) {
     return {
       service: Service.Thermostat,
       characteristics: [
@@ -375,7 +375,7 @@ export class DeviceConfigurations {
 
   // Heating zone (HC2 and HCL)
   @DeviceType(constants.DEVICE_TYPE_HEATING_ZONE)
-  static heatingZone(device) {
+  private static heatingZone(Service, Characteristic, device) {
     return {
       service: Service.Thermostat,
       characteristics: [
@@ -391,7 +391,7 @@ export class DeviceConfigurations {
 
   // Global variables
   @DeviceType(constants.DEVICE_TYPE_GLOBAL_VARIABLE)
-  static globalVariable(device) {
+  private static globalVariable(Service, Characteristic, device) {
     return {
       service: Service.Switch,
       characteristics: [Characteristic.On],
@@ -401,7 +401,7 @@ export class DeviceConfigurations {
 
   // Dimmer global variables
   @DeviceType(constants.DEVICE_TYPE_DIMMER_GLOBAL_VARIABLE)
-  static dimmerGlobalVariable(device) {
+  private static dimmerGlobalVariable(Service, Characteristic, device) {
     return {
       service: Service.Lightbulb,
       characteristics: [Characteristic.On, Characteristic.Brightness],

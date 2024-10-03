@@ -1,52 +1,63 @@
 // getFunctions.ts
 
-import { Characteristic } from 'hap-nodejs';
+import 'reflect-metadata';
 import { Utils } from './utils';
+import { Characteristics } from './constants';
 
 // Decorator function for mapping getCharacteristicValue to the Characteristic
-function characteristicGetter(...characteristics: typeof Characteristic[keyof typeof Characteristic][]) {
+function characteristicGetter(...characteristics: unknown[]) {
   return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
-    if (!target.constructor.getFunctionsMapping) {
-      target.constructor.getFunctionsMapping = new Map();
-    }
-    characteristics.forEach(char => {
-      target.constructor.getFunctionsMapping.set(char, descriptor.value);
-    });
+    const existingMethods = Reflect.getMetadata('characteristicMethods', target) || [];
+    existingMethods.push([propertyKey, characteristics]);
+    Reflect.defineMetadata('characteristicMethods', existingMethods, target);
+    return descriptor;
   };
 }
-
 export class GetFunctions {
-  static getFunctionsMapping: Map<typeof Characteristic[keyof typeof Characteristic], (...args: unknown[]) => unknown>;
-  // Initialize security system mappings
-  static CurrentSecuritySystemStateMapping = new Map([
-    ['AwayArmed', Characteristic.SecuritySystemCurrentState.AWAY_ARM],
-    ['Disarmed', Characteristic.SecuritySystemCurrentState.DISARMED],
-    ['NightArmed', Characteristic.SecuritySystemCurrentState.NIGHT_ARM],
-    ['StayArmed', Characteristic.SecuritySystemCurrentState.STAY_ARM],
-    ['AlarmTriggered', Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED],
-  ]);
+  getFunctionsMapping: Map<unknown, (...args: unknown[]) => unknown>;
 
-  static TargetSecuritySystemStateMapping = new Map([
-    ['AwayArmed', Characteristic.SecuritySystemTargetState.AWAY_ARM],
-    ['Disarmed', Characteristic.SecuritySystemTargetState.DISARM],
-    ['NightArmed', Characteristic.SecuritySystemTargetState.NIGHT_ARM],
-    ['StayArmed', Characteristic.SecuritySystemTargetState.STAY_ARM],
-  ]);
+  CurrentSecuritySystemStateMapping;
+  TargetSecuritySystemStateMapping;
 
   constructor(private platform) {
-    // Initialize the static mapping if not already done
-    if (!GetFunctions.getFunctionsMapping) {
-      GetFunctions.getFunctionsMapping = new Map();
+    // Initialize security system mappings
+    this.CurrentSecuritySystemStateMapping = new Map([
+      ['AwayArmed', this.platform.Characteristic.SecuritySystemCurrentState.AWAY_ARM],
+      ['Disarmed', this.platform.Characteristic.SecuritySystemCurrentState.DISARMED],
+      ['NightArmed', this.platform.Characteristic.SecuritySystemCurrentState.NIGHT_ARM],
+      ['StayArmed', this.platform.Characteristic.SecuritySystemCurrentState.STAY_ARM],
+      ['AlarmTriggered', this.platform.Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED],
+    ]);
+
+    this.TargetSecuritySystemStateMapping = new Map([
+      ['AwayArmed', this.platform.Characteristic.SecuritySystemTargetState.AWAY_ARM],
+      ['Disarmed', this.platform.Characteristic.SecuritySystemTargetState.DISARM],
+      ['NightArmed', this.platform.Characteristic.SecuritySystemTargetState.NIGHT_ARM],
+      ['StayArmed', this.platform.Characteristic.SecuritySystemTargetState.STAY_ARM],
+    ]);
+
+    this.getFunctionsMapping = new Map();
+    this.initializeFunctionsMapping();
+  }
+
+  private initializeFunctionsMapping() {
+    const prototype = Object.getPrototypeOf(this);
+    const characteristicMethods = Reflect.getMetadata('characteristicMethods', prototype) || [];
+
+    for (const [methodName, characteristics] of characteristicMethods) {
+      for (const characteristic of characteristics) {
+        this.getFunctionsMapping.set(this.platform.Characteristic[characteristic], this[methodName].bind(this));
+      }
     }
   }
 
-  @characteristicGetter(Characteristic.On, Characteristic.MotionDetected, Characteristic.OccupancyDetected)
+  @characteristicGetter(Characteristics.On, Characteristics.MotionDetected, Characteristics.OccupancyDetected)
   getBool(characteristic, service, IDs, properties) {
     const v = properties.value ?? properties['ui.startStopActivitySwitch.value'] ?? false;
     characteristic.updateValue(Utils.getBoolean(v));
   }
 
-  @characteristicGetter(Characteristic.Brightness)
+  @characteristicGetter(Characteristics.Brightness)
   getBrightness(characteristic, service, _IDs, { value }) {
     if (isNaN(value)) {
       return;
@@ -57,7 +68,7 @@ export class GetFunctions {
       r = 100;
     }
 
-    const onCharacteristic = service?.getCharacteristic(Characteristic.On);
+    const onCharacteristic = service?.getCharacteristic(this.platform.Characteristic.On);
     if (onCharacteristic?.value === false) {
       return;
     }
@@ -65,12 +76,12 @@ export class GetFunctions {
     characteristic.updateValue(r);
   }
 
-  @characteristicGetter(Characteristic.PositionState)
+  @characteristicGetter(Characteristics.PositionState)
   getPositionState(characteristic) {
-    characteristic.updateValue(Characteristic.PositionState.STOPPED);
+    characteristic.updateValue(this.platform.Characteristic.PositionState.STOPPED);
   }
 
-  @characteristicGetter(Characteristic.CurrentPosition, Characteristic.TargetPosition)
+  @characteristicGetter(Characteristics.CurrentPosition, Characteristics.TargetPosition)
   getCurrentPosition(characteristic, _service, _IDs, properties) {
     const value = properties.value;
     const state = properties.state;
@@ -86,7 +97,7 @@ export class GetFunctions {
     characteristic.updateValue(position);
   }
 
-  @characteristicGetter(Characteristic.CurrentHorizontalTiltAngle, Characteristic.TargetHorizontalTiltAngle)
+  @characteristicGetter(Characteristics.CurrentHorizontalTiltAngle, Characteristics.TargetHorizontalTiltAngle)
   getCurrentTiltAngle(characteristic, _service, _IDs, properties) {
     const value2 = parseInt(properties.value2 ?? '');
     const angle = (() => {
@@ -100,7 +111,7 @@ export class GetFunctions {
     characteristic.updateValue(angle);
   }
 
-  @characteristicGetter(Characteristic.CurrentTemperature)
+  @characteristicGetter(Characteristics.CurrentTemperature)
   async getCurrentTemperature(characteristic, service, IDs, properties) {
     try {
       let temperature;
@@ -117,7 +128,7 @@ export class GetFunctions {
     }
   }
 
-  @characteristicGetter(Characteristic.TargetTemperature)
+  @characteristicGetter(Characteristics.TargetTemperature)
   async getTargetTemperature(characteristic, service, IDs, properties) {
     try {
       let temperature;
@@ -156,51 +167,51 @@ export class GetFunctions {
     return temperature;
   }
 
-  @characteristicGetter(Characteristic.ContactSensorState)
+  @characteristicGetter(Characteristics.ContactSensorState)
   getContactSensorState(characteristic, _service, _IDs, properties) {
     const v = Utils.getBoolean(properties.value);
     characteristic.updateValue(v === false ?
-      Characteristic.ContactSensorState.CONTACT_DETECTED :
-      Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
+      this.platform.Characteristic.ContactSensorState.CONTACT_DETECTED :
+      this.platform.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
   }
 
-  @characteristicGetter(Characteristic.LeakDetected)
+  @characteristicGetter(Characteristics.LeakDetected)
   getLeakDetected(characteristic, _service, _IDs, properties) {
     const v = Utils.getBoolean(properties.value);
     characteristic.updateValue(v === true ?
-      Characteristic.LeakDetected.LEAK_DETECTED :
-      Characteristic.LeakDetected.LEAK_NOT_DETECTED);
+      this.platform.Characteristic.LeakDetected.LEAK_DETECTED :
+      this.platform.Characteristic.LeakDetected.LEAK_NOT_DETECTED);
   }
 
-  @characteristicGetter(Characteristic.SmokeDetected)
+  @characteristicGetter(Characteristics.SmokeDetected)
   getSmokeDetected(characteristic, _service, _IDs, properties) {
     const v = Utils.getBoolean(properties.value);
     characteristic.updateValue(v === true ?
-      Characteristic.SmokeDetected.SMOKE_DETECTED :
-      Characteristic.SmokeDetected.SMOKE_NOT_DETECTED);
+      this.platform.Characteristic.SmokeDetected.SMOKE_DETECTED :
+      this.platform.Characteristic.SmokeDetected.SMOKE_NOT_DETECTED);
   }
 
-  @characteristicGetter(Characteristic.CarbonMonoxideDetected)
+  @characteristicGetter(Characteristics.CarbonMonoxideDetected)
   getCarbonMonoxideDetected(characteristic, _service, _IDs, properties) {
     const v = Utils.getBoolean(properties.value);
     characteristic.updateValue(v === true ?
-      Characteristic.CarbonMonoxideDetected.CO_LEVELS_ABNORMAL :
-      Characteristic.CarbonMonoxideDetected.CO_LEVELS_NORMAL);
+      this.platform.Characteristic.CarbonMonoxideDetected.CO_LEVELS_ABNORMAL :
+      this.platform.Characteristic.CarbonMonoxideDetected.CO_LEVELS_NORMAL);
   }
 
-  @characteristicGetter(Characteristic.CarbonMonoxideLevel)
+  @characteristicGetter(Characteristics.CarbonMonoxideLevel)
   getCarbonMonoxideLevel(characteristic, _service, _IDs, properties) {
     const r = parseFloat(properties.concentration);
     characteristic.updateValue(r);
   }
 
-  @characteristicGetter(Characteristic.CarbonMonoxidePeakLevel)
+  @characteristicGetter(Characteristics.CarbonMonoxidePeakLevel)
   getCarbonMonoxidePeakLevel(characteristic, _service, _IDs, properties) {
     const r = parseFloat(properties.maxConcentration);
     characteristic.updateValue(r);
   }
 
-  @characteristicGetter(Characteristic.OutletInUse)
+  @characteristicGetter(Characteristics.OutletInUse)
   getOutletInUse(characteristic, _service, _IDs, properties) {
     const power = properties.power;
     if (power !== undefined && !isNaN(power)) {
@@ -208,10 +219,10 @@ export class GetFunctions {
     }
   }
 
-  @characteristicGetter(Characteristic.LockCurrentState, Characteristic.LockTargetState)
+  @characteristicGetter(Characteristics.LockCurrentState, Characteristics.LockTargetState)
   getLockCurrentState(characteristic, service, _IDs, properties) {
     const v = Utils.getBoolean(properties.value);
-    const { LockCurrentState } = Characteristic;
+    const { LockCurrentState } = this.platform.Characteristic;
 
     const state = service.isLockSwitch
       ? (v ? LockCurrentState.UNSECURED : LockCurrentState.SECURED)
@@ -220,7 +231,7 @@ export class GetFunctions {
     characteristic.updateValue(state);
   }
 
-  @characteristicGetter(Characteristic.CurrentHeatingCoolingState)
+  @characteristicGetter(Characteristics.CurrentHeatingCoolingState)
   async getCurrentHeatingCoolingState(characteristic, service, IDs) {
     try {
       if (service.isClimateZone) {
@@ -229,7 +240,7 @@ export class GetFunctions {
           throw new Error('No value for heating cooling state.');
         }
 
-        const { CurrentHeatingCoolingState } = Characteristic;
+        const { CurrentHeatingCoolingState } = this.platform.Characteristic;
         const modeMap = {
           'Off': CurrentHeatingCoolingState.OFF,
           'Heat': CurrentHeatingCoolingState.HEAT,
@@ -241,14 +252,14 @@ export class GetFunctions {
           characteristic.updateValue(state);
         }
       } else if (service.isHeatingZone) {
-        characteristic.updateValue(Characteristic.TargetHeatingCoolingState.HEAT);
+        characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
       }
     } catch (e) {
       this.platform.log(`Error getting Current Heating Cooling State: ${service.IDs[0]} - Err: ${e}`);
     }
   }
 
-  @characteristicGetter(Characteristic.TargetHeatingCoolingState)
+  @characteristicGetter(Characteristics.TargetHeatingCoolingState)
   async getTargetHeatingCoolingState(characteristic, service, IDs) {
     try {
       if (service.isClimateZone) {
@@ -257,7 +268,7 @@ export class GetFunctions {
           throw new Error('No value for heating cooling state.');
         }
 
-        const { TargetHeatingCoolingState } = Characteristic;
+        const { TargetHeatingCoolingState } = this.platform.Characteristic;
         const modeMap = {
           'Off': TargetHeatingCoolingState.OFF,
           'Heat': TargetHeatingCoolingState.HEAT,
@@ -269,31 +280,31 @@ export class GetFunctions {
           characteristic.updateValue(state);
         }
       } else if (service.isHeatingZone) {
-        characteristic.updateValue(Characteristic.TargetHeatingCoolingState.HEAT);
+        characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
       }
     } catch (e) {
       this.platform.log(`Error getting Target Heating Cooling State: ${service.IDs[0]} - Err: ${e}`);
     }
   }
 
-  @characteristicGetter(Characteristic.TemperatureDisplayUnits)
+  @characteristicGetter(Characteristics.TemperatureDisplayUnits)
   getTemperatureDisplayUnits(characteristic) {
-    characteristic.updateValue(Characteristic.TemperatureDisplayUnits.CELSIUS);
+    characteristic.updateValue(this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS);
   }
 
-  @characteristicGetter(Characteristic.Hue)
+  @characteristicGetter(Characteristics.Hue)
   getHue(characteristic, service, _IDs, properties) {
     characteristic.updateValue(Math.round(Utils.updateHomeKitColorFromHomeCenter(properties.color).h));
   }
 
-  @characteristicGetter(Characteristic.Saturation)
+  @characteristicGetter(Characteristics.Saturation)
   getSaturation(characteristic, service, _IDs, properties) {
     characteristic.updateValue(Math.round(Utils.updateHomeKitColorFromHomeCenter(properties.color).s));
   }
 
-  @characteristicGetter(Characteristic.CurrentDoorState)
+  @characteristicGetter(Characteristics.CurrentDoorState)
   getCurrentDoorState(characteristic, _service, _IDs, properties) {
-    const { CurrentDoorState } = Characteristic;
+    const { CurrentDoorState } = this.platform.Characteristic;
     const stateMap = {
       'Opened': CurrentDoorState.OPEN,
       'Opening': CurrentDoorState.OPENING,
@@ -325,9 +336,9 @@ export class GetFunctions {
     characteristic.updateValue(CurrentDoorState.STOPPED);
   }
 
-  @characteristicGetter(Characteristic.TargetDoorState)
+  @characteristicGetter(Characteristics.TargetDoorState)
   getTargetDoorState(characteristic, _service, _IDs, properties) {
-    const { TargetDoorState } = Characteristic;
+    const { TargetDoorState } = this.platform.Characteristic;
     const stateMap = {
       'Opened': TargetDoorState.OPEN,
       'Opening': TargetDoorState.OPEN,
@@ -353,12 +364,12 @@ export class GetFunctions {
     characteristic.updateValue(TargetDoorState.CLOSED);
   }
 
-  @characteristicGetter(Characteristic.ObstructionDetected)
+  @characteristicGetter(Characteristics.ObstructionDetected)
   getObstructionDetected(characteristic) {
     characteristic.updateValue(0);
   }
 
-  @characteristicGetter(Characteristic.BatteryLevel)
+  @characteristicGetter(Characteristics.BatteryLevel)
   getBatteryLevel(characteristic, _service, _IDs, properties) {
     const batteryLevel = parseFloat(properties.batteryLevel);
 
@@ -371,12 +382,12 @@ export class GetFunctions {
     characteristic.updateValue(level);
   }
 
-  @characteristicGetter(Characteristic.ChargingState)
+  @characteristicGetter(Characteristics.ChargingState)
   getChargingState(characteristic) {
     characteristic.updateValue(0);
   }
 
-  @characteristicGetter(Characteristic.StatusLowBattery)
+  @characteristicGetter(Characteristics.StatusLowBattery)
   getStatusLowBattery(characteristic, _service, _IDs, properties) {
     if (isNaN(properties.batteryLevel)) {
       this.platform.log('batteryLevel is not a number.', '');
@@ -387,66 +398,66 @@ export class GetFunctions {
     characteristic.updateValue(r);
   }
 
-  static getSecuritySystemState(characteristic, _service, _IDs, securitySystemStatus) {
-    let r = Characteristic.SecuritySystemTargetState.DISARM;
-    if (characteristic.constructor === Characteristic.SecuritySystemCurrentState) {
-      r = GetFunctions.CurrentSecuritySystemStateMapping.get(securitySystemStatus.value) ?? 0;
-    } else if (characteristic.constructor === Characteristic.SecuritySystemTargetState) {
-      r = GetFunctions.TargetSecuritySystemStateMapping.get(securitySystemStatus.value) ?? 0;
+  getSecuritySystemState(characteristic, _service, _IDs, securitySystemStatus) {
+    let r = this.platform.Characteristic.SecuritySystemTargetState.DISARM;
+    if (characteristic.constructor === this.platform.Characteristic.SecuritySystemCurrentState) {
+      r = this.CurrentSecuritySystemStateMapping.get(securitySystemStatus.value) ?? 0;
+    } else if (characteristic.constructor === this.platform.Characteristic.SecuritySystemTargetState) {
+      r = this.TargetSecuritySystemStateMapping.get(securitySystemStatus.value) ?? 0;
     }
     if (r !== undefined) {
       characteristic.updateValue(r);
     }
   }
 
-  @characteristicGetter(Characteristic.Active)
+  @characteristicGetter(Characteristics.Active)
   getActive(characteristic, _service, _IDs, properties) {
     const v = Utils.getBoolean(properties.value);
     characteristic.updateValue(v === false ?
-      Characteristic.Active.INACTIVE :
-      Characteristic.Active.ACTIVE);
+      this.platform.Characteristic.Active.INACTIVE :
+      this.platform.Characteristic.Active.ACTIVE);
   }
 
-  @characteristicGetter(Characteristic.InUse)
+  @characteristicGetter(Characteristics.InUse)
   getInUse(characteristic, _service, _IDs, properties) {
     const v = Utils.getBoolean(properties.value);
     characteristic.updateValue(v === false ?
-      Characteristic.InUse.NOT_IN_USE :
-      Characteristic.InUse.IN_USE);
+      this.platform.Characteristic.InUse.NOT_IN_USE :
+      this.platform.Characteristic.InUse.IN_USE);
   }
 
-  @characteristicGetter(Characteristic.ProgrammableSwitchEvent)
+  @characteristicGetter(Characteristics.ProgrammableSwitchEvent)
   getProgrammableSwitchEvent(characteristic, _service, _IDs, properties) {
     const v = Utils.getBoolean(properties.value);
     if (v) {
-      characteristic.updateValue(Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
+      characteristic.updateValue(this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
     }
   }
 
-  @characteristicGetter(Characteristic.AirQuality)
+  @characteristicGetter(Characteristics.AirQuality)
   getAirQuality(characteristic, _service, _IDs, properties) {
     const v = parseFloat(properties.value);
     // 2024 AQI for PM 2.5
     // https://www.epa.gov/system/files/documents/2024-02/pm-naaqs-air-quality-index-fact-sheet.pdf
     if (_service.isPM2_5Sensor) {
       if (v <= 5) {
-        characteristic.updateValue(Characteristic.AirQuality.EXCELLENT);
+        characteristic.updateValue(this.platform.Characteristic.AirQuality.EXCELLENT);
       } else if (v < 9.1) {
-        characteristic.updateValue(Characteristic.AirQuality.GOOD);
+        characteristic.updateValue(this.platform.Characteristic.AirQuality.GOOD);
       } else if ( v < 35.5) {
-        characteristic.updateValue(Characteristic.AirQuality.FAIR);
+        characteristic.updateValue(this.platform.Characteristic.AirQuality.FAIR);
       } else if ( v < 55.5) {
-        characteristic.updateValue(Characteristic.AirQuality.INFERIOR);
+        characteristic.updateValue(this.platform.Characteristic.AirQuality.INFERIOR);
       } else {
-        characteristic.updateValue(Characteristic.AirQuality.POOR);
+        characteristic.updateValue(this.platform.Characteristic.AirQuality.POOR);
       }
     }
   }
 
   @characteristicGetter(
-    Characteristic.CurrentRelativeHumidity,
-    Characteristic.CurrentAmbientLightLevel,
-    Characteristic.PM2_5Density)
+    Characteristics.CurrentRelativeHumidity,
+    Characteristics.CurrentAmbientLightLevel,
+    Characteristics.PM2_5Density)
   getFloat(characteristic, _service, _IDs, properties) {
     const value = properties.value;
     if (value !== undefined && !isNaN(value)) {

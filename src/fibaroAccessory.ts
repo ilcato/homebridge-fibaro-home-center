@@ -11,9 +11,6 @@ import { FibaroHC } from './platform';
 import * as constants from './constants';
 import { manualDeviceConfigs } from './manualDeviceConfigurations';
 import { autoDeviceConfigs } from './autoDeviceConfigurations';
-import { GetFunctions } from './getFunctions';
-import { SetFunctions } from './setFunctions';
-
 
 export class FibaroAccessory {
   mainService;
@@ -217,7 +214,7 @@ export class FibaroAccessory {
   async setCharacteristicValue(value, context, characteristic, service, IDs) {
     if (context !== 'fromFibaro' && context !== 'fromSetValue') {
       if (this.platform.setFunctions) {
-        const setFunction = SetFunctions.setFunctionsMapping.get(characteristic.constructor);
+        const setFunction = this.platform.setFunctions.setFunctionsMapping.get(characteristic.constructor);
         const platform = this.platform;
         await this.platform.mutex.runExclusive(async () => {
           if (platform.poller) {
@@ -260,14 +257,14 @@ export class FibaroAccessory {
 
   private async handleSecuritySystem(characteristic, service, IDs, callback) {
     const securitySystemStatus = (await this.platform.fibaroClient!.getGlobalVariable(constants.SECURITY_SYSTEM_GLOBAL_VARIABLE)).body;
-    GetFunctions.getSecuritySystemState(characteristic, service, IDs, securitySystemStatus);
+    this.platform.getFunctions!.getSecuritySystemState(characteristic, service, IDs, securitySystemStatus);
     callback(undefined, characteristic.value);
   }
 
   private async handleGlobalVariable(characteristic, service, IDs, callback) {
     const value = (await this.platform.fibaroClient!.getGlobalVariable(IDs[1])).body;
 
-    const getFunction = GetFunctions.getFunctionsMapping.get(characteristic.constructor);
+    const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(characteristic.constructor);
     if (getFunction) {
       getFunction.call(this.platform.getFunctions, characteristic, service, IDs, value);
     }
@@ -276,7 +273,7 @@ export class FibaroAccessory {
   }
 
   private async handleDefaultCase(characteristic, service, IDs, callback) {
-    const getFunction = GetFunctions.getFunctionsMapping.get(characteristic.constructor);
+    const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(characteristic.constructor);
     if (getFunction) {
       const properties = await this.getDeviceProperties(service, IDs[0]);
 
@@ -377,6 +374,8 @@ export class FibaroAccessory {
   }
 
   configureAccessoryFromType() {
+    const Service = this.platform.Service;
+    const Characteristic = this.platform.Characteristic;
     const type = this.device.type;
 
     // Find the matching device configuration function
@@ -387,7 +386,7 @@ export class FibaroAccessory {
     // If a matching deviceConfigFunction was found
     if (deviceConfigFunction) {
       // Set the configuration for this device by calling deviceConfigFunction
-      const config = deviceConfigFunction.call(null, this.device, this.platform.config);
+      const config = deviceConfigFunction.call(null, Service, Characteristic, this.device, this.platform.config);
       this.setMain(config.service, config.characteristics, config.subtype);
     } else {
       // If no matching DeviceClass was found, log that the device is not supported

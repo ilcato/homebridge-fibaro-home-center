@@ -1,34 +1,41 @@
 // setFunctions.ts
 
+import 'reflect-metadata';
 import { Utils } from './utils';
-import { Characteristic } from 'hap-nodejs';
+import { Characteristics } from './constants';
 
 // Decorator function for mapping setCharacteristicValue to the Characteristic
-function characteristicSetter(...characteristics: typeof Characteristic[keyof typeof Characteristic][]) {
+function characteristicSetter(...characteristics: unknown[]) {
   return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
-    if (!target.constructor.setFunctionsMapping) {
-      target.constructor.setFunctionsMapping = new Map();
-    }
-    characteristics.forEach(char => {
-      target.constructor.setFunctionsMapping.set(char, descriptor.value);
-    });
+    const existingMethods = Reflect.getMetadata('characteristicMethods', target) || [];
+    existingMethods.push([propertyKey, characteristics]);
+    Reflect.defineMetadata('characteristicMethods', existingMethods, target);
+    return descriptor;
   };
 }
 
 export class SetFunctions {
-  static setFunctionsMapping: Map<typeof Characteristic[keyof typeof Characteristic], (...args: unknown[]) => unknown>;
+  setFunctionsMapping: Map<unknown, (...args: unknown[]) => unknown>;
   private timeoutsUpdating;
 
   constructor(private platform) {
     this.timeoutsUpdating = [];
+    this.setFunctionsMapping = new Map();
+    this.initializeFunctionsMapping();
+  }
 
-    // Initialize the static mapping if not already done
-    if (!SetFunctions.setFunctionsMapping) {
-      SetFunctions.setFunctionsMapping = new Map();
+  private initializeFunctionsMapping() {
+    const prototype = Object.getPrototypeOf(this);
+    const characteristicMethods = Reflect.getMetadata('characteristicMethods', prototype) || [];
+
+    for (const [methodName, characteristics] of characteristicMethods) {
+      for (const characteristic of characteristics) {
+        this.setFunctionsMapping.set(this.platform.Characteristic[characteristic], this[methodName].bind(this));
+      }
     }
   }
 
-  @characteristicSetter(Characteristic.On)
+  @characteristicSetter(Characteristics.On)
   async setOn(value, context, characteristic, service, IDs) {
     const setValue = (delay = 100) => {
       setTimeout(() => {
@@ -60,7 +67,7 @@ export class SetFunctions {
     }
   }
 
-  @characteristicSetter(Characteristic.Brightness)
+  @characteristicSetter(Characteristics.Brightness)
   async setBrightness(value, context, characteristic, service, IDs) {
     // Handle global variable dimmer separately
     if (service.isGlobalVariableDimmer) {
@@ -84,7 +91,7 @@ export class SetFunctions {
     }, 500);
   }
 
-  @characteristicSetter(Characteristic.TargetPosition)
+  @characteristicSetter(Characteristics.TargetPosition)
   async setTargetPosition(value, context, characteristic, service, IDs) {
     if (service.isOpenCloseOnly) {
       // For open/close only devices, use specific commands based on the target position
@@ -111,20 +118,20 @@ export class SetFunctions {
     }, 1200);
   }
 
-  @characteristicSetter(Characteristic.HoldPosition)
+  @characteristicSetter(Characteristics.HoldPosition)
   async setHoldPosition(value, context, characteristic, service, IDs) {
     if (value) {
       await this.command('stop', [0], service, IDs);
     }
   }
 
-  @characteristicSetter(Characteristic.TargetHorizontalTiltAngle)
+  @characteristicSetter(Characteristics.TargetHorizontalTiltAngle)
   async setTargetTiltAngle(angle, context, characteristic, service, IDs) {
     const value2 = Utils.scale(angle, characteristic.props.minValue, characteristic.props.maxValue, 0, 100);
     await this.command('setValue2', [value2], service, IDs);
   }
 
-  @characteristicSetter(Characteristic.LockTargetState)
+  @characteristicSetter(Characteristics.LockTargetState)
   async setLockTargetState(value, context, characteristic, service, IDs) {
     const Characteristic = this.platform.Characteristic;
     const isUnsecured = value === Characteristic.LockTargetState.UNSECURED;
@@ -153,7 +160,7 @@ export class SetFunctions {
     }
   }
 
-  @characteristicSetter(Characteristic.TargetDoorState)
+  @characteristicSetter(Characteristics.TargetDoorState)
   async setTargetDoorState(value, context, characteristic, service, IDs) {
     const action = value === this.platform.Characteristic.TargetDoorState.CLOSED ? 'close' : 'open';
     await this.command(action, [0], service, IDs);
@@ -165,7 +172,7 @@ export class SetFunctions {
     }, 100);
   }
 
-  @characteristicSetter(Characteristic.TargetHeatingCoolingState)
+  @characteristicSetter(Characteristics.TargetHeatingCoolingState)
   async setTargetHeatingCoolingState(value, context, characteristic, service, IDs) {
     if (!service.isClimateZone && !service.isHeatingZone) {
       return;
@@ -194,7 +201,7 @@ export class SetFunctions {
     await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, currentTemperature, timestamp);
   }
 
-  @characteristicSetter(Characteristic.TargetTemperature)
+  @characteristicSetter(Characteristics.TargetTemperature)
   async setTargetTemperature(value, context, characteristic, service, IDs) {
     const timestamp = Math.trunc(Date.now() / 1000) + parseInt(this.platform.config.thermostattimeout);
 
@@ -218,17 +225,17 @@ export class SetFunctions {
     }
   }
 
-  @characteristicSetter(Characteristic.Hue)
+  @characteristicSetter(Characteristics.Hue)
   async setHue(value, context, characteristic, service, IDs) {
     this.updateHomeCenterColorFromHomeKit(value, null, service, IDs);
   }
 
-  @characteristicSetter(Characteristic.Saturation)
+  @characteristicSetter(Characteristics.Saturation)
   async setSaturation(value, context, characteristic, service, IDs) {
     this.updateHomeCenterColorFromHomeKit(null, value, service, IDs);
   }
 
-  @characteristicSetter(Characteristic.SecuritySystemTargetState)
+  @characteristicSetter(Characteristics.SecuritySystemTargetState)
   async setSecuritySystemTargetState(value) {
     const { Characteristic } = this.platform;
 
@@ -252,7 +259,7 @@ export class SetFunctions {
     await this.scene(sceneID);
   }
 
-  @characteristicSetter(Characteristic.Active)
+  @characteristicSetter(Characteristics.Active)
   async setActive(value, context, characteristic, service, IDs) {
     const action = (value === this.platform.Characteristic.Active.ACTIVE) ? 'turnOn' : 'turnOff';
     await this.command(action, null, service, IDs);
