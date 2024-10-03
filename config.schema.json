@@ -262,15 +262,15 @@
                   ]
                 },
                 {
-                  "title": "Exclude device",
-                  "enum": [
-                    "exclude"
-                  ]
-                },
-                {
                   "title": "Outlet",
                   "enum": [
                     "outlet"
+                  ]
+                },
+                {
+                  "title": "Exclude device",
+                  "enum": [
+                    "exclude"
                   ]
                 }
               ],
