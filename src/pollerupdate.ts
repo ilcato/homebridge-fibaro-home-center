@@ -4,19 +4,11 @@ import * as constants from './constants';
 import { GetFunctions } from './getFunctions';
 
 export class Poller {
-  private platform;
-  private pollingUpdateRunning: boolean;
-  private lastPoll: number;
-  private pollerPeriod: number;
-  private timeout: NodeJS.Timeout | null;
+  private pollingUpdateRunning: boolean = false;
+  private lastPoll: number = 0;
+  private timeout: NodeJS.Timeout | null = null;
 
-  constructor(platform, pollerPeriod: number) {
-    this.platform = platform;
-    this.pollingUpdateRunning = false;
-    this.lastPoll = 0;
-    this.pollerPeriod = pollerPeriod;
-    this.timeout = null;
-  }
+  constructor(private platform, private pollerPeriod: number) { }
 
   async poll() {
     if (this.pollingUpdateRunning) {
@@ -157,22 +149,20 @@ export class Poller {
       const globalVariables = param.split(',');
       for (const globalVariable of globalVariables) {
         const value = (await this.platform.fibaroClient.getGlobalVariable(globalVariable)).body;
-        let service, characteristic;
-        switch (type) {
-          case 'G':
-            service = this.platform.findServiceByName(globalVariable, this.platform.Service.Switch);
-            characteristic = service.getCharacteristic(this.platform.Characteristic.On);
-            this.platform.getFunctions.getBool(characteristic, null, null, value);
-            break;
-          case 'D':
-            service = this.platform.findServiceByName(globalVariable, this.platform.Service.Lightbulb);
-            characteristic = service.getCharacteristic(this.platform.Characteristic.On);
-            this.platform.getFunctions.getBool(characteristic, null, null, value);
-            characteristic = service.getCharacteristic(this.platform.Characteristic.Brightness);
-            this.platform.getFunctions.getBrightness(characteristic, null, null, value);
-            break;
-          default:
-            break;
+        // Determine the service type based on the 'type' parameter
+        const serviceType = type === 'G' ? this.platform.Service.Switch : this.platform.Service.Lightbulb;
+        const service = this.platform.findServiceByName(globalVariable, serviceType);
+
+        if (service) {
+          // Iterate through all characteristics of the service
+          service.characteristics.forEach(characteristic => {
+            // Get the function to call dynamically
+            const getFunction = GetFunctions.getFunctionsMapping.get(characteristic.constructor);
+            if (getFunction) {
+              // Call the function dynamically
+              getFunction.call(this.platform.getFunctions, characteristic, service, null, value);
+            }
+          });
         }
       }
     }
