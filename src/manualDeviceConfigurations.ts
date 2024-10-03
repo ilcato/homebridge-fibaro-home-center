@@ -121,6 +121,14 @@ export class ManualDeviceConfigurations {
       characteristics: [Characteristic.SmokeDetected],
     };
   }
+
+  @ManualType(MANUAL_DEVICE_TYPES.OUTLET)
+  static configureOutlet(Service, Characteristic) {
+    return {
+      service: Service.Outlet,
+      characteristics: [Characteristic.On, Characteristic.OutletInUse],
+    };
+  }
 }
 
 export { manualDeviceConfigs };

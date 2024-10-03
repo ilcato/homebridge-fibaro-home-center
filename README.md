@@ -387,6 +387,7 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 - Main refactoring.
 - Option to mark dead devices as not responding in HomeKit.
 - Log dead devices.
+- Add support for Outlet manual device type.
 - Dependencies updates.
 
 ### Version 2.1.0

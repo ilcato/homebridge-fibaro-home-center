@@ -81,4 +81,5 @@ export const MANUAL_DEVICE_TYPES = {
   MOTION: 'motion',
   LEAK: 'leak',
   SMOKE: 'smoke',
+  OUTLET: 'outlet',
 } as const;

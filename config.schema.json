@@ -199,55 +199,55 @@
                     "blind"
                   ]
                 },
-		{
+                {
                   "title": "Blind with tilt angle",
                   "enum": [
                     "blind2"
                   ]
                 },
-		{
+                {
                   "title": "Garage",
                   "enum": [
                     "garage"
                   ]
                 },
-		{
+                {
                   "title": "Temperature",
                   "enum": [
                     "temperature"
                   ]
                 },
-		{
+                {
                   "title": "Humidity",
                   "enum": [
                     "humidity"
                   ]
                 },
-		{
+                {
                   "title": "Light sensor",
                   "enum": [
                     "lightSensor"
                   ]
                 },
-		{
+                {
                   "title": "Motion",
                   "enum": [
                     "motion"
                   ]
                 },
-		{
+                {
                   "title": "Leak",
                   "enum": [
                     "leak"
                   ]
                 },
-		{
+                {
                   "title": "Smoke sensor",
                   "enum": [
                     "smoke"
                   ]
                 },
-		{
+                {
                   "title": "Security",
                   "enum": [
                     "security"
@@ -263,6 +263,12 @@
                   "title": "Exclude device",
                   "enum": [
                     "exclude"
+                  ]
+                },
+                {
+                  "title": "Outlet",
+                  "enum": [
+                    "outlet"
                   ]
                 }
               ],
