@@ -2,8 +2,8 @@
 
 'use strict';
 
-import { SetFunctions } from './setFunctions';
 import { Characteristic } from 'hap-nodejs';
+import { Utils } from './utils';
 
 // Decorator function
 function characteristicGetter(...characteristics: string[]) {
@@ -40,7 +40,7 @@ export class GetFunctions {
   @characteristicGetter(Characteristic.On.UUID, Characteristic.MotionDetected.UUID, Characteristic.OccupancyDetected.UUID)
   getBool(characteristic, service, IDs, properties) {
     const v = properties.value ?? properties['ui.startStopActivitySwitch.value'] ?? false;
-    characteristic.updateValue(this.getBoolean(v));
+    characteristic.updateValue(Utils.getBoolean(v));
   }
 
   @characteristicGetter(Characteristic.Brightness.UUID)
@@ -89,7 +89,7 @@ export class GetFunctions {
     const angle = (() => {
       if (value2 >= 0 && value2 <= 100) {
         const adjustedValue = value2 === 99 ? 100 : value2 === 1 ? 0 : value2;
-        return SetFunctions.scale(adjustedValue, 0, 100, characteristic.props.minValue, characteristic.props.maxValue);
+        return Utils.scale(adjustedValue, 0, 100, characteristic.props.minValue, characteristic.props.maxValue);
       }
       return characteristic.props.minValue;
     })();
@@ -155,7 +155,7 @@ export class GetFunctions {
 
   @characteristicGetter(Characteristic.ContactSensorState.UUID)
   getContactSensorState(characteristic, _service, _IDs, properties) {
-    const v = this.getBoolean(properties.value);
+    const v = Utils.getBoolean(properties.value);
     characteristic.updateValue(v === false ?
       Characteristic.ContactSensorState.CONTACT_DETECTED :
       Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
@@ -163,7 +163,7 @@ export class GetFunctions {
 
   @characteristicGetter(Characteristic.LeakDetected.UUID)
   getLeakDetected(characteristic, _service, _IDs, properties) {
-    const v = this.getBoolean(properties.value);
+    const v = Utils.getBoolean(properties.value);
     characteristic.updateValue(v === true ?
       Characteristic.LeakDetected.LEAK_DETECTED :
       Characteristic.LeakDetected.LEAK_NOT_DETECTED);
@@ -171,7 +171,7 @@ export class GetFunctions {
 
   @characteristicGetter(Characteristic.SmokeDetected.UUID)
   getSmokeDetected(characteristic, _service, _IDs, properties) {
-    const v = this.getBoolean(properties.value);
+    const v = Utils.getBoolean(properties.value);
     characteristic.updateValue(v === true ?
       Characteristic.SmokeDetected.SMOKE_DETECTED :
       Characteristic.SmokeDetected.SMOKE_NOT_DETECTED);
@@ -179,7 +179,7 @@ export class GetFunctions {
 
   @characteristicGetter(Characteristic.CarbonMonoxideDetected.UUID)
   getCarbonMonoxideDetected(characteristic, _service, _IDs, properties) {
-    const v = this.getBoolean(properties.value);
+    const v = Utils.getBoolean(properties.value);
     characteristic.updateValue(v === true ?
       Characteristic.CarbonMonoxideDetected.CO_LEVELS_ABNORMAL :
       Characteristic.CarbonMonoxideDetected.CO_LEVELS_NORMAL);
@@ -207,7 +207,7 @@ export class GetFunctions {
 
   @characteristicGetter(Characteristic.LockCurrentState.UUID, Characteristic.LockTargetState.UUID)
   getLockCurrentState(characteristic, service, _IDs, properties) {
-    const v = this.getBoolean(properties.value);
+    const v = Utils.getBoolean(properties.value);
     const { LockCurrentState } = Characteristic;
 
     const state = service.isLockSwitch
@@ -280,12 +280,12 @@ export class GetFunctions {
 
   @characteristicGetter(Characteristic.Hue.UUID)
   getHue(characteristic, service, _IDs, properties) {
-    characteristic.updateValue(Math.round(this.updateHomeKitColorFromHomeCenter(properties.color).h));
+    characteristic.updateValue(Math.round(Utils.updateHomeKitColorFromHomeCenter(properties.color).h));
   }
 
   @characteristicGetter(Characteristic.Saturation.UUID)
   getSaturation(characteristic, service, _IDs, properties) {
-    characteristic.updateValue(Math.round(this.updateHomeKitColorFromHomeCenter(properties.color).s));
+    characteristic.updateValue(Math.round(Utils.updateHomeKitColorFromHomeCenter(properties.color).s));
   }
 
   @characteristicGetter(Characteristic.CurrentDoorState.UUID)
@@ -398,7 +398,7 @@ export class GetFunctions {
 
   @characteristicGetter(Characteristic.Active.UUID)
   getActive(characteristic, _service, _IDs, properties) {
-    const v = this.getBoolean(properties.value);
+    const v = Utils.getBoolean(properties.value);
     characteristic.updateValue(v === false ?
       Characteristic.Active.INACTIVE :
       Characteristic.Active.ACTIVE);
@@ -406,7 +406,7 @@ export class GetFunctions {
 
   @characteristicGetter(Characteristic.InUse.UUID)
   getInUse(characteristic, _service, _IDs, properties) {
-    const v = this.getBoolean(properties.value);
+    const v = Utils.getBoolean(properties.value);
     characteristic.updateValue(v === false ?
       Characteristic.InUse.NOT_IN_USE :
       Characteristic.InUse.IN_USE);
@@ -414,7 +414,7 @@ export class GetFunctions {
 
   @characteristicGetter(Characteristic.ProgrammableSwitchEvent.UUID)
   getProgrammableSwitchEvent(characteristic, _service, _IDs, properties) {
-    const v = this.getBoolean(properties.value);
+    const v = Utils.getBoolean(properties.value);
     if (v) {
       characteristic.updateValue(Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
     }
@@ -449,76 +449,5 @@ export class GetFunctions {
     if (value !== undefined && !isNaN(value)) {
       characteristic.updateValue(parseFloat(value));
     }
-  }
-
-  // Utility methods
-  getBoolean(value: number | string | boolean): boolean {
-    switch (typeof value) {
-      case 'number':
-        // Any non-zero number is true
-        return value !== 0;
-
-      case 'string':
-      {
-      // Convert string to lowercase for case-insensitive comparison
-        const lowercaseValue = value.toLowerCase().trim();
-        // Check for truthy string values
-        if (['true', 'on', 'yes'].includes(lowercaseValue)) {
-          return true;
-        }
-        // Check for falsy string values
-        if (['false', 'off', 'no'].includes(lowercaseValue)) {
-          return false;
-        }
-        // If it's a number string, convert to integer and check if it's non-zero
-        const numValue = parseInt(value, 10);
-        return !isNaN(numValue) && numValue !== 0;
-      }
-
-      case 'boolean':
-        // Boolean values are returned as-is
-        return value;
-
-      default:
-        // For any other type, return false
-        return false;
-    }
-  }
-
-  RGBtoHSV(r, g, b, w) {
-    if (arguments.length === 1) {
-      g = r.g;
-      b = r.b;
-      r = r.r;
-    }
-    const max = Math.max(r, g, b),
-      min = Math.min(r, g, b),
-      d = max - min,
-      s = (max === 0 ? 0 : d / max),
-      v = Math.max(max, w) / 255;
-    let h;
-
-    switch (max) {
-      case min: h = 0; break;
-      case r: h = (g - b) + d * (g < b ? 6 : 0); h /= 6 * d; break;
-      case g: h = (b - r) + d * 2; h /= 6 * d; break;
-      case b: h = (r - g) + d * 4; h /= 6 * d; break;
-    }
-
-    return {
-      h: h * 360.0,
-      s: s * 100.0,
-      v: v * 100.0,
-    };
-  }
-
-  updateHomeKitColorFromHomeCenter(color) {
-    const colors = color.split(',');
-    const r = parseInt(colors[0]);
-    const g = parseInt(colors[1]);
-    const b = parseInt(colors[2]);
-    const w = parseInt(colors[3]);
-    const hsv = this.RGBtoHSV(r, g, b, w);
-    return hsv;
   }
 }

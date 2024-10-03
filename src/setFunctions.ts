@@ -2,6 +2,8 @@
 
 'use strict';
 
+import { Utils } from './utils';
+
 export const lowestTemp = 12;
 export const stdTemp = 21;
 
@@ -127,7 +129,7 @@ export class SetFunctions {
   }
 
   async setTargetTiltAngle(angle, context, characteristic, service, IDs) {
-    const value2 = SetFunctions.scale(angle, characteristic.props.minValue, characteristic.props.maxValue, 0, 100);
+    const value2 = Utils.scale(angle, characteristic.props.minValue, characteristic.props.maxValue, 0, 100);
     await this.command('setValue2', [value2], service, IDs);
   }
 
@@ -266,39 +268,12 @@ export class SetFunctions {
     }
     if (service.h !== undefined && service.s !== undefined) {
       const v = service.characteristics[2].value;
-      const rgbw = this.HSVtoRGB(service.h, service.s, v);
+      const rgbw = Utils.HSVtoRGB(service.h, service.s, v);
       await this.command('setColor', [rgbw.r, rgbw.g, rgbw.b, rgbw.w], service, IDs);
       await this.command('setValue', [v], service, IDs);
       delete service.h;
       delete service.s;
     }
-  }
-
-  HSVtoRGB(hue, saturation, value) {
-    const h = hue / 360.0;
-    const s = saturation / 100.0;
-    const v = value / 100.0;
-    const i = Math.floor(h * 6);
-    const f = h * 6 - i;
-    const p = v * (1 - s);
-    const q = v * (1 - f * s);
-    const t = v * (1 - (1 - f) * s);
-    let r, g, b;
-    switch (i % 6) {
-      case 0: r = v; g = t; b = p; break;
-      case 1: r = q; g = v; b = p; break;
-      case 2: r = p; g = v; b = t; break;
-      case 3: r = p; g = q; b = v; break;
-      case 4: r = t; g = p; b = v; break;
-      case 5: r = v; g = p; b = q; break;
-    }
-    const w = Math.min(r, g, b);
-    return {
-      r: Math.round(r * 255),
-      g: Math.round(g * 255),
-      b: Math.round(b * 255),
-      w: Math.round(w * 255),
-    };
   }
 
   async command(c, value, service, IDs) {
@@ -364,10 +339,6 @@ export class SetFunctions {
     } catch (e) {
       this.platform.log.error('There was a problem getting value from: ', `${IDs[0]} - Err: ${e}`);
     }
-  }
-
-  static scale(num: number, in_min: number, in_max: number, out_min: number, out_max: number): number {
-    return Math.trunc((num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
   }
 }
 
