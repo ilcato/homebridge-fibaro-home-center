@@ -3,6 +3,7 @@
 'use strict';
 
 import * as constants from './constants';
+import { GetFunctions } from './getFunctions';
 
 export class Poller {
   private platform;
@@ -109,7 +110,7 @@ export class Poller {
             change.value = (change.value - 32) * 5 / 9;
           }
 
-          const getFunction = this.platform.getFunctions.getFunctionsMapping.get(characteristic.UUID);
+          const getFunction = GetFunctions.getFunctionsMapping.get(characteristic.UUID);
           if (getFunction) {
             const IDs = service.subtype.split('-');
             getFunction.call(this.platform.getFunctions, characteristic, service, IDs, change);
@@ -185,7 +186,7 @@ export class Poller {
     const service = this.platform.findServiceByName('FibaroSecuritySystem', this.platform.Service.SecuritySystem);
 
     if (service !== undefined) {
-      const state = this.platform.getFunctions.getCurrentSecuritySystemStateMapping.get(securitySystemStatus.value);
+      const state = GetFunctions.CurrentSecuritySystemStateMapping.get(securitySystemStatus.value);
       if (state !== undefined) {
         const characteristic = service.getCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState);
         if (characteristic.value !== state) {

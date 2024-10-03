@@ -11,6 +11,8 @@ import { FibaroHC } from './platform';
 import * as constants from './constants';
 import { manualDeviceConfigs } from './manualDeviceConfigurations';
 import { autoDeviceConfigs } from './autoDeviceConfigurations';
+import { GetFunctions } from './getFunctions';
+
 
 export class FibaroAccessory {
   mainService;
@@ -257,24 +259,23 @@ export class FibaroAccessory {
 
   private async handleSecuritySystem(characteristic, service, IDs, callback) {
     const securitySystemStatus = (await this.platform.fibaroClient!.getGlobalVariable(constants.SECURITY_SYSTEM_GLOBAL_VARIABLE)).body;
-    this.platform.getFunctions?.getSecuritySystemState(characteristic, service, IDs, securitySystemStatus);
+    GetFunctions.getSecuritySystemState(characteristic, service, IDs, securitySystemStatus);
     callback(undefined, characteristic.value);
   }
 
   private async handleGlobalVariable(characteristic, service, IDs, callback) {
     const value = (await this.platform.fibaroClient!.getGlobalVariable(IDs[1])).body;
 
-    if (characteristic.UUID === this.platform.Characteristic.Brightness.UUID) {
-      this.platform.getFunctions?.getBrightness(characteristic, service, IDs, value);
-    } else {
-      this.platform.getFunctions?.getBool(characteristic, service, IDs, value);
+    const getFunction = GetFunctions.getFunctionsMapping.get(characteristic.UUID);
+    if (getFunction) {
+      getFunction.call(null, characteristic, service, IDs, value);
     }
 
     callback(undefined, characteristic.value);
   }
 
   private async handleDefaultCase(characteristic, service, IDs, callback) {
-    const getFunction = this.platform.getFunctions?.getFunctionsMapping.get(characteristic.UUID);
+    const getFunction = GetFunctions.getFunctionsMapping.get(characteristic.UUID);
     if (getFunction) {
       const properties = await this.getDeviceProperties(service, IDs[0]);
 
