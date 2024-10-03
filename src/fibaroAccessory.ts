@@ -53,7 +53,7 @@ export class FibaroAccessory {
       return;
     }
 
-    this.bindCharactersticsEvent(this.mainService, this.mainCharacteristics);
+    this.bindCharacterstics(this.mainService, this.mainCharacteristics);
 
     if (this.device.interfaces && this.device.interfaces.includes('battery')) {
       this.batteryService = this.accessory.getService(this.platform.Service.Battery);
@@ -67,7 +67,7 @@ export class FibaroAccessory {
         [this.platform.Characteristic.BatteryLevel,
           this.platform.Characteristic.ChargingState,
           this.platform.Characteristic.StatusLowBattery];
-      this.bindCharactersticsEvent(this.batteryService, this.batteryCharacteristics);
+      this.bindCharacterstics(this.batteryService, this.batteryCharacteristics);
     }
 
     // Remove no more existing services
@@ -81,93 +81,134 @@ export class FibaroAccessory {
     }
   }
 
-  bindCharactersticsEvent(service, characteristics) {
+  bindCharacterstics(service, characteristics) {
     if (!characteristics) {
       return;
     }
     for (let i = 0; i < characteristics.length; i++) {
       const characteristic = service.getCharacteristic(characteristics[i]);
+
+      // Case 1: Ambient Light Sensor
+      // Set the range for light level measurements
       if (characteristic.UUID === this.platform.Characteristic.CurrentAmbientLightLevel.UUID) {
         characteristic.props.maxValue = 100000;
         characteristic.props.minStep = 1;
         characteristic.props.minValue = 0;
       }
+
+      // Case 2: Temperature Sensor
+      // Set the minimum temperature that can be reported
       if (characteristic.UUID === this.platform.Characteristic.CurrentTemperature.UUID) {
         characteristic.props.minValue = -50;
       }
+
+      // Case 3: Thermostat
+      // Set the maximum target temperature based on configuration
       if (characteristic.UUID === this.platform.Characteristic.TargetTemperature.UUID) {
         characteristic.props.maxValue = this.platform.config.thermostatmaxtemperature;
       }
+
+      // Case 4: Valve
+      // Set the default valve type to generic
       if (characteristic.UUID === this.platform.Characteristic.ValveType.UUID) {
         characteristic.value = this.platform.Characteristic.ValveType.GENERIC_VALVE;
       }
+
+      // Case 5: Air Quality Sensor
+      // Set the initial air quality status to unknown
       if (characteristic.UUID === this.platform.Characteristic.AirQuality.UUID) {
         characteristic.value = this.platform.Characteristic.AirQuality.UNKNOWN;
       }
-      this.bindCharacteristicEvents(characteristic, service);
+
+      // Bind the characteristic to the service
+      this.bindCharacteristic(characteristic, service);
     }
   }
 
-  bindCharacteristicEvents(characteristic, service) {
+  bindCharacteristic(characteristic, service) {
     if (!characteristic || !service || !service.subtype) {
       return;
     }
-    const IDs = service.subtype.split('-');
+
     // IDs[0] is always device ID, "0" for security system and "G" for global variables switches
     // IDs[1] is reserved for the button ID for virtual devices, or the global variable name for global variable devices, otherwise is ""
     // IDs[2] is a subdevice type: "LOCK" for locks, "SC" for Scenes, "CZ" for Climate zones,
     //                             "HZ" for heating zones, "G" for global variables, "D" for dimmer global variables
-    service.isVirtual = IDs[1] !== '' ? true : false;
-    service.isSecuritySystem = IDs[0] === '0' ? true : false;
-    service.isGlobalVariableSwitch = IDs[0] === 'G' ? true : false;
-    service.isGlobalVariableDimmer = IDs[0] === 'D' ? true : false;
-    service.isLockSwitch = (IDs.length >= 3 && IDs[2] === constants.SUBTYPE_LOCK) ? true : false;
-    service.isScene = (IDs.length >= 3 && IDs[2] === constants.SUBTYPE_SCENE) ? true : false;
-    service.isClimateZone = (IDs.length >= 3 && IDs[2] === constants.SUBTYPE_CLIMATE_ZONE) ? true : false;
-    service.isHeatingZone = (IDs.length >= 3 && IDs[2] === constants.SUBTYPE_HEATING_ZONE) ? true : false;
-    service.isOpenCloseOnly = (IDs.length >= 3 && IDs[2] === constants.SUBTYPE_OPEN_CLOSE_ONLY) ? true : false;
-    service.isPM2_5Sensor = (IDs.length >= 3 && IDs[2] === constants.SUBTYPE_PM2_5) ? true : false;
-    if (!service.isVirtual && !service.isScene
-      && characteristic.UUID !== this.platform.Characteristic.ValveType.UUID) {
-      let propertyChanged = 'value'; // subscribe to the changes of this property
-      if (characteristic.UUID === this.platform.Characteristic.Hue.UUID
-        || characteristic.UUID === this.platform.Characteristic.Saturation.UUID) {
-        propertyChanged = 'color';
-      }
-      if (characteristic.UUID === this.platform.Characteristic.CurrentHeatingCoolingState.UUID ||
-        characteristic.UUID === this.platform.Characteristic.TargetHeatingCoolingState.UUID) {
-        propertyChanged = 'mode';
-      }
-      if (characteristic.UUID === this.platform.Characteristic.TargetTemperature.UUID) {
-        propertyChanged = 'targettemperature';
-      }
-      if (service.UUID === this.platform.Service.WindowCovering.UUID
-        && characteristic.UUID === this.platform.Characteristic.CurrentHorizontalTiltAngle.UUID) {
-        propertyChanged = 'value2';
-      }
-      if (service.UUID === this.platform.Service.WindowCovering.UUID
-        && characteristic.UUID === this.platform.Characteristic.TargetHorizontalTiltAngle.UUID) {
-        propertyChanged = 'value2';
-      }
-      this.subscribeUpdate(service, characteristic, propertyChanged);
+    const IDs = service.subtype.split('-');
+    this.setServiceProperties(service, IDs);
+
+    if (this.shouldSubscribeToUpdates(service, characteristic)) {
+      this.subscribeUpdate(service, characteristic, this.getPropertyToSubscribe(service, characteristic));
     }
+
+    this.bindSetEvent(characteristic, service, IDs);
+    this.bindGetEvent(characteristic, service, IDs);
+  }
+
+  private setServiceProperties(service, IDs) {
+    service.isVirtual = IDs[1] !== '';
+    service.isSecuritySystem = IDs[0] === '0';
+    service.isGlobalVariableSwitch = IDs[0] === 'G';
+    service.isGlobalVariableDimmer = IDs[0] === 'D';
+    service.isLockSwitch = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_LOCK;
+    service.isScene = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_SCENE;
+    service.isClimateZone = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_CLIMATE_ZONE;
+    service.isHeatingZone = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_HEATING_ZONE;
+    service.isOpenCloseOnly = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_OPEN_CLOSE_ONLY;
+    service.isPM2_5Sensor = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_PM2_5;
+  }
+
+  private shouldSubscribeToUpdates(service, characteristic) {
+    return !service.isVirtual && !service.isScene
+      && characteristic.UUID !== this.platform.Characteristic.ValveType.UUID;
+  }
+
+  private getPropertyToSubscribe(service, characteristic) {
+    if (characteristic.UUID === this.platform.Characteristic.Hue.UUID
+      || characteristic.UUID === this.platform.Characteristic.Saturation.UUID) {
+      return 'color';
+    }
+    if (characteristic.UUID === this.platform.Characteristic.CurrentHeatingCoolingState.UUID ||
+      characteristic.UUID === this.platform.Characteristic.TargetHeatingCoolingState.UUID) {
+      return 'mode';
+    }
+    if (characteristic.UUID === this.platform.Characteristic.TargetTemperature.UUID) {
+      return 'targettemperature';
+    }
+    if (service.UUID === this.platform.Service.WindowCovering.UUID
+      && (characteristic.UUID === this.platform.Characteristic.CurrentHorizontalTiltAngle.UUID
+      || characteristic.UUID === this.platform.Characteristic.TargetHorizontalTiltAngle.UUID)) {
+      return 'value2';
+    }
+    return 'value';
+  }
+
+  private bindSetEvent(characteristic, service, IDs) {
     characteristic.on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback, context) => {
       this.setCharacteristicValue(value, context, characteristic, service, IDs);
       callback();
     });
+  }
+
+  private bindGetEvent(characteristic, service, IDs) {
     characteristic.on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
-      if (characteristic.UUID === this.platform.Characteristic.Name.UUID
-        || characteristic.UUID === this.platform.Characteristic.ValveType.UUID) {
+      if (this.isStaticCharacteristic(characteristic)) {
         callback(undefined, characteristic.value);
-        return;
-      }
-      if ((service.isVirtual && !service.isGlobalVariableSwitch && !service.isGlobalVariableDimmer) || service.isScene) {
-        // a push button is normally off
+      } else if (this.isVirtualButtonOrScene(service)) {
         callback(undefined, false);
       } else {
         this.getCharacteristicValue(callback, characteristic, service, this.accessory, IDs);
       }
     });
+  }
+
+  private isStaticCharacteristic(characteristic) {
+    return characteristic.UUID === this.platform.Characteristic.Name.UUID
+      || characteristic.UUID === this.platform.Characteristic.ValveType.UUID;
+  }
+
+  private isVirtualButtonOrScene(service) {
+    return (service.isVirtual && !service.isGlobalVariableSwitch && !service.isGlobalVariableDimmer) || service.isScene;
   }
 
   async setCharacteristicValue(value, context, characteristic, service, IDs) {
@@ -201,47 +242,51 @@ export class FibaroAccessory {
     }
 
     try {
-      // Handle special cases
       if (service.isSecuritySystem) {
-        const securitySystemStatus = (await this.platform.fibaroClient.getGlobalVariable(constants.SECURITY_SYSTEM_GLOBAL_VARIABLE)).body;
-        this.platform.getFunctions?.getSecuritySystemState(characteristic, service, IDs, securitySystemStatus);
-        callback(undefined, characteristic.value);
-      } else if (service.isGlobalVariableSwitch) {
-        const switchStatus = (await this.platform.fibaroClient.getGlobalVariable(IDs[1])).body;
-        this.platform.getFunctions?.getBool(characteristic, service, IDs, switchStatus);
-        callback(undefined, characteristic.value);
-      } else if (service.isGlobalVariableDimmer) {
-        const value = (await this.platform.fibaroClient.getGlobalVariable(IDs[1])).body;
-        if (characteristic.UUID === this.platform.Characteristic.Brightness.UUID) {
-          this.platform.getFunctions?.getBrightness(characteristic, service, IDs, value);
-        } else if (characteristic.UUID === this.platform.Characteristic.On.UUID) {
-          this.platform.getFunctions?.getBool(characteristic, service, IDs, value);
-        }
-        callback(undefined, characteristic.value);
+        await this.handleSecuritySystem(characteristic, service, IDs, callback);
+      } else if (service.isGlobalVariableSwitch || service.isGlobalVariableDimmer) {
+        await this.handleGlobalVariable(characteristic, service, IDs, callback);
       } else {
-        // Get mapped function and call it
-        const getFunction = this.platform.getFunctions?.getFunctionsMapping.get(characteristic.UUID);
-        if (getFunction) {
-          const properties = await this.getDeviceProperties(service, IDs[0]);
-
-          // Convert temperature if necessary
-          if (this.shouldConvertTemperature(characteristic)) {
-            properties.value = this.convertFahrenheitToCelsius(properties.value);
-          }
-
-          // Handle dead device status
-          this.handleDeadDeviceStatus(service, properties, IDs[0]);
-
-          // Call the get function and handle the result
-          this.callGetFunctionAndHandleResult(getFunction, characteristic, service, IDs, properties, callback);
-        } else {
-          callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-          this.platform.log.error('No get function defined for: ', `${characteristic.displayName}`);
-        }
+        await this.handleDefaultCase(characteristic, service, IDs, callback);
       }
     } catch (e) {
       callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
       this.platform.log.error('G1 - There was a problem getting value from: ', `${IDs[0]} - Err: ${e}`);
+    }
+  }
+
+  private async handleSecuritySystem(characteristic, service, IDs, callback) {
+    const securitySystemStatus = (await this.platform.fibaroClient!.getGlobalVariable(constants.SECURITY_SYSTEM_GLOBAL_VARIABLE)).body;
+    this.platform.getFunctions?.getSecuritySystemState(characteristic, service, IDs, securitySystemStatus);
+    callback(undefined, characteristic.value);
+  }
+
+  private async handleGlobalVariable(characteristic, service, IDs, callback) {
+    const value = (await this.platform.fibaroClient!.getGlobalVariable(IDs[1])).body;
+
+    if (characteristic.UUID === this.platform.Characteristic.Brightness.UUID) {
+      this.platform.getFunctions?.getBrightness(characteristic, service, IDs, value);
+    } else {
+      this.platform.getFunctions?.getBool(characteristic, service, IDs, value);
+    }
+
+    callback(undefined, characteristic.value);
+  }
+
+  private async handleDefaultCase(characteristic, service, IDs, callback) {
+    const getFunction = this.platform.getFunctions?.getFunctionsMapping.get(characteristic.UUID);
+    if (getFunction) {
+      const properties = await this.getDeviceProperties(service, IDs[0]);
+
+      if (this.shouldConvertTemperature(characteristic)) {
+        properties.value = this.convertFahrenheitToCelsius(properties.value);
+      }
+
+      this.handleDeadDeviceStatus(service, properties, IDs[0]);
+      this.callGetFunctionAndHandleResult(getFunction, characteristic, service, IDs, properties, callback);
+    } else {
+      callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+      this.platform.log.error('No get function defined for: ', `${characteristic.displayName}`);
     }
   }
 
@@ -334,17 +379,10 @@ export class FibaroAccessory {
     const Characteristic = this.platform.Characteristic;
     const type = this.device.type;
 
-    // Attempt to find a matching function based on the device type
-    let deviceConfigFunction;
-
-    // Iterate through the deviceConfigs map
-    for (const [key, value] of autoDeviceConfigs) {
-      // Check if the key is a RegExp and matches the type, or if the key exactly matches the type
-      if ((key instanceof RegExp && key.test(type)) || key === type) {
-        deviceConfigFunction = value;
-        break;  // Exit the loop once a match is found
-      }
-    }
+    // Find the matching device configuration function
+    const deviceConfigFunction = [...autoDeviceConfigs.entries()].find(([key]) =>
+      (key instanceof RegExp && key.test(type)) || key === type,
+    )?.[1];
 
     // If a matching deviceConfigFunction was found
     if (deviceConfigFunction) {
