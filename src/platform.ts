@@ -82,9 +82,16 @@ export class FibaroHC implements DynamicPlatformPlugin {
   }
 
   private setupPollerPeriod() {
-    let pollerPeriod = this.config.pollerperiod ? parseInt(this.config.pollerperiod) : defaultPollerPeriod;
-    if (isNaN(pollerPeriod) || pollerPeriod < 0 || pollerPeriod > 100) {
+    let pollerPeriod = this.config.pollerperiod;
+    if (pollerPeriod === undefined) {
       pollerPeriod = defaultPollerPeriod;
+    } else {
+      const parsedValue = typeof pollerPeriod === 'string' ? parseInt(pollerPeriod, 10) : pollerPeriod;
+      if (isNaN(parsedValue) || parsedValue < 0 || parsedValue > 100) {
+        pollerPeriod = defaultPollerPeriod;
+      } else {
+        pollerPeriod = parsedValue;
+      }
     }
     this.config.pollerperiod = pollerPeriod;
   }
