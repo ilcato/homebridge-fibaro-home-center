@@ -15,64 +15,116 @@ function characteristicSetter(...characteristics: unknown[]) {
 }
 
 
-function throttleWithTrailing(timeWindow: number, inactivityThreshold: number) {
+function throttleWithTrailing(
+  timeWindow: number,
+  inactivityThreshold: number,
+  skipInterval: number = 0,
+) {
+  if (skipInterval < 0) {
+    throw new Error('skipInterval must be >= 0');
+  }
+
+  interface State {
+      lastExecutionTime?: number;
+      inactivityTimeout?: NodeJS.Timeout;
+      lastArgs?;
+      lastContext?;
+      pendingExecution?: boolean;
+      skipUntil?: number; // Timestamp until which to skip executions
+  }
+
+  const stateMap = new WeakMap<object, State>();
+
   return function (
     target: object,
     propertyKey: string | symbol,
     descriptor: PropertyDescriptor,
   ): PropertyDescriptor {
     const originalMethod = descriptor.value;
-    const lastExecutionTimeKey = Symbol();
-    const lastArgsKey = Symbol();
-    const lastThisKey = Symbol();
-    const inactivityTimeoutKey = Symbol();
-    const pendingExecutionKey = Symbol();
 
     descriptor.value = function (...args) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const context = this as any;
       const now = Date.now();
 
-      // Reset inactivity timer
-      if (context[inactivityTimeoutKey]) {
-        clearTimeout(context[inactivityTimeoutKey]);
+      // Get or initialize state for the current instance
+      let state = stateMap.get(context);
+      if (!state) {
+        state = {};
+        stateMap.set(context, state);
+
+        // Initialize skipUntil if skipInterval > 0
+        if (skipInterval > 0) {
+          state.skipUntil = now + skipInterval;
+        }
       }
 
-      context[inactivityTimeoutKey] = setTimeout(() => {
-        const timeSinceLastExecution = Date.now() - context[lastExecutionTimeKey] || 0;
-        const remainingTime = timeWindow - timeSinceLastExecution;
-        const delay = Math.max(0, remainingTime);
+      // Reset inactivity timer
+      if (state.inactivityTimeout) {
+        clearTimeout(state.inactivityTimeout);
+      }
 
-        setTimeout(() => {
-          if (context[pendingExecutionKey]) {
-            originalMethod.apply(context[lastThisKey], context[lastArgsKey]);
-            context[lastExecutionTimeKey] = Date.now();
-            context[pendingExecutionKey] = false;
-            context[lastArgsKey] = null;
-            context[lastThisKey] = null;
-          }
-        }, delay);
-
-        context[inactivityTimeoutKey] = null;
+      state.inactivityTimeout = setTimeout(() => {
+        handleTrailingExecution(state, timeWindow, originalMethod);
       }, inactivityThreshold);
 
-      const timeSinceLastExecution = now - (context[lastExecutionTimeKey] || 0);
+      // Handle skip interval
+      if (state.skipUntil && now < state.skipUntil) {
+        // We are within the skip interval, skip execution
+        // But store the arguments and context for possible trailing execution
+        state.lastArgs = args;
+        state.lastContext = context;
+        state.pendingExecution = true;
+        return;
+      } else if (state.skipUntil && now >= state.skipUntil) {
+        // Skip period has ended
+        state.skipUntil = undefined;
+        // Reset lastExecutionTime to allow immediate execution
+        state.lastExecutionTime = undefined;
+      }
 
-      if (!context[lastExecutionTimeKey] || timeSinceLastExecution >= timeWindow) {
-        // Execute immediately
+      const timeSinceLastExecution = now - (state.lastExecutionTime || 0);
+
+      if (!state.lastExecutionTime || timeSinceLastExecution >= timeWindow) {
+        // Enough time has passed, execute immediately
         originalMethod.apply(context, args);
-        context[lastExecutionTimeKey] = now;
-        context[pendingExecutionKey] = false;
+        state.lastExecutionTime = now;
+        state.pendingExecution = false;
       } else {
         // Throttled: Store the last arguments for trailing execution
-        context[lastArgsKey] = args;
-        context[lastThisKey] = context;
-        context[pendingExecutionKey] = true;
+        state.lastArgs = args;
+        state.lastContext = context;
+        state.pendingExecution = true;
       }
     };
 
     return descriptor;
   };
+
+  // Helper function to handle trailing execution
+  function handleTrailingExecution(
+    state: State,
+    timeWindow: number,
+    originalMethod,
+  ) {
+    const now = Date.now();
+    const timeSinceLastExecution = now - (state.lastExecutionTime || 0);
+    const delay = Math.max(0, timeWindow - timeSinceLastExecution);
+
+    if (state.pendingExecution) {
+      setTimeout(() => {
+        if (state.pendingExecution) {
+          originalMethod.apply(state.lastContext, state.lastArgs || []);
+          state.lastExecutionTime = Date.now();
+          state.pendingExecution = false;
+          state.lastArgs = undefined;
+          state.lastContext = undefined;
+        }
+      }, delay);
+    }
+
+    state.inactivityTimeout = undefined;
+  }
 }
 
 export class SetFunctions {
@@ -153,7 +205,7 @@ export class SetFunctions {
   }
 
   @characteristicSetter(Characteristics.TargetPosition)
-  @throttleWithTrailing(1000, 200)
+  @throttleWithTrailing(1000, 200, 1000)
   async setTargetPosition(value, context, characteristic, service, IDs) {
     try {
       if (service.isOpenCloseOnly) {
@@ -176,7 +228,7 @@ export class SetFunctions {
   }
 
   @characteristicSetter(Characteristics.HoldPosition)
-  @throttleWithTrailing(1000, 200)
+  @throttleWithTrailing(1000, 200, 1000)
   async setHoldPosition(value, context, characteristic, service, IDs) {
     try {
       if (value) {
