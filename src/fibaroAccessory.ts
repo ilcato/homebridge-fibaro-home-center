@@ -185,7 +185,8 @@ export class FibaroAccessory {
 
   private bindSetEvent(characteristic, service, IDs) {
     characteristic.on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback, context) => {
-      this.setCharacteristicValue(value, context, characteristic, service, IDs, callback);
+      this.setCharacteristicValue(value, context, characteristic, service, IDs);
+      callback();
     });
   }
 
@@ -210,7 +211,7 @@ export class FibaroAccessory {
     return (service.isVirtual && !service.isGlobalVariableSwitch && !service.isGlobalVariableDimmer) || service.isScene;
   }
 
-  async setCharacteristicValue(value, context, characteristic, service, IDs, callback) {
+  async setCharacteristicValue(value, context, characteristic, service, IDs) {
     if (context !== 'fromFibaro' && context !== 'fromSetValue') {
       if (this.platform.setFunctions) {
         const setFunction = this.platform.setFunctions.setFunctionsMapping.get(characteristic.constructor);
@@ -219,7 +220,7 @@ export class FibaroAccessory {
           poller.cancelPoll();
         }
         if (setFunction) {
-          setFunction.call(this.platform.setFunctions, value, context, characteristic, service, IDs, callback);
+          setFunction.call(this.platform.setFunctions, value, context, characteristic, service, IDs);
         }
         if (poller) {
           poller.restartPoll(5000);

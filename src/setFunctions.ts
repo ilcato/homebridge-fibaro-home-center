@@ -14,8 +14,69 @@ function characteristicSetter(...characteristics: unknown[]) {
   };
 }
 
+
+function throttleWithTrailing(timeWindow: number, inactivityThreshold: number) {
+  return function (
+    target: object,
+    propertyKey: string | symbol,
+    descriptor: PropertyDescriptor,
+  ): PropertyDescriptor {
+    const originalMethod = descriptor.value;
+    const lastExecutionTimeKey = Symbol();
+    const lastArgsKey = Symbol();
+    const lastThisKey = Symbol();
+    const inactivityTimeoutKey = Symbol();
+    const pendingExecutionKey = Symbol();
+
+    descriptor.value = function (...args: any[]) {
+      const context = this as any;
+      const now = Date.now();
+
+      // Reset inactivity timer
+      if (context[inactivityTimeoutKey]) {
+        clearTimeout(context[inactivityTimeoutKey]);
+      }
+
+      context[inactivityTimeoutKey] = setTimeout(() => {
+        const timeSinceLastExecution = Date.now() - context[lastExecutionTimeKey] || 0;
+        const remainingTime = timeWindow - timeSinceLastExecution;
+        const delay = Math.max(0, remainingTime);
+
+        setTimeout(() => {
+          if (context[pendingExecutionKey]) {
+            originalMethod.apply(context[lastThisKey], context[lastArgsKey]);
+            context[lastExecutionTimeKey] = Date.now();
+            context[pendingExecutionKey] = false;
+            context[lastArgsKey] = null;
+            context[lastThisKey] = null;
+          }
+        }, delay);
+
+        context[inactivityTimeoutKey] = null;
+      }, inactivityThreshold);
+
+      const timeSinceLastExecution = now - (context[lastExecutionTimeKey] || 0);
+
+      if (!context[lastExecutionTimeKey] || timeSinceLastExecution >= timeWindow) {
+        // Execute immediately
+        originalMethod.apply(context, args);
+        context[lastExecutionTimeKey] = now;
+        context[pendingExecutionKey] = false;
+      } else {
+        // Throttled: Store the last arguments for trailing execution
+        context[lastArgsKey] = args;
+        context[lastThisKey] = context;
+        context[pendingExecutionKey] = true;
+      }
+    };
+
+    return descriptor;
+  };
+}
+
 export class SetFunctions {
   setFunctionsMapping: Map<unknown, (...args: unknown[]) => unknown>;
+  private lastCommandTime: number = 0;
 
   constructor(private platform) {
     this.setFunctionsMapping = new Map();
@@ -34,7 +95,7 @@ export class SetFunctions {
   }
 
   @characteristicSetter(Characteristics.On)
-  async setOn(value, context, characteristic, service, IDs, callback) {
+  async setOn(value, context, characteristic, service, IDs) {
     try {
       const setValue = (delay = 100) => {
         setTimeout(() => {
@@ -63,15 +124,14 @@ export class SetFunctions {
       } else {
         await this.command(value ? 'turnOn' : 'turnOff', null, service, IDs);
       }
-      callback();
     } catch (error) {
-      callback(error);
       this.platform.log.error(`Error setting On for device ${IDs[0]}:`, error);
     }
   }
 
   @characteristicSetter(Characteristics.Brightness)
-  async setBrightness(value, context, characteristic, service, IDs, callback) {
+  @throttleWithTrailing(600, 200)
+  async setBrightness(value, context, characteristic, service, IDs) {
     // Handle global variable dimmer separately
     if (service.isGlobalVariableDimmer) {
       await this.setGlobalVariable(IDs[1], value.toString());
@@ -79,17 +139,21 @@ export class SetFunctions {
     }
 
     try {
+      const currentTime = Date.now();
+      const timeSinceLastCommand = currentTime - this.lastCommandTime;
+      this.platform.log.debug(`Time since last brightness command: ${timeSinceLastCommand}ms`);
+
       await this.command('setValue', [value], service, IDs);
-      characteristic.updateValue(value, undefined, 'fromSetValue');
-      callback();
+
+      this.lastCommandTime = currentTime;
     } catch (error) {
-      callback(error);
       this.platform.log.error(`Error setting brightness for device ${IDs[0]}:`, error);
     }
   }
 
   @characteristicSetter(Characteristics.TargetPosition)
-  async setTargetPosition(value, context, characteristic, service, IDs, callback) {
+  @throttleWithTrailing(1000, 200)
+  async setTargetPosition(value, context, characteristic, service, IDs) {
     try {
       if (service.isOpenCloseOnly) {
         // For open/close only devices, use specific commands based on the target position
@@ -105,22 +169,19 @@ export class SetFunctions {
       } catch (error) {
         this.platform.log.error(`Error setting target position for device ${IDs[0]}:`, error);
       }
-      callback();
     } catch (error) {
-      callback(error);
       this.platform.log.error(`Error setting target position for device ${IDs[0]}:`, error);
     }
   }
 
   @characteristicSetter(Characteristics.HoldPosition)
-  async setHoldPosition(value, context, characteristic, service, IDs, callback) {
+  @throttleWithTrailing(1000, 200)
+  async setHoldPosition(value, context, characteristic, service, IDs) {
     try {
       if (value) {
         await this.command('stop', [0], service, IDs);
       }
-      callback();
     } catch (error) {
-      callback(error);
       this.platform.log.error(`Error setting hold position for device ${IDs[0]}:`, error);
     }
   }
@@ -236,7 +297,7 @@ export class SetFunctions {
   }
 
   @characteristicSetter(Characteristics.SecuritySystemTargetState)
-  async setSecuritySystemTargetState(value, context, characteristic, service, IDs, callback) {
+  async setSecuritySystemTargetState(value) {
     try {
       const { Characteristic } = this.platform;
 
@@ -258,21 +319,17 @@ export class SetFunctions {
       }
 
       await this.scene(sceneID);
-      callback();
     } catch (error) {
-      callback(error);
       this.platform.log.error('Error setting security system target state:', error);
     }
   }
 
   @characteristicSetter(Characteristics.Active)
-  async setActive(value, context, characteristic, service, IDs, callback) {
+  async setActive(value, context, characteristic, service, IDs) {
     try {
       const action = (value === this.platform.Characteristic.Active.ACTIVE) ? 'turnOn' : 'turnOff';
       await this.command(action, null, service, IDs);
-      callback();
     } catch (error) {
-      callback(error);
       this.platform.log.error(`Error setting active state for device ${IDs[0]}:`, error);
     }
   }

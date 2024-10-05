@@ -11,46 +11,11 @@ declare const Buffer;
 
 // Throttle for GET requests
 // fix HC2 - 503-error (devices > 100)
-const getThrottle = new Throttle({
+const throttle = new Throttle({
   active: true,
   rate: constants.DEFAULT_THROTTLE_RATE,
   ratePer: constants.DEFAULT_THROTTLE_RATE_PER,
   concurrent: constants.DEFAULT_THROTTLE_CONCURRENT,
-});
-
-// Throttle for PUT and POST requests
-// sequentialize PUT and POST requests
-class ThrottleWithDiscard {
-  private throttle: Throttle;
-  private activeRequests: number = 0;
-  private maxConcurrent: number;
-
-  constructor(options) {
-    this.throttle = new Throttle(options);
-    this.maxConcurrent = options.concurrent || 1;
-  }
-
-  plugin() {
-    return async (request) => {
-      if (this.activeRequests >= this.maxConcurrent) {
-        throw new Error('Request discarded due to concurrent limit');
-      }
-
-      this.activeRequests++;
-      try {
-        await this.throttle.plugin()(request);
-      } finally {
-        this.activeRequests--;
-      }
-    };
-  }
-}
-
-const putPostThrottle = new ThrottleWithDiscard({
-  active: true,
-  rate: 3,
-  ratePer: 500,
-  concurrent: 1, // Allow up to 3 concurrent requests
 });
 
 export class FibaroClient {
@@ -119,7 +84,7 @@ export class FibaroClient {
     const url = this.composeURL(service);
     let request = superagent
       .get(url)
-      .use(getThrottle.plugin())
+      .use(throttle.plugin())
       .set('Authorization', this.auth)
       .set('accept', constants.HTTP_ACCEPT_HEADER);
 
@@ -134,7 +99,7 @@ export class FibaroClient {
     const url = this.composeURL(service);
     let request = superagent
       .post(url)
-      .use(putPostThrottle.plugin())
+      .use(throttle.plugin())
       .send(body)
       .set('Authorization', this.auth)
       .set('accept', constants.HTTP_ACCEPT_HEADER);
@@ -156,7 +121,7 @@ export class FibaroClient {
     const url = this.composeURL(service);
     let request = superagent
       .put(url)
-      .use(putPostThrottle.plugin())
+      .use(throttle.plugin())
       .send(body)
       .set('Authorization', this.auth)
       .set('accept', constants.HTTP_ACCEPT_HEADER);
@@ -178,7 +143,7 @@ export class FibaroClient {
     const url = this.composeURL(service);
     let request = superagent
       .put(url)
-      .use(putPostThrottle.plugin())
+      .use(throttle.plugin())
       .send(body)
       .set('Authorization', this.adminAuth)
       .set('accept', constants.HTTP_ACCEPT_HEADER);
