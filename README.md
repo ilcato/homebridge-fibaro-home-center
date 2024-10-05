@@ -382,12 +382,14 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 
 # Latest release notes
 
-### Version 2.2.0
+### Version 3.0.0
 
-- Main refactoring.
+- Main refactoring of code.
+- Significant reduction in device response time.
 - Option to mark dead devices as not responding in HomeKit.
 - Log dead devices.
-- Add support for Outlet manual device type.
+- Improvements for poller. 
+- Add support for Outlet in individual device config.
 - Dependencies updates.
 
 ### Version 2.1.0
