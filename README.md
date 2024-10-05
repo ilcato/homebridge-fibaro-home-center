@@ -14,7 +14,7 @@
 
 This is an [Homebridge](https://homebridge.io) plugin.
 
-It supports devices (Z-wave only, Zigbee not supported), scenes, global variables, security systems, climate / heating zones. Exposes them to Homebridge and HomeKit (Apple Home and more).
+It supports devices (Z-Wave only, Zigbee not supported), scenes, global variables, security systems, climate / heating zones. Exposes them to Homebridge and HomeKit (Apple Home and more).
 
 # How it works
 
