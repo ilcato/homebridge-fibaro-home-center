@@ -14,7 +14,7 @@
 
 This is an [Homebridge](https://homebridge.io) plugin.
 
-It supports devices (Z-wave only, Zigbee not supported), scenes, global variables, security systems, climate / heating zones. Exposes them to Homebridge and HomeKit (Apple Home and more).
+It supports devices (Z-Wave only, Zigbee not supported), scenes, global variables, security systems, climate / heating zones. Exposes them to Homebridge and HomeKit (Apple Home and more).
 
 # How it works
 
@@ -382,12 +382,14 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 
 # Latest release notes
 
-### Version 2.2.0
+### Version 3.0.0
 
-- Main refactoring.
+- Main refactoring of code.
+- Significant reduction in device response time.
 - Option to mark dead devices as not responding in HomeKit.
 - Log dead devices.
-- Add support for Outlet manual device type.
+- Improvements for poller. 
+- Add support for Outlet in individual device config.
 - Dependencies updates.
 
 ### Version 2.1.0
