@@ -16,10 +16,8 @@ function characteristicSetter(...characteristics: unknown[]) {
 
 export class SetFunctions {
   setFunctionsMapping: Map<unknown, (...args: unknown[]) => unknown>;
-  private timeoutsUpdating;
 
   constructor(private platform) {
-    this.timeoutsUpdating = [];
     this.setFunctionsMapping = new Map();
     this.initializeFunctionsMapping();
   }
@@ -36,92 +34,94 @@ export class SetFunctions {
   }
 
   @characteristicSetter(Characteristics.On)
-  async setOn(value, context, characteristic, service, IDs) {
-    const setValue = (delay = 100) => {
-      setTimeout(() => {
-        characteristic.setValue(0, undefined, 'fromSetValue');
-      }, delay);
-    };
+  async setOn(value, context, characteristic, service, IDs, callback) {
+    try {
+      const setValue = (delay = 100) => {
+        setTimeout(() => {
+          characteristic.setValue(0, undefined, 'fromSetValue');
+        }, delay);
+      };
 
-    if (service.isVirtual && !service.isGlobalVariableSwitch && !service.isGlobalVariableDimmer) {
-      // It's a virtual device so the command is pressButton and not turnOn or Off
-      await this.command('pressButton', [IDs[1]], service, IDs);
-      // In order to behave like a push button reset the status to off
-      setValue();
-    } else if (service.isScene) {
-      // It's a scene so the command is execute scene
-      await this.scene(IDs[0]);
-      // In order to behave like a push button reset the status to off
-      setValue();
-    } else if (service.isGlobalVariableSwitch) {
-      await this.setGlobalVariable(IDs[1], value ? 'true' : 'false');
-    } else if (service.isGlobalVariableDimmer) {
-      const currentDimmerValue = (await this.getGlobalVariable(IDs[1])).body.value;
-      if (currentDimmerValue !== '0' && value) {
-        return;
+      if (service.isVirtual && !service.isGlobalVariableSwitch && !service.isGlobalVariableDimmer) {
+        // It's a virtual device so the command is pressButton and not turnOn or Off
+        await this.command('pressButton', [IDs[1]], service, IDs);
+        // In order to behave like a push button reset the status to off
+        setValue();
+      } else if (service.isScene) {
+        // It's a scene so the command is execute scene
+        await this.scene(IDs[0]);
+        // In order to behave like a push button reset the status to off
+        setValue();
+      } else if (service.isGlobalVariableSwitch) {
+        await this.setGlobalVariable(IDs[1], value ? 'true' : 'false');
+      } else if (service.isGlobalVariableDimmer) {
+        const currentDimmerValue = (await this.getGlobalVariable(IDs[1])).body.value;
+        if (currentDimmerValue !== '0' && value) {
+          return;
+        }
+        await this.setGlobalVariable(IDs[1], value ? '100' : '0');
+      } else {
+        await this.command(value ? 'turnOn' : 'turnOff', null, service, IDs);
       }
-      await this.setGlobalVariable(IDs[1], value ? '100' : '0');
-    } else if (!this.timeoutsUpdating[IDs[0]]) {
-      // Only execute if there's no ongoing update for this device
-      await this.command(value ? 'turnOn' : 'turnOff', null, service, IDs);
+      callback();
+    } catch (error) {
+      callback(error);
+      this.platform.log.error(`Error setting On for device ${IDs[0]}:`, error);
     }
   }
 
   @characteristicSetter(Characteristics.Brightness)
-  async setBrightness(value, context, characteristic, service, IDs) {
+  async setBrightness(value, context, characteristic, service, IDs, callback) {
     // Handle global variable dimmer separately
     if (service.isGlobalVariableDimmer) {
       await this.setGlobalVariable(IDs[1], value.toString());
       return;
     }
 
-    // Clear any existing timeout for this device
-    clearTimeout(this.timeoutsUpdating[IDs[0]]);
-
-    // Set a new timeout to update the brightness
-    this.timeoutsUpdating[IDs[0]] = setTimeout(async () => {
-      try {
-        await this.command('setValue', [value], service, IDs);
-      } catch (error) {
-        this.platform.log.error(`Error setting brightness for device ${IDs[0]}:`, error);
-      } finally {
-        // Clear the timeout reference after execution
-        this.timeoutsUpdating[IDs[0]] = null;
-      }
-    }, 500);
+    try {
+      await this.command('setValue', [value], service, IDs);
+      characteristic.updateValue(value, undefined, 'fromSetValue');
+      callback();
+    } catch (error) {
+      callback(error);
+      this.platform.log.error(`Error setting brightness for device ${IDs[0]}:`, error);
+    }
   }
 
   @characteristicSetter(Characteristics.TargetPosition)
-  async setTargetPosition(value, context, characteristic, service, IDs) {
-    if (service.isOpenCloseOnly) {
-      // For open/close only devices, use specific commands based on the target position
-      const action = value === 0 ? 'close' : value >= 99 ? 'open' : null;
-      if (action) {
-        await this.command(action, [0], service, IDs);
+  async setTargetPosition(value, context, characteristic, service, IDs, callback) {
+    try {
+      if (service.isOpenCloseOnly) {
+        // For open/close only devices, use specific commands based on the target position
+        const action = value === 0 ? 'close' : value >= 99 ? 'open' : null;
+        if (action) {
+          await this.command(action, [0], service, IDs);
+        }
+        return;
       }
-      return;
-    }
 
-    // Clear any existing timeout for this device
-    clearTimeout(this.timeoutsUpdating[IDs[0]]);
-
-    // Set a new timeout to update the target position
-    this.timeoutsUpdating[IDs[0]] = setTimeout(async () => {
       try {
         await this.command('setValue', [value], service, IDs);
       } catch (error) {
         this.platform.log.error(`Error setting target position for device ${IDs[0]}:`, error);
-      } finally {
-        // Clear the timeout reference after execution
-        this.timeoutsUpdating[IDs[0]] = null;
       }
-    }, 1200);
+      callback();
+    } catch (error) {
+      callback(error);
+      this.platform.log.error(`Error setting target position for device ${IDs[0]}:`, error);
+    }
   }
 
   @characteristicSetter(Characteristics.HoldPosition)
-  async setHoldPosition(value, context, characteristic, service, IDs) {
-    if (value) {
-      await this.command('stop', [0], service, IDs);
+  async setHoldPosition(value, context, characteristic, service, IDs, callback) {
+    try {
+      if (value) {
+        await this.command('stop', [0], service, IDs);
+      }
+      callback();
+    } catch (error) {
+      callback(error);
+      this.platform.log.error(`Error setting hold position for device ${IDs[0]}:`, error);
     }
   }
 
@@ -236,33 +236,45 @@ export class SetFunctions {
   }
 
   @characteristicSetter(Characteristics.SecuritySystemTargetState)
-  async setSecuritySystemTargetState(value) {
-    const { Characteristic } = this.platform;
+  async setSecuritySystemTargetState(value, context, characteristic, service, IDs, callback) {
+    try {
+      const { Characteristic } = this.platform;
 
-    const sceneMap = new Map([
-      [Characteristic.SecuritySystemTargetState.AWAY_ARM, this.platform.scenes.SetAwayArmed],
-      [Characteristic.SecuritySystemTargetState.DISARM, this.platform.scenes.SetDisarmed],
-      [Characteristic.SecuritySystemTargetState.NIGHT_ARM, this.platform.scenes.SetNightArmed],
-      [Characteristic.SecuritySystemTargetState.STAY_ARM, this.platform.scenes.SetStayArmed],
-    ]);
+      const sceneMap = new Map([
+        [Characteristic.SecuritySystemTargetState.AWAY_ARM, this.platform.scenes.SetAwayArmed],
+        [Characteristic.SecuritySystemTargetState.DISARM, this.platform.scenes.SetDisarmed],
+        [Characteristic.SecuritySystemTargetState.NIGHT_ARM, this.platform.scenes.SetNightArmed],
+        [Characteristic.SecuritySystemTargetState.STAY_ARM, this.platform.scenes.SetStayArmed],
+      ]);
 
-    const sceneID = sceneMap.get(value);
+      const sceneID = sceneMap.get(value);
 
-    if (sceneID === undefined) {
-      return;
+      if (sceneID === undefined) {
+        return;
+      }
+
+      if (value === Characteristic.SecuritySystemTargetState.DISARM) {
+        value = Characteristic.SecuritySystemCurrentState.DISARMED;
+      }
+
+      await this.scene(sceneID);
+      callback();
+    } catch (error) {
+      callback(error);
+      this.platform.log.error('Error setting security system target state:', error);
     }
-
-    if (value === Characteristic.SecuritySystemTargetState.DISARM) {
-      value = Characteristic.SecuritySystemCurrentState.DISARMED;
-    }
-
-    await this.scene(sceneID);
   }
 
   @characteristicSetter(Characteristics.Active)
-  async setActive(value, context, characteristic, service, IDs) {
-    const action = (value === this.platform.Characteristic.Active.ACTIVE) ? 'turnOn' : 'turnOff';
-    await this.command(action, null, service, IDs);
+  async setActive(value, context, characteristic, service, IDs, callback) {
+    try {
+      const action = (value === this.platform.Characteristic.Active.ACTIVE) ? 'turnOn' : 'turnOff';
+      await this.command(action, null, service, IDs);
+      callback();
+    } catch (error) {
+      callback(error);
+      this.platform.log.error(`Error setting active state for device ${IDs[0]}:`, error);
+    }
   }
 
   async updateHomeCenterColorFromHomeKit(h, s, service, IDs) {

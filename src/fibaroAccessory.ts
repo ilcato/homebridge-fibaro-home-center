@@ -9,8 +9,8 @@ import {
 } from 'homebridge';
 import { FibaroHC } from './platform';
 import * as constants from './constants';
-import { manualDeviceConfigs } from './manualDeviceConfigurations';
-import { autoDeviceConfigs } from './autoDeviceConfigurations';
+import { manualDeviceConfigs } from './deviceManual';
+import { autoDeviceConfigs } from './deviceAuto';
 
 export class FibaroAccessory {
   mainService;
@@ -185,8 +185,7 @@ export class FibaroAccessory {
 
   private bindSetEvent(characteristic, service, IDs) {
     characteristic.on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback, context) => {
-      this.setCharacteristicValue(value, context, characteristic, service, IDs);
-      callback();
+      this.setCharacteristicValue(value, context, characteristic, service, IDs, callback);
     });
   }
 
@@ -211,22 +210,20 @@ export class FibaroAccessory {
     return (service.isVirtual && !service.isGlobalVariableSwitch && !service.isGlobalVariableDimmer) || service.isScene;
   }
 
-  async setCharacteristicValue(value, context, characteristic, service, IDs) {
+  async setCharacteristicValue(value, context, characteristic, service, IDs, callback) {
     if (context !== 'fromFibaro' && context !== 'fromSetValue') {
       if (this.platform.setFunctions) {
         const setFunction = this.platform.setFunctions.setFunctionsMapping.get(characteristic.constructor);
-        const platform = this.platform;
-        await this.platform.mutex.runExclusive(async () => {
-          if (platform.poller) {
-            platform.poller.cancelPoll();
-          }
-          if (setFunction) {
-            setFunction.call(platform.setFunctions, value, context, characteristic, service, IDs);
-          }
-          if (platform.poller) {
-            platform.poller.restartPoll(5000);
-          }
-        });
+        const poller = this.platform.poller;
+        if (poller) {
+          poller.cancelPoll();
+        }
+        if (setFunction) {
+          setFunction.call(this.platform.setFunctions, value, context, characteristic, service, IDs, callback);
+        }
+        if (poller) {
+          poller.restartPoll(5000);
+        }
       }
     }
   }

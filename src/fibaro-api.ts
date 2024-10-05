@@ -9,12 +9,22 @@ import * as constants from './constants';
 
 declare const Buffer;
 
+// Throttle for GET requests
 // fix HC2 - 503-error (devices > 100)
-const throttle = new Throttle({
+const getThrottle = new Throttle({
   active: true,
   rate: constants.DEFAULT_THROTTLE_RATE,
   ratePer: constants.DEFAULT_THROTTLE_RATE_PER,
   concurrent: constants.DEFAULT_THROTTLE_CONCURRENT,
+});
+
+// Throttle for PUT and POST requests
+// sequentialize PUT and POST requests
+const putPostThrottle = new Throttle({
+  active: true,
+  rate: 3,
+  ratePer: 500,
+  concurrent: 3, // Set to 1 for sequential processing
 });
 
 export class FibaroClient {
@@ -81,80 +91,65 @@ export class FibaroClient {
 
   async genericGet(service) {
     const url = this.composeURL(service);
+    let request = superagent
+      .get(url)
+      .use(getThrottle.plugin())
+      .set('Authorization', this.auth)
+      .set('accept', constants.HTTP_ACCEPT_HEADER);
+
     if (this.https) {
-      return superagent
-        .get(url)
-        .use(throttle.plugin())
-        .set('Authorization', this.auth)
-        .set('accept', constants.HTTP_ACCEPT_HEADER)
-        .ca(this.ca as Buffer);
-    } else {
-      return superagent
-        .get(url)
-        .use(throttle.plugin())
-        .set('Authorization', this.auth)
-        .set('accept', constants.HTTP_ACCEPT_HEADER);
+      request = request.ca(this.ca as Buffer);
     }
+
+    return request;
   }
 
   genericPost(service, body) {
     const url = this.composeURL(service);
+    let request = superagent
+      .post(url)
+      .use(getThrottle.plugin())
+      .send(body)
+      .set('Authorization', this.auth)
+      .set('accept', constants.HTTP_ACCEPT_HEADER);
+
     if (this.https) {
-      return superagent
-        .post(url)
-        .use(throttle.plugin())
-        .send(body)
-        .set('Authorization', this.auth)
-        .set('accept', constants.HTTP_ACCEPT_HEADER)
-        .ca(this.ca as Buffer);
-    } else {
-      return superagent
-        .post(url)
-        .use(throttle.plugin())
-        .send(body)
-        .set('Authorization', this.auth)
-        .set('accept', constants.HTTP_ACCEPT_HEADER);
+      request = request.ca(this.ca as Buffer);
     }
+
+    return request;
   }
 
   genericPut(service, body) {
     const url = this.composeURL(service);
+    let request = superagent
+      .put(url)
+      .use(putPostThrottle.plugin())
+      .send(body)
+      .set('Authorization', this.auth)
+      .set('accept', constants.HTTP_ACCEPT_HEADER);
+
     if (this.https) {
-      return superagent
-        .put(url)
-        .use(throttle.plugin())
-        .send(body)
-        .set('Authorization', this.auth)
-        .set('accept', constants.HTTP_ACCEPT_HEADER)
-        .ca(this.ca as Buffer);
-    } else {
-      return superagent
-        .put(url)
-        .use(throttle.plugin())
-        .send(body)
-        .set('Authorization', this.auth)
-        .set('accept', constants.HTTP_ACCEPT_HEADER);
+      request = request.ca(this.ca as Buffer);
     }
+
+    return request;
   }
 
   genericAdminPut(service, body) {
     const url = this.composeURL(service);
+    let request = superagent
+      .put(url)
+      .use(putPostThrottle.plugin())
+      .send(body)
+      .set('Authorization', this.adminAuth)
+      .set('accept', constants.HTTP_ACCEPT_HEADER);
+
     if (this.https) {
-      return superagent
-        .put(url)
-        .use(throttle.plugin())
-        .send(body)
-        .set('Authorization', this.adminAuth)
-        .set('accept', constants.HTTP_ACCEPT_HEADER)
-        .ca(this.ca as Buffer);
-    } else {
-      return superagent
-        .put(url)
-        .use(throttle.plugin())
-        .send(body)
-        .set('Authorization', this.adminAuth)
-        .set('accept', constants.HTTP_ACCEPT_HEADER);
+      request = request.ca(this.ca as Buffer);
     }
+
+    return request;
   }
 
   getInfo() {

@@ -16,7 +16,6 @@ import { SetFunctions } from './setFunctions';
 import { GetFunctions } from './getFunctions';
 import * as constants from './constants';
 import { Poller } from './pollerupdate';
-import { Mutex } from 'async-mutex';
 
 const defaultPollerPeriod = 3;
 const defaultThermostatMaxTemp = 100;
@@ -42,7 +41,6 @@ export class FibaroHC implements DynamicPlatformPlugin {
   public fibaroClient?: FibaroClient;
   public setFunctions?: SetFunctions;
   public getFunctions?: GetFunctions;
-  public mutex = new Mutex();
   public loginTimeout: NodeJS.Timeout | null = null;
 
   constructor(
