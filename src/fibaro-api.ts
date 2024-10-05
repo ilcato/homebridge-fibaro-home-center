@@ -20,11 +20,37 @@ const getThrottle = new Throttle({
 
 // Throttle for PUT and POST requests
 // sequentialize PUT and POST requests
-const putPostThrottle = new Throttle({
+class ThrottleWithDiscard {
+  private throttle: Throttle;
+  private activeRequests: number = 0;
+  private maxConcurrent: number;
+
+  constructor(options) {
+    this.throttle = new Throttle(options);
+    this.maxConcurrent = options.concurrent || 1;
+  }
+
+  plugin() {
+    return async (request) => {
+      if (this.activeRequests >= this.maxConcurrent) {
+        throw new Error('Request discarded due to concurrent limit');
+      }
+
+      this.activeRequests++;
+      try {
+        await this.throttle.plugin()(request);
+      } finally {
+        this.activeRequests--;
+      }
+    };
+  }
+}
+
+const putPostThrottle = new ThrottleWithDiscard({
   active: true,
   rate: 3,
   ratePer: 500,
-  concurrent: 3, // Set to 1 for sequential processing
+  concurrent: 1, // Allow up to 3 concurrent requests
 });
 
 export class FibaroClient {
@@ -108,7 +134,7 @@ export class FibaroClient {
     const url = this.composeURL(service);
     let request = superagent
       .post(url)
-      .use(getThrottle.plugin())
+      .use(putPostThrottle.plugin())
       .send(body)
       .set('Authorization', this.auth)
       .set('accept', constants.HTTP_ACCEPT_HEADER);
@@ -117,7 +143,13 @@ export class FibaroClient {
       request = request.ca(this.ca as Buffer);
     }
 
-    return request;
+    return request.catch(error => {
+      if (error.message === 'Request discarded due to concurrent limit') {
+        // Silently discard the request
+        return Promise.resolve({ discarded: true });
+      }
+      throw error; // Re-throw other errors
+    });
   }
 
   genericPut(service, body) {
@@ -133,7 +165,13 @@ export class FibaroClient {
       request = request.ca(this.ca as Buffer);
     }
 
-    return request;
+    return request.catch(error => {
+      if (error.message === 'Request discarded due to concurrent limit') {
+        // Silently discard the request
+        return Promise.resolve({ discarded: true });
+      }
+      throw error; // Re-throw other errors
+    });
   }
 
   genericAdminPut(service, body) {
