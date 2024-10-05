@@ -28,7 +28,8 @@ function throttleWithTrailing(timeWindow: number, inactivityThreshold: number) {
     const inactivityTimeoutKey = Symbol();
     const pendingExecutionKey = Symbol();
 
-    descriptor.value = function (...args: any[]) {
+    descriptor.value = function (...args) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const context = this as any;
       const now = Date.now();
 
