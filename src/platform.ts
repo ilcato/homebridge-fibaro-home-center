@@ -9,7 +9,6 @@ import {
   PlatformConfig,
 } from 'homebridge';
 
-import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { FibaroAccessory } from './fibaroAccessory';
 import { FibaroClient } from './fibaro-api';
 import { SetFunctions } from './setFunctions';
@@ -300,7 +299,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
       const fa = new FibaroAccessory(this, accessory, device);
       if (fa.isValid) {
         // link the accessory to the platform
-        this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+        this.api.registerPlatformAccessories(constants.PLUGIN_NAME, constants.PLATFORM_NAME, [accessory]);
 
         this.accessories.push(accessory);
         this.log.info('Adding new accessory:', device.name);
@@ -310,7 +309,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
 
   removeAccessory(accessory) {
     this.log.info('Remove accessory: ', accessory.displayName);
-    this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+    this.api.unregisterPlatformAccessories(constants.PLUGIN_NAME, constants.PLATFORM_NAME, [accessory]);
     this.accessories.forEach((element, index) => {
       if (element.UUID === accessory.uuid) {
         this.accessories.splice(index, 1);

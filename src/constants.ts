@@ -1,5 +1,11 @@
 // constants.ts
 
+// This is the name of the platform that users will use to register the plugin in the Homebridge config.json
+export const PLATFORM_NAME = 'FibaroHC';
+
+// This must match the name of your plugin as defined the package.json
+export const PLUGIN_NAME = 'homebridge-fibaro-home-center';
+
 // API constants
 export const API_URL_INFO = '/api/settings/info';
 export const API_URL_SCENES = '/api/scenes';

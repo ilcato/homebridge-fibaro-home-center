@@ -2,7 +2,7 @@
 
 import { API } from 'homebridge';
 
-import { PLATFORM_NAME } from './settings';
+import { PLATFORM_NAME } from './constants';
 import { FibaroHC } from './platform';
 
 /**
