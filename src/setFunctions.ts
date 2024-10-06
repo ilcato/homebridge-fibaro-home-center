@@ -14,118 +14,120 @@ function characteristicSetter(...characteristics: unknown[]) {
   };
 }
 
-
-function throttleWithTrailing(
+// Throttle decorator
+function throttle(
   timeWindow: number,
   inactivityThreshold: number,
   skipInterval: number = 0,
 ) {
-  if (skipInterval < 0) {
-    throw new Error('skipInterval must be >= 0');
-  }
-
-  interface State {
-      lastExecutionTime?: number;
-      inactivityTimeout?: NodeJS.Timeout;
-      lastArgs?;
-      lastContext?;
-      pendingExecution?: boolean;
-      skipUntil?: number; // Timestamp until which to skip executions
-  }
-
-  const stateMap = new WeakMap<object, State>();
-
   return function (
-    target: object,
-    propertyKey: string | symbol,
+    target,
+    propertyKey: string,
     descriptor: PropertyDescriptor,
-  ): PropertyDescriptor {
+  ) {
     const originalMethod = descriptor.value;
 
+    // Map to store per-device state
+    const deviceStateMap = new WeakMap();
+
     descriptor.value = function (...args) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const context = this as any;
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      const device = this;
+
+      let state = deviceStateMap.get(device);
+      if (!state) {
+        state = {
+          lastInvocationTime: 0,     // Last time the method was executed
+          lastCallTime: 0,           // Last time the method was called
+          lastArgs: null,            // Arguments of the last call
+          skipIntervalTimerId: null, // Timer for skipInterval
+          skipIntervalEndTime: 0,    // Time when skipInterval ends
+          inactivityTimerId: null,   // Timer for inactivity threshold
+          executionScheduled: false, // Flag to prevent multiple schedules
+          isBurst: false,            // Flag to indicate if we're in a burst
+        };
+        deviceStateMap.set(device, state);
+      }
+
       const now = Date.now();
 
-      // Get or initialize state for the current instance
-      let state = stateMap.get(context);
-      if (!state) {
-        state = {};
-        stateMap.set(context, state);
+      // Update last call time and args
+      state.lastCallTime = now;
+      state.lastArgs = args;
 
-        // Initialize skipUntil if skipInterval > 0
+      // If we're not in a burst, apply skipInterval
+      if (!state.isBurst) {
+        state.isBurst = true;
+
         if (skipInterval > 0) {
-          state.skipUntil = now + skipInterval;
+          // Start skipInterval timer without executing immediately
+          state.skipIntervalEndTime = now + skipInterval;
+          state.skipIntervalTimerId = setTimeout(() => {
+            state.skipIntervalTimerId = null;
+            scheduleExecution();
+          }, skipInterval);
+        } else {
+          // skipInterval is zero
+          scheduleExecution();
         }
+      } else {
+        // We're in a burst, schedule execution as per timeWindow and inactivityThreshold
+        scheduleExecution();
       }
 
-      // Reset inactivity timer
-      if (state.inactivityTimeout) {
-        clearTimeout(state.inactivityTimeout);
+      // Reset the inactivity timer
+      if (state.inactivityTimerId) {
+        clearTimeout(state.inactivityTimerId);
       }
-
-      state.inactivityTimeout = setTimeout(() => {
-        handleTrailingExecution(state, timeWindow, originalMethod);
+      state.inactivityTimerId = setTimeout(() => {
+        // Inactivity threshold passed, burst has ended
+        state.isBurst = false;
+        // Schedule the last execution if needed
+        scheduleExecution();
       }, inactivityThreshold);
 
-      // Handle skip interval
-      if (state.skipUntil && now < state.skipUntil) {
-        // We are within the skip interval, skip execution
-        // But store the arguments and context for possible trailing execution
-        state.lastArgs = args;
-        state.lastContext = context;
-        state.pendingExecution = true;
-        return;
-      } else if (state.skipUntil && now >= state.skipUntil) {
-        // Skip period has ended
-        state.skipUntil = undefined;
-        // Reset lastExecutionTime to allow immediate execution
-        state.lastExecutionTime = undefined;
+      function scheduleExecution() {
+        const now = Date.now();
+
+        // Calculate time since last invocation for timeWindow
+        const timeSinceLastInvocation = now - state.lastInvocationTime;
+        const timeWindowRemaining = timeWindow - timeSinceLastInvocation;
+        const timeWindowDelay = timeWindowRemaining > 0 ? timeWindowRemaining : 0;
+
+        let totalDelay = timeWindowDelay;
+
+        // If skipInterval is active, adjust totalDelay to ensure skipInterval is respected
+        if (state.skipIntervalTimerId) {
+          const skipIntervalRemaining = state.skipIntervalEndTime - now;
+          totalDelay = Math.max(totalDelay, skipIntervalRemaining);
+        }
+
+        if (state.executionScheduled) {
+          // Execution already scheduled, no need to schedule again
+          return;
+        }
+
+        state.executionScheduled = true;
+        setTimeout(() => {
+          executeMethod();
+        }, totalDelay);
       }
 
-      const timeSinceLastExecution = now - (state.lastExecutionTime || 0);
+      function executeMethod() {
+        state.lastInvocationTime = Date.now();
+        state.executionScheduled = false;
+        originalMethod.apply(device, state.lastArgs);
 
-      if (!state.lastExecutionTime || timeSinceLastExecution >= timeWindow) {
-        // Enough time has passed, execute immediately
-        originalMethod.apply(context, args);
-        state.lastExecutionTime = now;
-        state.pendingExecution = false;
-      } else {
-        // Throttled: Store the last arguments for trailing execution
-        state.lastArgs = args;
-        state.lastContext = context;
-        state.pendingExecution = true;
+        // Clear timers
+        if (state.inactivityTimerId) {
+          clearTimeout(state.inactivityTimerId);
+          state.inactivityTimerId = null;
+        }
       }
     };
-
-    return descriptor;
   };
-
-  // Helper function to handle trailing execution
-  function handleTrailingExecution(
-    state: State,
-    timeWindow: number,
-    originalMethod,
-  ) {
-    const now = Date.now();
-    const timeSinceLastExecution = now - (state.lastExecutionTime || 0);
-    const delay = Math.max(0, timeWindow - timeSinceLastExecution);
-
-    if (state.pendingExecution) {
-      setTimeout(() => {
-        if (state.pendingExecution) {
-          originalMethod.apply(state.lastContext, state.lastArgs || []);
-          state.lastExecutionTime = Date.now();
-          state.pendingExecution = false;
-          state.lastArgs = undefined;
-          state.lastContext = undefined;
-        }
-      }, delay);
-    }
-
-    state.inactivityTimeout = undefined;
-  }
 }
+
 
 export class SetFunctions {
   setFunctionsMapping: Map<unknown, (...args: unknown[]) => unknown>;
@@ -149,41 +151,37 @@ export class SetFunctions {
 
   @characteristicSetter(Characteristics.On)
   async setOn(value, context, characteristic, service, IDs) {
-    try {
-      const setValue = (delay = 100) => {
-        setTimeout(() => {
-          characteristic.setValue(0, undefined, 'fromSetValue');
-        }, delay);
-      };
+    const setValue = (delay = 100) => {
+      setTimeout(() => {
+        characteristic.setValue(0, undefined, 'fromSetValue');
+      }, delay);
+    };
 
-      if (service.isVirtual && !service.isGlobalVariableSwitch && !service.isGlobalVariableDimmer) {
-        // It's a virtual device so the command is pressButton and not turnOn or Off
-        await this.command('pressButton', [IDs[1]], service, IDs);
-        // In order to behave like a push button reset the status to off
-        setValue();
-      } else if (service.isScene) {
-        // It's a scene so the command is execute scene
-        await this.scene(IDs[0]);
-        // In order to behave like a push button reset the status to off
-        setValue();
-      } else if (service.isGlobalVariableSwitch) {
-        await this.setGlobalVariable(IDs[1], value ? 'true' : 'false');
-      } else if (service.isGlobalVariableDimmer) {
-        const currentDimmerValue = (await this.getGlobalVariable(IDs[1])).body.value;
-        if (currentDimmerValue !== '0' && value) {
-          return;
-        }
-        await this.setGlobalVariable(IDs[1], value ? '100' : '0');
-      } else {
-        await this.command(value ? 'turnOn' : 'turnOff', null, service, IDs);
+    if (service.isVirtual && !service.isGlobalVariableSwitch && !service.isGlobalVariableDimmer) {
+      // It's a virtual device so the command is pressButton and not turnOn or Off
+      await this.command('pressButton', [IDs[1]], service, IDs);
+      // In order to behave like a push button reset the status to off
+      setValue();
+    } else if (service.isScene) {
+      // It's a scene so the command is execute scene
+      await this.scene(IDs[0]);
+      // In order to behave like a push button reset the status to off
+      setValue();
+    } else if (service.isGlobalVariableSwitch) {
+      await this.setGlobalVariable(IDs[1], value ? 'true' : 'false');
+    } else if (service.isGlobalVariableDimmer) {
+      const currentDimmerValue = (await this.getGlobalVariable(IDs[1])).body.value;
+      if (currentDimmerValue !== '0' && value) {
+        return;
       }
-    } catch (error) {
-      this.platform.log.error(`Error setting On for device ${IDs[0]}:`, error);
+      await this.setGlobalVariable(IDs[1], value ? '100' : '0');
+    } else {
+      await this.command(value ? 'turnOn' : 'turnOff', null, service, IDs);
     }
   }
 
   @characteristicSetter(Characteristics.Brightness)
-  @throttleWithTrailing(1000, 200)
+  @throttle(1000, 200)
   async setBrightness(value, context, characteristic, service, IDs) {
     // Handle global variable dimmer separately
     if (service.isGlobalVariableDimmer) {
@@ -191,51 +189,35 @@ export class SetFunctions {
       return;
     }
 
-    try {
-      const currentTime = Date.now();
-      const timeSinceLastCommand = currentTime - this.lastCommandTime;
-      this.platform.log.debug(`Time since last brightness command: ${timeSinceLastCommand}ms`);
+    const currentTime = Date.now();
+    const timeSinceLastCommand = currentTime - this.lastCommandTime;
+    this.platform.log.debug(`Time since last brightness command: ${timeSinceLastCommand}ms`);
 
-      await this.command('setValue', [value], service, IDs);
+    await this.command('setValue', [value], service, IDs);
 
-      this.lastCommandTime = currentTime;
-    } catch (error) {
-      this.platform.log.error(`Error setting brightness for device ${IDs[0]}:`, error);
-    }
+    this.lastCommandTime = currentTime;
   }
 
   @characteristicSetter(Characteristics.TargetPosition)
-  @throttleWithTrailing(1000, 200, 1000)
+  @throttle(1000, 200, 500)
   async setTargetPosition(value, context, characteristic, service, IDs) {
-    try {
-      if (service.isOpenCloseOnly) {
-        // For open/close only devices, use specific commands based on the target position
-        const action = value === 0 ? 'close' : value >= 99 ? 'open' : null;
-        if (action) {
-          await this.command(action, [0], service, IDs);
-        }
-        return;
+    if (service.isOpenCloseOnly) {
+      // For open/close only devices, use specific commands based on the target position
+      const action = value === 0 ? 'close' : value >= 99 ? 'open' : null;
+      if (action) {
+        await this.command(action, [0], service, IDs);
       }
-
-      try {
-        await this.command('setValue', [value], service, IDs);
-      } catch (error) {
-        this.platform.log.error(`Error setting target position for device ${IDs[0]}:`, error);
-      }
-    } catch (error) {
-      this.platform.log.error(`Error setting target position for device ${IDs[0]}:`, error);
+      return;
     }
+
+    await this.command('setValue', [value], service, IDs);
   }
 
   @characteristicSetter(Characteristics.HoldPosition)
-  @throttleWithTrailing(1000, 200, 1000)
+  @throttle(1000, 200, 500)
   async setHoldPosition(value, context, characteristic, service, IDs) {
-    try {
-      if (value) {
-        await this.command('stop', [0], service, IDs);
-      }
-    } catch (error) {
-      this.platform.log.error(`Error setting hold position for device ${IDs[0]}:`, error);
+    if (value) {
+      await this.command('stop', [0], service, IDs);
     }
   }
 
@@ -351,40 +333,32 @@ export class SetFunctions {
 
   @characteristicSetter(Characteristics.SecuritySystemTargetState)
   async setSecuritySystemTargetState(value) {
-    try {
-      const { Characteristic } = this.platform;
+    const { Characteristic } = this.platform;
 
-      const sceneMap = new Map([
-        [Characteristic.SecuritySystemTargetState.AWAY_ARM, this.platform.scenes.SetAwayArmed],
-        [Characteristic.SecuritySystemTargetState.DISARM, this.platform.scenes.SetDisarmed],
-        [Characteristic.SecuritySystemTargetState.NIGHT_ARM, this.platform.scenes.SetNightArmed],
-        [Characteristic.SecuritySystemTargetState.STAY_ARM, this.platform.scenes.SetStayArmed],
-      ]);
+    const sceneMap = new Map([
+      [Characteristic.SecuritySystemTargetState.AWAY_ARM, this.platform.scenes.SetAwayArmed],
+      [Characteristic.SecuritySystemTargetState.DISARM, this.platform.scenes.SetDisarmed],
+      [Characteristic.SecuritySystemTargetState.NIGHT_ARM, this.platform.scenes.SetNightArmed],
+      [Characteristic.SecuritySystemTargetState.STAY_ARM, this.platform.scenes.SetStayArmed],
+    ]);
 
-      const sceneID = sceneMap.get(value);
+    const sceneID = sceneMap.get(value);
 
-      if (sceneID === undefined) {
-        return;
-      }
-
-      if (value === Characteristic.SecuritySystemTargetState.DISARM) {
-        value = Characteristic.SecuritySystemCurrentState.DISARMED;
-      }
-
-      await this.scene(sceneID);
-    } catch (error) {
-      this.platform.log.error('Error setting security system target state:', error);
+    if (sceneID === undefined) {
+      return;
     }
+
+    if (value === Characteristic.SecuritySystemTargetState.DISARM) {
+      value = Characteristic.SecuritySystemCurrentState.DISARMED;
+    }
+
+    await this.scene(sceneID);
   }
 
   @characteristicSetter(Characteristics.Active)
   async setActive(value, context, characteristic, service, IDs) {
-    try {
-      const action = (value === this.platform.Characteristic.Active.ACTIVE) ? 'turnOn' : 'turnOff';
-      await this.command(action, null, service, IDs);
-    } catch (error) {
-      this.platform.log.error(`Error setting active state for device ${IDs[0]}:`, error);
-    }
+    const action = (value === this.platform.Characteristic.Active.ACTIVE) ? 'turnOn' : 'turnOff';
+    await this.command(action, null, service, IDs);
   }
 
   async updateHomeCenterColorFromHomeKit(h, s, service, IDs) {
@@ -405,67 +379,47 @@ export class SetFunctions {
   }
 
   async command(c, value, service, IDs) {
-    try {
-      await this.platform.fibaroClient.executeDeviceAction(IDs[0], c, value);
+    await this.platform.fibaroClient.executeDeviceAction(IDs[0], c, value);
 
-      if (this.platform.config.logsLevel >= 1) {
-        const nc = c.replace(/turnOn|turnOff|setValue|open|close/g, match => {
-          const replacements = {
-            turnOn: 'On',
-            turnOff: 'Off',
-            setValue: '',
-            open: 'Open',
-            close: 'Close',
-          };
-          return replacements[match] || match;
-        });
+    if (this.platform.config.logsLevel >= 1) {
+      const nc = c.replace(/turnOn|turnOff|setValue|open|close/g, match => {
+        const replacements = {
+          turnOn: 'On',
+          turnOff: 'Off',
+          setValue: '',
+          open: 'Open',
+          close: 'Close',
+        };
+        return replacements[match] || match;
+      });
 
-        const logMessage = `${service.displayName} [${IDs[0]}]: set ${nc}${
-          value !== null && nc !== 'Open' && nc !== 'Close' ? ` ${value}%` : ''
-        }`;
+      const logMessage = `${service.displayName} [${IDs[0]}]: set ${nc}${
+        value !== null && nc !== 'Open' && nc !== 'Close' ? ` ${value}%` : ''
+      }`;
 
-        this.platform.log(logMessage);
-      }
-    } catch (error) {
-      this.platform.log.error(`There was a problem sending command ${c} to ${IDs[0]}:`, error);
+      this.platform.log(logMessage);
     }
   }
 
   async scene(sceneID) {
-    try {
-      await this.platform.fibaroClient.executeScene(sceneID, this.platform.isOldApi());
-    } catch {
-      this.platform.log.error('There was a problem executing scene: ', sceneID);
-    }
+    await this.platform.fibaroClient.executeScene(sceneID, this.platform.isOldApi());
   }
 
   async setGlobalVariable(variableID, value) {
-    try {
-      await this.platform.fibaroClient.setGlobalVariable(variableID, value);
-    } catch {
-      this.platform.log.error('There was a problem setting variable: ', `${variableID} to ${value}`);
-    }
+    await this.platform.fibaroClient.setGlobalVariable(variableID, value);
   }
 
   async getGlobalVariable(variableID) {
-    try {
-      const value = await this.platform.fibaroClient.getGlobalVariable(variableID);
-      return value;
-    } catch {
-      this.platform.log.error('There was a problem getting variable: ', `${variableID}`);
-    }
+    const value = await this.platform.fibaroClient.getGlobalVariable(variableID);
+    return value;
   }
 
   async checkLockCurrentState(IDs, value) {
-    try {
-      const properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
-      const currentValue = (properties.value === true) ?
-        this.platform.Characteristic.LockCurrentState.SECURED : this.platform.Characteristic.LockCurrentState.UNSECURED;
-      if (currentValue !== value) {
-        this.platform.log.error('There was a problem setting value to Lock: ', `${IDs[0]}`);
-      }
-    } catch (e) {
-      this.platform.log.error('There was a problem getting value from: ', `${IDs[0]} - Err: ${e}`);
+    const properties = (await this.platform.fibaroClient.getDeviceProperties(IDs[0])).body.properties;
+    const currentValue = (properties.value === true) ?
+      this.platform.Characteristic.LockCurrentState.SECURED : this.platform.Characteristic.LockCurrentState.UNSECURED;
+    if (currentValue !== value) {
+      this.platform.log.error('There was a problem setting value to Lock: ', `${IDs[0]}`);
     }
   }
 }
