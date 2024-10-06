@@ -27,26 +27,35 @@ function throttle(
   ) {
     const originalMethod = descriptor.value;
 
-    // Map to store per-device state
-    const deviceStateMap = new WeakMap();
+    // Map to store per-device state using device identifiers
+    const deviceStateMap = new Map();
 
     descriptor.value = function (...args) {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       const device = this;
+      // Obtain the device identifier from IDs[0]
+      const IDs = args[4]; // Assuming IDs is the 5th argument
+      const deviceId = IDs && IDs[0];
 
-      let state = deviceStateMap.get(device);
+      if (!deviceId) {
+        throw new Error(
+          'Device ID could not be determined. Please provide a valid IDs array.',
+        );
+      }
+
+      let state = deviceStateMap.get(deviceId);
       if (!state) {
         state = {
-          lastInvocationTime: 0,     // Last time the method was executed
-          lastCallTime: 0,           // Last time the method was called
-          lastArgs: null,            // Arguments of the last call
-          skipIntervalTimerId: null, // Timer for skipInterval
-          skipIntervalEndTime: 0,    // Time when skipInterval ends
-          inactivityTimerId: null,   // Timer for inactivity threshold
-          executionScheduled: false, // Flag to prevent multiple schedules
-          isBurst: false,            // Flag to indicate if we're in a burst
+          lastInvocationTime: 0,
+          lastCallTime: 0,
+          lastArgs: null,
+          skipIntervalTimerId: null,
+          skipIntervalEndTime: 0,
+          inactivityTimerId: null,
+          executionScheduled: false,
+          isBurst: false,
         };
-        deviceStateMap.set(device, state);
+        deviceStateMap.set(deviceId, state);
       }
 
       const now = Date.now();
@@ -92,7 +101,8 @@ function throttle(
         // Calculate time since last invocation for timeWindow
         const timeSinceLastInvocation = now - state.lastInvocationTime;
         const timeWindowRemaining = timeWindow - timeSinceLastInvocation;
-        const timeWindowDelay = timeWindowRemaining > 0 ? timeWindowRemaining : 0;
+        const timeWindowDelay =
+          timeWindowRemaining > 0 ? timeWindowRemaining : 0;
 
         let totalDelay = timeWindowDelay;
 
@@ -199,7 +209,7 @@ export class SetFunctions {
   }
 
   @characteristicSetter(Characteristics.TargetPosition)
-  @throttle(1000, 200, 500)
+  @throttle(1000, 200, 1200)
   async setTargetPosition(value, context, characteristic, service, IDs) {
     if (service.isOpenCloseOnly) {
       // For open/close only devices, use specific commands based on the target position
@@ -214,7 +224,7 @@ export class SetFunctions {
   }
 
   @characteristicSetter(Characteristics.HoldPosition)
-  @throttle(1000, 200, 500)
+  @throttle(1000, 200, 1200)
   async setHoldPosition(value, context, characteristic, service, IDs) {
     if (value) {
       await this.command('stop', [0], service, IDs);
