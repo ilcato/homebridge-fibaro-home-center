@@ -226,7 +226,6 @@ export class FibaroClient {
   executeDeviceAction(ID, action, param) {
     const body = param !== null ? {
       'args': param,
-      'delay': 0,
     } : {};
     return this.genericPost(constants.API_URL_DEVICES + '/' + ID + '/action/' + action, body);
   }

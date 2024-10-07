@@ -34,7 +34,7 @@ function throttle(
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       const device = this;
       // Obtain the device identifier from IDs[0]
-      const IDs = args[4]; // Assuming IDs is the 5th argument
+      const IDs = args[4]; // IDs is the 5th argument
       const deviceId = IDs && IDs[0];
 
       if (!deviceId) {
@@ -191,7 +191,7 @@ export class SetFunctions {
   }
 
   @characteristicSetter(Characteristics.Brightness)
-  @throttle(1000, 200)
+  @throttle(200, 100)
   async setBrightness(value, context, characteristic, service, IDs) {
     // Handle global variable dimmer separately
     if (service.isGlobalVariableDimmer) {
