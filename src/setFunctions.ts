@@ -199,13 +199,7 @@ export class SetFunctions {
       return;
     }
 
-    const currentTime = Date.now();
-    const timeSinceLastCommand = currentTime - this.lastCommandTime;
-    this.platform.log.debug(`Time since last brightness command: ${timeSinceLastCommand}ms`);
-
     await this.command('setValue', [value], service, IDs);
-
-    this.lastCommandTime = currentTime;
   }
 
   @characteristicSetter(Characteristics.TargetPosition)
