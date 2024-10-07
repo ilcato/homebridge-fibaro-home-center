@@ -16,6 +16,10 @@ export class Poller {
     this.pollingUpdateRunning = true;
 
     try {
+      if (this.platform.config.logsLevel > 1) {
+        this.platform.log.debug('Restarting poller...');
+      }
+
       const { body: updates } = await this.platform.fibaroClient.refreshStates(this.lastPoll);
 
       if (updates.last !== undefined) {
@@ -40,9 +44,6 @@ export class Poller {
       this.pollingUpdateRunning = false;
       this.restartPoll(this.pollerPeriod * 1000);
 
-      if (this.platform.config.logsLevel > 1) {
-        this.platform.log.debug('Restarting poller...');
-      }
     } catch (e) {
       this.handlePollingError(e);
     }
