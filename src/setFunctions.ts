@@ -203,7 +203,7 @@ export class SetFunctions {
   }
 
   @characteristicSetter(Characteristics.TargetPosition)
-  @throttle(1000, 200, 1200)
+  @throttle(500, 200, 1400)
   async setTargetPosition(value, context, characteristic, service, IDs) {
     if (service.isOpenCloseOnly) {
       // For open/close only devices, use specific commands based on the target position
