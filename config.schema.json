@@ -113,7 +113,7 @@
         "default": "disabled"
       },
       "addRoomNameToDeviceName": {
-        "description": "If enabled, to each device name will be added the name of the room in which it is located. Default: disabled.",
+        "description": "If enabled, each device name will be prepended with the name of the room in which it is located, e.g.: Bedroom Light.",
         "title": "Add room name to device name.",
         "type": "string",
 	"required": true,      
