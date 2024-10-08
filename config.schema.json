@@ -42,7 +42,7 @@
         "minimum": 0
       },
       "markDeadDevices": {
-        "description": "Show dead devices as not responding in HomeKit. Dead devices are devices that have connection problems. Warning: Not responding devices will break HomeKit automations.",
+        "description": "Show dead devices as not responding in HomeKit. Dead devices are devices that have connection problems and in the Fibaro hub selected option to mark such devices. Warning: Not responding device in HomeKit can break automation, it is recommended to place such device in a separate automation.",
         "title": "Mark dead devices",
         "type": "boolean",
         "required": false,
