@@ -41,6 +41,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
   public setFunctions?: SetFunctions;
   public getFunctions?: GetFunctions;
   public loginTimeout: NodeJS.Timeout | null = null;
+  public rooms: { id: number; name: string }[] = [];
 
   constructor(
     public readonly log: Logging,
@@ -172,11 +173,8 @@ export class FibaroHC implements DynamicPlatformPlugin {
       }
       this.setFunctions = new SetFunctions(this);	// There's a dependency in setFunction to Scene Mapping
       const devices = this.fibaroClient ? (await this.fibaroClient.getDevices()).body : {};
-      let rooms = null;
-      if (this.config.addRoomNameToDeviceName === 'enabled' && this.fibaroClient) {
-        rooms = (await this.fibaroClient.getRooms()).body;
-      }
-      this.LoadAccessories(devices, rooms);
+      this.rooms = (await this.fibaroClient.getRooms()).body;
+      this.LoadAccessories(devices);
       this.log.info('Successfully logged in.');
     } catch (e) {
       this.log.error('Error getting data from Home Center: ', e);
@@ -207,15 +205,15 @@ export class FibaroHC implements DynamicPlatformPlugin {
     this.accessories.push(accessory);
   }
 
-  LoadAccessories(devices, rooms) {
+  LoadAccessories(devices) {
     this.log.debug('Loading accessories');
     devices.map((s) => {
       if (s.visible === true && !s.name.startsWith('_')) {
-        if (rooms !== null) {
-          // patch device name
-          const room = rooms.find(r => r.id === s.roomID);
-          if (room !== undefined && room.name !== undefined && room.name !== '') {
-            s.name = s.name + ' - ' + room.name;
+        if (this.config.addRoomNameToDeviceName === 'enabled' && this.rooms) {
+          // patch device name with the room name
+          const room = this.getRoomNameById(s.roomID);
+          if (room !== undefined && room !== '') {
+            s.name = s.name + ' - ' + room;
           } else {
             s.name = s.name + ' - ' + 'no-room';
           }
@@ -338,6 +336,10 @@ export class FibaroHC implements DynamicPlatformPlugin {
       (this.info.serialNumber.indexOf('HC2-') === 0 || this.info.serialNumber.indexOf('HCL-') === 0);
   }
 
+  getRoomNameById(roomId: number): string | undefined {
+    return this.rooms.find(r => r.id === roomId)?.name;
+  }
+
 }
 
 function validUrl(str) {
@@ -352,4 +354,3 @@ function validUrl(str) {
   );
   return pattern.test(str);
 }
-

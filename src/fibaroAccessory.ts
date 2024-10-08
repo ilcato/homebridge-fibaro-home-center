@@ -30,6 +30,8 @@ export class FibaroAccessory {
     const properties = this.device.properties || {};
     const manufacturer = (properties.zwaveCompany || 'IlCato').replace('Fibargroup', 'Fibar Group');
 
+    const roomName = this.platform.getRoomNameById(this.device.roomID);
+
     // Set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, manufacturer)
@@ -37,7 +39,10 @@ export class FibaroAccessory {
         this.device.type :
         'HomeCenter Bridged Accessory'}`)
       .setCharacteristic(this.platform.Characteristic.SerialNumber,
-        `${properties.serialNumber || '<unknown>'}, ID: ${this.device.id || '<unknown>'}`);
+        `ID: ${this.device.id}` +
+        `${roomName ? `, Room: ${roomName}` : ''}` +
+        `${properties.serialNumber ? `, ${properties.serialNumber}` : ''}`,
+      );
 
     // Check for device-specific configuration
     const devConfig = this.platform.config.devices?.find(item => item.id === this.device.id);
