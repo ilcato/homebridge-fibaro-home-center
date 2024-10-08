@@ -86,7 +86,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 
 #### Advanced
 + `pollerperiod` (integer) : Polling interval (refresh interval) for querying Fibaro Home Center (0: disabled, recomended: 3, 1 or 2 seconds allows for a more responsive update of the Home app when changes appear outside the HomeKit environment). If it is disabled the Home app is not updated automatically when such a change happen but only when you close a panel and reopen it. Enabling this option is useful to read the new state when controlling devices outside HomeKit, E.G.: via Fibaro, physical buttons, scenes and automations.
-+ `markDeadDevices` (boolean) : Show dead devices as not responding in HomeKit. Dead devices are devices that have connection problems. Warning: Not responding devices will break HomeKit automations.
++ `markDeadDevices` (boolean) : Show dead devices as not responding in HomeKit. Dead devices are devices that have connection problems and in the Fibaro hub selected option to mark such devices. Warning: Not responding device in HomeKit can break automation, it is recommended to place such device in a separate automation.
 + `thermostatmaxtemperature` (integer) : Set max temperature for thermostatic devices (default 100 C).
 + `thermostattimeout` (integer) : Number of seconds for the thermostat timeout, default: 7200 (2 hours).
 + `switchglobalvariables` (string) : Comma separated list of home center global variables names acting like a bistable switch.
@@ -94,7 +94,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 + `adminUsername` (string) : Admin username of your home center, needed only to set global variables.
 + `adminPassword` (string) : Admin password of your home center, needed only to set global variables.
 + `securitysystem` (string) : Set 'enabled' or 'disabled' in order to manage the availability of the security system.
-+ `addRoomNameToDeviceName` (string) : Set 'enabled' or 'disabled'. If enabled, to each device name will be added the name of the room in which it is located. Default: disabled.
++ `addRoomNameToDeviceName` (string) : Set 'enabled', 'enabledBefore' or 'disabled'. If enabled, to each device name will be added the name of the room in which it is located. Warning: changing this may cause that some of your devices will be removed and add as new.
 + `doorbellDeviceId` (integer) : Home Center binary sensor device id acting as a doorbell.
 + `logsLevel` (integer) : Desired log level: 0 disabled, 1 only changes, 2 all.
 
@@ -388,7 +388,9 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 - Significant reduction in device response time.
 - Option to mark dead devices as not responding in HomeKit.
 - Log dead devices.
-- Improvements for poller. 
+- Improvements for poller.
+- Ability to add a room name before or after the device name.
+- Display room name in device info.
 - Add support for Outlet in individual device config.
 - Dependencies updates.
 
