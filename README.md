@@ -389,7 +389,8 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 - Option to mark dead devices as not responding in HomeKit.
 - Log dead devices.
 - Improvements for poller.
-- Display Room name in device info.
+- Ability to add a room name before or after the device name.
+- Display room name in device info.
 - Add support for Outlet in individual device config.
 - Dependencies updates.
 
