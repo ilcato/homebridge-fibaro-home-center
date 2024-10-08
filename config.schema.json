@@ -113,7 +113,7 @@
         "default": "disabled"
       },
       "addRoomNameToDeviceName": {
-        "description": "If enabled, to each device name will be added the name of the room in which it is located.",
+        "description": "If enabled, to each device name will be added the name of the room in which it is located. Warning: changing this may cause that some of your devices will be removed and add as new.",
         "title": "Add room name to device name.",
         "type": "string",
 	"required": true,      
