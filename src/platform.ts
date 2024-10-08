@@ -217,6 +217,14 @@ export class FibaroHC implements DynamicPlatformPlugin {
           } else {
             s.name = s.name + ' - ' + 'no-room';
           }
+        } else if (this.config.addRoomNameToDeviceName === 'enabledBefore' && this.rooms) {
+          // patch device name with the room name
+          const room = this.getRoomNameById(s.roomID);
+          if (room !== undefined && room !== '') {
+            s.name = room + ' ' + s.name;
+          } else {
+            s.name = s.name;
+          }
         }
         this.addAccessory(s);
       }
