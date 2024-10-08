@@ -222,8 +222,6 @@ export class FibaroHC implements DynamicPlatformPlugin {
           const room = this.getRoomNameById(s.roomID);
           if (room !== undefined && room !== '') {
             s.name = room + ' ' + s.name;
-          } else {
-            s.name = s.name;
           }
         }
         this.addAccessory(s);
