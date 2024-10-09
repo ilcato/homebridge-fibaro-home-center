@@ -385,7 +385,7 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 ### Version 3.0.0
 
 - Main refactoring of code.
-- Significant reduction in device response time.
+- Significant reduction in device response time (especially for dimmers).
 - Option to mark dead devices as not responding in HomeKit.
 - Log dead devices.
 - Improvements for poller.
