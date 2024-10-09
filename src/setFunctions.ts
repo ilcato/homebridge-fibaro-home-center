@@ -214,7 +214,13 @@ export class SetFunctions {
       return;
     }
 
-    await this.command('setValue', [value], service, IDs);
+    const result = await this.command('setValue', [value], service, IDs);
+    if (result && !result.result) {
+      // The command was discarded because the device is not ready to accept commands
+      // set the characteristic value to the current value of the device
+      characteristic.updateValue(service.getCharacteristic(this.platform.Characteristic.CurrentPosition).value, undefined, 'fromSetValue');
+      this.platform.log.warn('setValue discarded for device', IDs[0]);
+    }
   }
 
   @characteristicSetter(Characteristics.HoldPosition)
@@ -383,7 +389,7 @@ export class SetFunctions {
   }
 
   async command(c, value, service, IDs) {
-    await this.platform.fibaroClient.executeDeviceAction(IDs[0], c, value);
+    const result = await this.platform.fibaroClient.executeDeviceAction(IDs[0], c, value);
 
     if (this.platform.config.logsLevel >= 1) {
       const nc = c.replace(/turnOn|turnOff|setValue|open|close/g, match => {
@@ -403,6 +409,7 @@ export class SetFunctions {
 
       this.platform.log(logMessage);
     }
+    return result;
   }
 
   async scene(sceneID) {
