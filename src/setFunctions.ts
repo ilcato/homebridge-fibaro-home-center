@@ -215,7 +215,7 @@ export class SetFunctions {
     }
 
     const result = await this.command('setValue', [value], service, IDs);
-    if (result && !result.result) {
+    if (result && result.body && !result.body.result) {
       // The command was discarded because the device is not ready to accept commands
       // set the characteristic value to the current value of the device
       characteristic.updateValue(service.getCharacteristic(this.platform.Characteristic.CurrentPosition).value, undefined, 'fromSetValue');
