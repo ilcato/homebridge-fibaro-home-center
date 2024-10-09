@@ -391,6 +391,7 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 - Improvements for poller.
 - Ability to add a room name before or after the device name.
 - Display room name in device info.
+- Checking if the roller shutter has reached the required position to prevent endless Opening or Closing status.
 - Add support for Outlet in individual device config.
 - Dependencies updates.
 
