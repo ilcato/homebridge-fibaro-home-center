@@ -33,6 +33,7 @@ export class FibaroAccessory {
     const roomName = this.platform.getRoomNameById(this.device.roomID);
 
     // Set accessory information
+    const serialNumber = properties.serialNumber?.startsWith('h\'') ? properties.serialNumber.slice(2) : properties.serialNumber;
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, manufacturer)
       .setCharacteristic(this.platform.Characteristic.Model, `${this.device.type.length > 1 ?
@@ -41,7 +42,7 @@ export class FibaroAccessory {
       .setCharacteristic(this.platform.Characteristic.SerialNumber,
         `ID: ${this.device.id}` +
         `${roomName ? `, Room: ${roomName}` : ''}` +
-        `${properties.serialNumber ? `, ${properties.serialNumber}` : ''}`,
+        `${serialNumber ? `, ${serialNumber}` : ''}`,
       );
 
     // Check for device-specific configuration
