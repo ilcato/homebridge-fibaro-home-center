@@ -289,7 +289,10 @@ export class FibaroHC implements DynamicPlatformPlugin {
       this.api.updatePlatformAccessories([existingAccessory]);
 
       // Create accessory handler
-      new FibaroAccessory(this, existingAccessory, device);
+      const fa = new FibaroAccessory(this, existingAccessory, device);
+      if (!fa.isValid) {
+        this.removeAccessory(existingAccessory);
+      }
 
     } else {
       // the accessory does not yet exist, so we need to create it
