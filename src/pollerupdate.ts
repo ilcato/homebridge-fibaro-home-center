@@ -65,7 +65,6 @@ export class Poller {
         this.manageValue(change);
         break;
       default:
-        this.platform.log.warn(`Unhandled event type: ${type}`);
         return;
     }
     this.platform.log.info(`Processed event ${sceneId} of type ${type} from device ${deviceId}`);
