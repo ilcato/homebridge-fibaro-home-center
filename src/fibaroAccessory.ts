@@ -13,10 +13,6 @@ import { manualDeviceConfigs } from './deviceManual';
 import { autoDeviceConfigs } from './deviceAuto';
 
 export class FibaroAccessory {
-  mainService;
-  batteryService;
-  mainCharacteristics;
-  batteryCharacteristics;
   isValid;
   lastServiceChecked;
 
@@ -49,41 +45,57 @@ export class FibaroAccessory {
     const devConfig = this.platform.config.devices?.find(item => item.id === this.device.id);
 
     // Configure accessory based on config or device type
+    let serviceAndCharacteristics;
     if (devConfig) {
-      this.configureAccessoryFromConfig(devConfig);
+      serviceAndCharacteristics = this.configureAccessoryFromConfig(devConfig);
     } else {
-      this.configureAccessoryFromType();
+      serviceAndCharacteristics = this.configureAccessoryFromType();
     }
-
-    if (!this.isValid) {
+    if (!serviceAndCharacteristics || !(serviceAndCharacteristics instanceof Array) || serviceAndCharacteristics.length === 0) {
+      this.isValid = false;
       return;
     }
 
-    this.bindCharacterstics(this.mainService, this.mainCharacteristics);
-
+    // Add battery service if the device supports it
     if (this.device.interfaces && this.device.interfaces.includes('battery')) {
-      this.batteryService = this.accessory.getService(this.platform.Service.Battery);
-      if (!this.batteryService) {
-        this.batteryService = this.accessory.addService(new this.platform.Service.Battery(this.device.name + ' Battery'));
-      }
-      if (!this.batteryService.subtype) {
-        this.batteryService.subtype = this.device.id + '----';
-      }
-      this.batteryCharacteristics =
-        [this.platform.Characteristic.BatteryLevel,
+      serviceAndCharacteristics.push({
+        service: this.platform.Service.Battery,
+        characteristics: [this.platform.Characteristic.BatteryLevel,
           this.platform.Characteristic.ChargingState,
-          this.platform.Characteristic.StatusLowBattery];
-      this.bindCharacterstics(this.batteryService, this.batteryCharacteristics);
+          this.platform.Characteristic.StatusLowBattery],
+        subtype: this.device.id + '----',
+      });
     }
+
+    // loop through all services, create it if necessary and bind characteristics
+    serviceAndCharacteristics.forEach(({ service, characteristics, subtype }) => {
+      const serviceName = this.buildServiceName(service, subtype);
+      let s = this.accessory.getService(serviceName);
+      if (!s) {
+        s = this.accessory.addService(service, serviceName, subtype);
+      }
+      this.bindCharacterstics(s, characteristics);
+    });
 
     // Remove no more existing services
     for (let t = 0; t < this.accessory.services.length; t++) {
       const s = this.accessory.services[t];
-      if (s.displayName !== this.mainService.displayName &&
-        s.UUID !== this.platform.Service.AccessoryInformation.UUID &&
-        s.UUID !== this.platform.Service.Battery.UUID) {
+      if (s.constructor === this.platform.Service.AccessoryInformation) {
+        continue;
+      }
+      if (!serviceAndCharacteristics.some(sc => sc.service === s.constructor)) {
         this.accessory.removeService(s);
       }
+    }
+  }
+
+  buildServiceName(service, subtype) {
+    if (service === this.platform.Service.Battery) {
+      return this.device.name + ' Battery';
+    } else if (service === this.platform.Service.StatelessProgrammableSwitch) {
+      return this.device.name + ' Button ' + subtype.split('-')[4];
+    } else {
+      return this.device.name;
     }
   }
 
@@ -91,6 +103,9 @@ export class FibaroAccessory {
     if (!characteristics) {
       return;
     }
+    const IDs = service.subtype.split('-');
+    this.setServiceProperties(service, IDs);
+
     for (let i = 0; i < characteristics.length; i++) {
       const characteristic = service.getCharacteristic(characteristics[i]);
 
@@ -126,6 +141,13 @@ export class FibaroAccessory {
         characteristic.value = this.platform.Characteristic.AirQuality.UNKNOWN;
       }
 
+      // Case 6: Remote controller and remote scene controller
+      // Set the remote controller button states
+      if (service.isRemoteSceneController && characteristic.constructor === this.platform.Characteristic.ProgrammableSwitchEvent) {
+        characteristic.props.validValues = [this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS,
+          this.platform.Characteristic.ProgrammableSwitchEvent.LONG_PRESS];
+      }
+
       // Bind the characteristic to the service
       this.bindCharacteristic(characteristic, service);
     }
@@ -136,22 +158,31 @@ export class FibaroAccessory {
       return;
     }
 
-    // IDs[0] is always device ID, "0" for security system and "G" for global variables switches
-    // IDs[1] is reserved for the button ID for virtual devices, or the global variable name for global variable devices, otherwise is ""
-    // IDs[2] is a subdevice type: "LOCK" for locks, "SC" for Scenes, "CZ" for Climate zones,
-    //                             "HZ" for heating zones, "G" for global variables, "D" for dimmer global variables
-    const IDs = service.subtype.split('-');
-    this.setServiceProperties(service, IDs);
-
     if (this.shouldSubscribeToUpdates(service, characteristic)) {
       this.subscribeUpdate(service, characteristic, this.getPropertyToSubscribe(service, characteristic));
     }
 
+    const IDs = service.subtype.split('-');
     this.bindSetEvent(characteristic, service, IDs);
     this.bindGetEvent(characteristic, service, IDs);
   }
 
   private setServiceProperties(service, IDs) {
+    // IDs[0] is always device ID, "0" for security system and "G" for global variables switches
+    // IDs[1] is reserved for the button ID for virtual devices, or the global variable name for global variable devices, otherwise is ""
+    // IDs[2] is a subdevice type:
+    //   "LOCK"        for locks,
+    //   "SC"          for Scenes,
+    //   "CZ"          for Climate zones,
+    //   "HZ"          for heating zones,
+    //   "G"           for global variables,
+    //   "D"           for dimmer global variables,
+    //   "PM2.5"       for PM2.5 sensor
+    // IDs[3] is for remote controllers and remote scene controllers and represent the remote controller type:
+    //   "RC"          for remote controller,
+    //   "RS"          for remote scene controller
+    // IDs[4] is for remote controllers and remote scene controllers and represent the remote controller button number
+
     service.isVirtual = IDs[1] !== '';
     service.isSecuritySystem = IDs[0] === '0';
     service.isGlobalVariableSwitch = IDs[0] === 'G';
@@ -162,6 +193,9 @@ export class FibaroAccessory {
     service.isHeatingZone = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_HEATING_ZONE;
     service.isOpenCloseOnly = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_OPEN_CLOSE_ONLY;
     service.isPM2_5Sensor = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_PM2_5;
+    service.isRemoteController = IDs.length >= 5 && IDs[3] === constants.SUBTYPE_REMOTE_CONTROLLER;
+    service.isRemoteSceneController = IDs.length >= 5 && IDs[3] === constants.SUBTYPE_REMOTE_SCENE_CONTROLLER;
+    service.remoteButtonNumber = IDs.length >= 5 ? parseInt(IDs[4]) : -1;
   }
 
   private shouldSubscribeToUpdates(service, characteristic) {
@@ -334,6 +368,10 @@ export class FibaroAccessory {
         callback(undefined, characteristic.value);
       }
     } else {
+      if (characteristic.constructor === this.platform.Characteristic.ServiceLabelIndex) {
+        this.platform.log.info(`${this.device.name} [${IDs[0]}]:`, 'getting', `${characteristic.displayName}`,
+          'value:', service.remoteButtonNumber);
+      }
       callback(undefined, characteristic.value);
       // The get function call may update the value with updatValue api
       getFunction.call(this.platform.getFunctions, characteristic, service, IDs, properties);
@@ -347,7 +385,10 @@ export class FibaroAccessory {
     );
   }
 
-  configureAccessoryFromConfig(devConfig) {
+  configureAccessoryFromConfig(devConfig): unknown {
+    if (!devConfig) {
+      return;
+    }
     const Service = this.platform.Service;
     const Characteristic = this.platform.Characteristic;
 
@@ -355,25 +396,28 @@ export class FibaroAccessory {
       this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${this.device.type}]: device found in config`);
     }
 
+    // If the device is excluded in config
+    if (devConfig.displayAs === 'exclude') {
+      if (this.platform.config.logsLevel > 0) {
+        this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${this.device.type}]: device excluded in config`);
+      }
+      return;
+    }
+
     // Find a matching function based on the name
-    const manualConfigFunc = manualDeviceConfigs.get(devConfig?.displayAs);
+    const manualConfigFunc = manualDeviceConfigs.get(devConfig.displayAs);
 
     // If a matching manualConfigFunc was found
     if (manualConfigFunc) {
       // Set the configuration for this device by calling manualConfigFunc
-      const serviceConfig = manualConfigFunc.call(null, Service, Characteristic, this.device);
-      this.setMain(serviceConfig.service, serviceConfig.characteristics, serviceConfig.subtype);
-
-      // If the device is excluded in config
-      if (devConfig?.displayAs === 'exclude') {
-        if (this.platform.config.logsLevel > 0) {
-          this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${this.device.type}]: device excluded in config`);
-        }
-        this.isValid = false;
-      }
+      return manualConfigFunc.call(null, Service, Characteristic, this.device);
     } else {
       // Default to switch if no matching configuration is found
-      this.setMain(Service.Switch, [Characteristic.On]);
+      return [{
+        service: Service.Switch,
+        characteristics: [Characteristic.On],
+        subtype: this.device.id + '----',
+      }];
     }
   }
 
@@ -390,29 +434,13 @@ export class FibaroAccessory {
     // If a matching deviceConfigFunction was found
     if (deviceConfigFunction) {
       // Set the configuration for this device by calling deviceConfigFunction
-      const config = deviceConfigFunction.call(null, Service, Characteristic, this.device, this.platform.config);
-      this.setMain(config.service, config.characteristics, config.subtype);
+      return deviceConfigFunction.call(null, Service, Characteristic, this.device, this.platform.config);
     } else {
       // If no matching DeviceClass was found, log that the device is not supported
       if (this.platform.config.logsLevel > 0) {
         this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${type}]: device not supported`);
       }
-      // Mark this accessory as invalid
-      this.isValid = false;
+      return;
     }
-  }
-
-  setMain(service, characteristics, subtype?: string) {
-    this.mainService = this.accessory.getService(service);
-    if (!this.mainService) {
-      this.mainService = this.accessory.addService(
-        new service(this.device.name),
-      );
-    }
-    this.mainCharacteristics = characteristics;
-    if (subtype === null || subtype === undefined || subtype === '') {
-      subtype = this.device.id + '----';
-    }
-    this.mainService.subtype = subtype;
   }
 }

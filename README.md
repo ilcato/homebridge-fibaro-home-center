@@ -382,6 +382,11 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 
 # Latest release notes
 
+### Version 3.1.0
+
+- Added support for remote scene controller (like Aeon Labs Minimote).
+- Dependencies updates.
+
 ### Version 3.0.0
 
 - Main refactoring of code.
@@ -395,9 +400,5 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 - Add support for Outlet in individual device config.
 - Dependencies updates.
 
-### Version 2.1.0
-
-- Fix to excluding devices feature
-- Dependencies updates.
 
 #### See all: [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)

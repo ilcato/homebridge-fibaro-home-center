@@ -20,24 +20,26 @@ function ManualType(displayAs: string) {
 
 export class ManualDeviceConfigurations {
   @ManualType(MANUAL_DEVICE_TYPES.SWITCH)
-  static configureSwitch(Service, Characteristic) {
-    return {
+  static configureSwitch(Service, Characteristic, device) {
+    return [{
       service: Service.Switch,
       characteristics: [Characteristic.On],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   @ManualType(MANUAL_DEVICE_TYPES.DIMMER)
-  static configureDimmer(Service, Characteristic) {
-    return {
+  static configureDimmer(Service, Characteristic, device) {
+    return [{
       service: Service.Lightbulb,
       characteristics: [Characteristic.On, Characteristic.Brightness],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   @ManualType(MANUAL_DEVICE_TYPES.BLIND)
-  static configureBlind(Service, Characteristic) {
-    return {
+  static configureBlind(Service, Characteristic, device) {
+    return [{
       service: Service.WindowCovering,
       characteristics: [
         Characteristic.CurrentPosition,
@@ -45,12 +47,13 @@ export class ManualDeviceConfigurations {
         Characteristic.PositionState,
         Characteristic.HoldPosition,
       ],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   @ManualType(MANUAL_DEVICE_TYPES.BLIND_WITH_TILT)
-  static configureBlindWithTilt(Service, Characteristic) {
-    return {
+  static configureBlindWithTilt(Service, Characteristic, device) {
+    return [{
       service: Service.WindowCovering,
       characteristics: [
         Characteristic.CurrentPosition,
@@ -60,75 +63,84 @@ export class ManualDeviceConfigurations {
         Characteristic.CurrentHorizontalTiltAngle,
         Characteristic.TargetHorizontalTiltAngle,
       ],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   @ManualType(MANUAL_DEVICE_TYPES.GARAGE)
-  static configureGarage(Service, Characteristic) {
-    return {
+  static configureGarage(Service, Characteristic, device) {
+    return [{
       service: Service.GarageDoorOpener,
       characteristics: [
         Characteristic.CurrentDoorState,
         Characteristic.TargetDoorState,
         Characteristic.ObstructionDetected,
       ],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   @ManualType(MANUAL_DEVICE_TYPES.TEMPERATURE)
-  static configureTemperature(Service, Characteristic) {
-    return {
+  static configureTemperature(Service, Characteristic, device) {
+    return [{
       service: Service.TemperatureSensor,
       characteristics: [Characteristic.CurrentTemperature],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   @ManualType(MANUAL_DEVICE_TYPES.HUMIDITY)
-  static configureHumidity(Service, Characteristic) {
-    return {
+  static configureHumidity(Service, Characteristic, device) {
+    return [{
       service: Service.HumiditySensor,
       characteristics: [Characteristic.CurrentRelativeHumidity],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   @ManualType(MANUAL_DEVICE_TYPES.LIGHT_SENSOR)
-  static configureLightSensor(Service, Characteristic) {
-    return {
+  static configureLightSensor(Service, Characteristic, device) {
+    return [{
       service: Service.LightSensor,
       characteristics: [Characteristic.CurrentAmbientLightLevel],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   @ManualType(MANUAL_DEVICE_TYPES.MOTION)
-  static configureMotion(Service, Characteristic) {
-    return {
+  static configureMotion(Service, Characteristic, device) {
+    return [{
       service: Service.MotionSensor,
       characteristics: [Characteristic.MotionDetected],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   @ManualType(MANUAL_DEVICE_TYPES.LEAK)
-  static configureLeak(Service, Characteristic) {
-    return {
+  static configureLeak(Service, Characteristic, device) {
+    return [{
       service: Service.LeakSensor,
       characteristics: [Characteristic.LeakDetected],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   @ManualType(MANUAL_DEVICE_TYPES.SMOKE)
-  static configureSmoke(Service, Characteristic) {
-    return {
+  static configureSmoke(Service, Characteristic, device) {
+    return [{
       service: Service.SmokeSensor,
       characteristics: [Characteristic.SmokeDetected],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   @ManualType(MANUAL_DEVICE_TYPES.OUTLET)
-  static configureOutlet(Service, Characteristic) {
-    return {
+  static configureOutlet(Service, Characteristic, device) {
+    return [{
       service: Service.Outlet,
       characteristics: [Characteristic.On, Characteristic.OutletInUse],
-    };
+      subtype: device.id + '----',
+    }];
   }
 }
 

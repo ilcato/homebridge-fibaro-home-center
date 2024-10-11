@@ -26,7 +26,11 @@ export class Poller {
         this.lastPoll = updates.last;
       }
 
-      if (updates.changes) {
+      if (updates.events && updates.events.length > 0) {
+        updates.events.forEach(this.handleEvent.bind(this));
+      }
+
+      if (updates.changes && updates.changes.length > 0) {
         updates.changes.forEach(this.handleChange.bind(this));
       }
 
@@ -47,6 +51,24 @@ export class Poller {
     } catch (e) {
       this.handlePollingError(e);
     }
+  }
+
+  private handleEvent(event) {
+    const { type, data } = event;
+    const deviceId = data.deviceId || 'N/A';
+    const sceneId = data.sceneId || 'N/A';
+
+    // Create a change object in order to reuse the manageValue function
+    const change = { id: deviceId, value: sceneId };
+    switch (type) {
+      case 'SceneActivationEvent':
+        this.manageValue(change);
+        break;
+      default:
+        this.platform.log.warn(`Unhandled event type: ${type}`);
+        return;
+    }
+    this.platform.log.info(`Processed event ${sceneId} of type ${type} from device ${deviceId}`);
   }
 
   private handleChange(change) {
@@ -98,6 +120,16 @@ export class Poller {
           if (this.platform.config.FibaroTemperatureUnit === constants.CONFIG_FIBARO_TEMPERATURE_UNIT_FAHRENHEIT &&
               characteristic.displayName === 'Current Temperature') {
             change.value = (change.value - 32) * 5 / 9;
+          }
+
+          if (service.isRemoteSceneController) {
+            const buttonNumber = service.remoteButtonNumber;
+            const eventNumber = change.value;
+            // Each button handles two consecutive events starting from button 1. Skip if not in range.
+            if (!(eventNumber >= (buttonNumber - 1) * 2 + 1 && eventNumber <= buttonNumber * 2) ||
+                characteristic.constructor !== this.platform.Characteristic.ProgrammableSwitchEvent) {
+              return;
+            }
           }
 
           const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(characteristic.constructor);
