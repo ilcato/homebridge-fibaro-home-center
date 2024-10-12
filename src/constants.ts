@@ -27,6 +27,12 @@ export const CERTIFICATE_PATHS = [
 
 export const HTTP_ACCEPT_HEADER = 'json';
 
+// Poller constants
+export const DEFAULT_POLLER_PERIOD = 3;
+export const DEFAULT_THERMOSTAT_MAX_TEMP = 100;
+export const TIME_OFFSET = 2 * 3600;
+export const POLLER_RESTART_AFTER_SET_VALUE = 3000;
+
 // Security system constant
 export const SECURITY_SYSTEM_GLOBAL_VARIABLE = 'SecuritySystem';
 

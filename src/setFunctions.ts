@@ -191,7 +191,7 @@ export class SetFunctions {
   }
 
   @characteristicSetter(Characteristics.Brightness)
-  @throttle(200, 100)
+  @throttle(100, 100, 500)
   async setBrightness(value, context, characteristic, service, IDs) {
     // Handle global variable dimmer separately
     if (service.isGlobalVariableDimmer) {

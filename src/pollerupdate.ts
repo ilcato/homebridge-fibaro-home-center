@@ -6,10 +6,15 @@ export class Poller {
   private pollingUpdateRunning: boolean = false;
   private lastPoll: number = 0;
   private timeout: NodeJS.Timeout | null = null;
+  private shouldProcessUpdates: boolean = true;
 
   constructor(private platform, private pollerPeriod: number) { }
 
   async poll() {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = null;
+    }
 
     if (this.pollingUpdateRunning) {
       return;
@@ -17,11 +22,15 @@ export class Poller {
     this.pollingUpdateRunning = true;
 
     try {
-      if (this.platform.config.logsLevel > 1) {
-        this.platform.log.debug('Restarting poller...');
+      const { body: updates } = await this.platform.fibaroClient.refreshStates(this.lastPoll);
+      if (!this.shouldProcessUpdates) {
+        this.pollingUpdateRunning = false;
+        return;
       }
 
-      const { body: updates } = await this.platform.fibaroClient.refreshStates(this.lastPoll);
+      if (this.platform.config.logsLevel > 1) {
+        this.platform.log.debug('Executing poller...');
+      }
 
       if (updates.last !== undefined) {
         this.lastPoll = updates.last;
@@ -99,16 +108,22 @@ export class Poller {
   restartPoll(delay: number) {
     if (this.timeout) {
       clearTimeout(this.timeout);
+      this.timeout = null;
     }
     if (delay > 0) {
-      this.timeout = setTimeout(() => this.poll(), delay);
+      this.timeout = setTimeout(() => {
+        this.shouldProcessUpdates = true;
+        this.poll();
+      }, delay);
     }
   }
 
   cancelPoll() {
     if (this.timeout) {
       clearTimeout(this.timeout);
+      this.timeout = null;
     }
+    this.shouldProcessUpdates = false;
   }
 
   private manageValue(change) {

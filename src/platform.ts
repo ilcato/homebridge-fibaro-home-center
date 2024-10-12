@@ -16,9 +16,6 @@ import { GetFunctions } from './getFunctions';
 import * as constants from './constants';
 import { Poller } from './pollerupdate';
 
-const defaultPollerPeriod = 3;
-const defaultThermostatMaxTemp = 100;
-const timeOffset = 2 * 3600;
 
 /**
  * HomebridgePlatform
@@ -82,11 +79,11 @@ export class FibaroHC implements DynamicPlatformPlugin {
   private setupPollerPeriod() {
     let pollerPeriod = this.config.pollerperiod;
     if (pollerPeriod === undefined) {
-      pollerPeriod = defaultPollerPeriod;
+      pollerPeriod = constants.DEFAULT_POLLER_PERIOD;
     } else {
       const parsedValue = typeof pollerPeriod === 'string' ? parseFloat(pollerPeriod) : pollerPeriod;
       if (isNaN(parsedValue) || parsedValue < 0 || parsedValue > 100) {
-        pollerPeriod = defaultPollerPeriod;
+        pollerPeriod = constants.DEFAULT_POLLER_PERIOD;
       } else {
         pollerPeriod = parsedValue;
       }
@@ -97,15 +94,15 @@ export class FibaroHC implements DynamicPlatformPlugin {
   private setupThermostatMaxTemp() {
     const thermostatMaxTemp = this.config.thermostatmaxtemperature ?
       parseInt(this.config.thermostatmaxtemperature) :
-      defaultThermostatMaxTemp;
-    if (isNaN(thermostatMaxTemp) || thermostatMaxTemp < 0 || thermostatMaxTemp > defaultThermostatMaxTemp) {
-      this.config.thermostatmaxtemperature = defaultThermostatMaxTemp;
+      constants.DEFAULT_THERMOSTAT_MAX_TEMP;
+    if (isNaN(thermostatMaxTemp) || thermostatMaxTemp < 0 || thermostatMaxTemp > constants.DEFAULT_THERMOSTAT_MAX_TEMP) {
+      this.config.thermostatmaxtemperature = constants.DEFAULT_THERMOSTAT_MAX_TEMP;
     }
   }
 
   private setupDefaultConfigValues() {
     this.config.markDeadDevices = this.config.markDeadDevices ?? false;
-    this.config.thermostattimeout = this.config.thermostattimeout ?? timeOffset.toString();
+    this.config.thermostattimeout = this.config.thermostattimeout ?? constants.TIME_OFFSET.toString();
     this.config.switchglobalvariables = this.config.switchglobalvariables ?? '';
     this.config.dimmerglobalvariables = this.config.dimmerglobalvariables ?? '';
     this.config.securitysystem = this.config.securitysystem === 'enabled' ? 'enabled' : 'disabled';

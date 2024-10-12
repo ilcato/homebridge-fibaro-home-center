@@ -263,7 +263,7 @@ export class FibaroAccessory {
           setFunction.call(this.platform.setFunctions, value, context, characteristic, service, IDs);
         }
         if (poller) {
-          poller.restartPoll(5000);
+          poller.restartPoll(constants.POLLER_RESTART_AFTER_SET_VALUE);
         }
       }
     }
