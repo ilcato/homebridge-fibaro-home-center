@@ -27,6 +27,8 @@ export const CERTIFICATE_PATHS = [
 
 export const HTTP_ACCEPT_HEADER = 'json';
 
+export const RETRY_DELAY_LOGIN = 300000;
+
 // Poller constants
 export const DEFAULT_POLLER_PERIOD = 3;
 export const DEFAULT_THERMOSTAT_MAX_TEMP = 100;
