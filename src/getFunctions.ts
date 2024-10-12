@@ -427,11 +427,22 @@ export class GetFunctions {
   }
 
   @characteristicGetter(Characteristics.ProgrammableSwitchEvent)
-  getProgrammableSwitchEvent(characteristic, _service, _IDs, properties) {
-    const v = Utils.getBoolean(properties.value);
-    if (v) {
-      characteristic.updateValue(this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
+  getProgrammableSwitchEvent(characteristic, service, _IDs, properties) {
+    if (service.isRemoteSceneController) {
+      if (properties.value % 2 === 1) { // 1 for single press, 0 for double press
+        characteristic.updateValue(this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
+      } else {
+        characteristic.updateValue(this.platform.Characteristic.ProgrammableSwitchEvent.LONG_PRESS);
+      }
+    } else if (service.isRemoteController) {
+      // TODO: Add support for remote controller
+      return;
     }
+  }
+
+  @characteristicGetter(Characteristics.ServiceLabelIndex)
+  getServiceLabelIndex(characteristic, service) {
+    characteristic.updateValue(service.remoteButtonNumber);
   }
 
   @characteristicGetter(Characteristics.AirQuality)

@@ -36,15 +36,17 @@ export class DeviceConfigurations {
       deviceControlType === constants.CONTROL_TYPE_LIGHTING_ALT;
 
     if (isLightingControl) {
-      return {
+      return [{
         service: Service.Lightbulb,
         characteristics: [Characteristic.On, Characteristic.Brightness],
-      };
+        subtype: device.id + '----',
+      }];
     } else {
-      return {
+      return [{
         service: Service.Switch,
         characteristics: [Characteristic.On],
-      };
+        subtype: device.id + '----',
+      }];
     }
   }
 
@@ -52,11 +54,12 @@ export class DeviceConfigurations {
   @DeviceType(/^com\.fibaro\.FGRGBW/)
   @DeviceType('com.fibaro.FGRGBW441M')
   @DeviceType('com.fibaro.colorController')
-  private static lightWithRGBW(Service, Characteristic) {
-    return {
+  private static lightWithRGBW(Service, Characteristic, device) {
+    return [{
       service: Service.Lightbulb,
       characteristics: [Characteristic.On, Characteristic.Brightness, Characteristic.Hue, Characteristic.Saturation],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   // Light / Switch / Outlet / Valve
@@ -88,31 +91,35 @@ export class DeviceConfigurations {
       deviceControlType === constants.CONTROL_TYPE_VALVE;
 
     if (isLightingDevice) {
-      return {
+      return [{
         service: Service.Lightbulb,
         characteristics: [Characteristic.On],
-      };
+        subtype: device.id + '----',
+      }];
     } else if (isOtherDevice) {
-      return {
+      return [{
         service: Service.Switch,
         characteristics: [Characteristic.On],
-      };
+        subtype: device.id + '----',
+      }];
     } else if (isLockDevice) {
-      return {
+      return [{
         service: Service.LockMechanism,
         characteristics: [Characteristic.LockCurrentState, Characteristic.LockTargetState],
         subtype: `${device.id}--${constants.SUBTYPE_LOCK}`,
-      };
+      }];
     } else if (isValveDevice) {
-      return {
+      return [{
         service: Service.Valve,
         characteristics: [Characteristic.Active, Characteristic.InUse, Characteristic.ValveType],
-      };
+        subtype: device.id + '----',
+      }];
     } else {
-      return {
+      return [{
         service: Service.Outlet,
         characteristics: [Characteristic.On, Characteristic.OutletInUse],
-      };
+        subtype: device.id + '----',
+      }];
     }
   }
 
@@ -143,11 +150,12 @@ export class DeviceConfigurations {
 
     // Garage door cases
     if (isGarageDoor) {
-      return {
+      return [{
         service: Service.GarageDoorOpener,
         characteristics: [
           Characteristic.CurrentDoorState, Characteristic.TargetDoorState, Characteristic.ObstructionDetected],
-      };
+        subtype: device.id + '----',
+      }];
     }
 
     // Window covering case
@@ -166,44 +174,48 @@ export class DeviceConfigurations {
     }
 
     if (isBaseShutter) {
-      return {
+      return [{
         service: Service.WindowCovering,
         characteristics: characteristics,
         subtype: device.id + '--' + constants.SUBTYPE_OPEN_CLOSE_ONLY,
-      };
+      }];
     } else {
-      return {
+      return [{
         service: Service.WindowCovering,
         characteristics: characteristics,
-      };
+        subtype: device.id + '----',
+      }];
     }
   }
 
   // Temperature sensor
   @DeviceType('com.fibaro.temperatureSensor')
-  private static temperatureSensor(Service, Characteristic) {
-    return {
+  private static temperatureSensor(Service, Characteristic, device) {
+    return [{
       service: Service.TemperatureSensor,
       characteristics: [Characteristic.CurrentTemperature],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   // Humidity sensor
   @DeviceType('com.fibaro.humiditySensor')
-  private static humiditySensor(Service, Characteristic) {
-    return {
+  private static humiditySensor(Service, Characteristic, device) {
+    return [{
       service: Service.HumiditySensor,
       characteristics: [Characteristic.CurrentRelativeHumidity],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   // Light sensor
   @DeviceType('com.fibaro.lightSensor')
-  private static lightSensor(Service, Characteristic) {
-    return {
+  private static lightSensor(Service, Characteristic, device) {
+    return [{
       service: Service.LightSensor,
       characteristics: [Characteristic.CurrentAmbientLightLevel],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   // Multilevel sensor
@@ -219,20 +231,23 @@ export class DeviceConfigurations {
       deviceRole === constants.DEVICE_ROLE_MULTILEVEL_SENSOR;
 
     if (isTemperatureSensor) {
-      return {
+      return [{
         service: Service.TemperatureSensor,
         characteristics: [Characteristic.CurrentTemperature],
-      };
+        subtype: device.id + '----',
+      }];
     } else if (isHumiditySensor) {
-      return {
+      return [{
         service: Service.HumiditySensor,
         characteristics: [Characteristic.CurrentRelativeHumidity],
-      };
+        subtype: device.id + '----',
+      }];
     } else if (isLightSensor) {
-      return {
+      return [{
         service: Service.LightSensor,
         characteristics: [Characteristic.CurrentAmbientLightLevel],
-      };
+        subtype: device.id + '----',
+      }];
     } else {
       throw new Error(`Unsupported device role for multilevel sensor: ${deviceRole}`);
     }
@@ -241,11 +256,12 @@ export class DeviceConfigurations {
   // Motion sensor
   @DeviceType(/^com\.fibaro\.FGMS/)
   @DeviceType('com.fibaro.motionSensor')
-  private static motionSensor(Service, Characteristic) {
-    return {
+  private static motionSensor(Service, Characteristic, device) {
+    return [{
       service: Service.MotionSensor,
       characteristics: [Characteristic.MotionDetected],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   // Doorbell / Contact sensor
@@ -264,53 +280,59 @@ export class DeviceConfigurations {
     const isDoorbell = device.id === config.doorbellDeviceId;
 
     if (isMotionSensor) {
-      return {
+      return [{
         service: Service.MotionSensor,
         characteristics: [Characteristic.MotionDetected],
-      };
+        subtype: device.id + '----',
+      }];
     } else if (isPresenceSensor) {
-      return {
+      return [{
         service: Service.OccupancySensor,
         characteristics: [Characteristic.OccupancyDetected],
-      };
+        subtype: device.id + '----',
+      }];
     } else if (isDoorbell) {
-      return {
+      return [{
         service: Service.Doorbell,
         characteristics: [Characteristic.ProgrammableSwitchEvent],
-      };
+        subtype: device.id + '----',
+      }];
     } else {
-      return {
+      return [{
         service: Service.ContactSensor,
         characteristics: [Characteristic.ContactSensorState],
-      };
+        subtype: device.id + '----',
+      }];
     }
   }
 
   // Leak sensor
   @DeviceType(/^com\.fibaro\.FGFS/)
   @DeviceType('com.fibaro.floodSensor')
-  private static leakSensor(Service, Characteristic) {
-    return {
+  private static leakSensor(Service, Characteristic, device) {
+    return [{
       service: Service.LeakSensor,
       characteristics: [Characteristic.LeakDetected],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   // Smoke sensor
   @DeviceType(/^com\.fibaro\.FGSS/)
   @DeviceType('com.fibaro.smokeSensor')
   @DeviceType('com.fibaro.gasDetector')
-  private static smokeSensor(Service, Characteristic) {
-    return {
+  private static smokeSensor(Service, Characteristic, device) {
+    return [{
       service: Service.SmokeSensor,
       characteristics: [Characteristic.SmokeDetected],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   // Carbon Monoxide Sensor
   @DeviceType(/^com\.fibaro\.FGCD/)
-  private static carbonMonoxideSensor(Service, Characteristic) {
-    return {
+  private static carbonMonoxideSensor(Service, Characteristic, device) {
+    return [{
       service: Service.CarbonMonoxideSensor,
       characteristics: [
         Characteristic.CarbonMonoxideDetected,
@@ -318,49 +340,71 @@ export class DeviceConfigurations {
         Characteristic.CarbonMonoxidePeakLevel,
         Characteristic.BatteryLevel,
       ],
-    };
+      subtype: device.id + '----',
+    }];
   }
 
   // Lock Mechanism
   @DeviceType('com.fibaro.doorLock')
   @DeviceType('com.fibaro.gerda')
-  private static lockMechanism(Service, Characteristic) {
-    return {
+  private static lockMechanism(Service, Characteristic, device) {
+    return [{
       service: Service.LockMechanism,
       characteristics: [
         Characteristic.LockCurrentState,
         Characteristic.LockTargetState,
       ],
-    };
+      subtype: device.id + '----',
+    }];
+  }
+
+  // Remote controller and remote scene controller
+  @DeviceType('com.fibaro.remoteController')
+  @DeviceType('com.fibaro.remoteSceneController')
+  private static remoteController(Service, Characteristic, device) {
+    const availableScenes = device.properties.availableScenes || [];
+    if (availableScenes.length === 0) { // Aeon Minimote like devices
+      return;
+    }
+    const numberOfButtons = Math.ceil(availableScenes.length / 2); // Assuming each button can trigger 2 scenes
+
+    return Array.from({ length: numberOfButtons }, (_, index) => ({
+      service: Service.StatelessProgrammableSwitch,
+      characteristics: [
+        Characteristic.ProgrammableSwitchEvent,
+        Characteristic.ServiceLabelIndex,
+      ],
+      subtype: `${device.id}---RS-${index + 1}`,
+    }));
   }
 
   // Security system
   @DeviceType(constants.DEVICE_TYPE_SECURITY_SYSTEM)
   private static securitySystem(Service, Characteristic) {
-    return {
+    return [{
       service: Service.SecuritySystem,
       characteristics: [
         Characteristic.SecuritySystemCurrentState,
         Characteristic.SecuritySystemTargetState,
       ],
       subtype: '0--',
-    };
+    }];
   }
 
   // Scene
   @DeviceType(constants.DEVICE_TYPE_SCENE)
   private static scene(Service, Characteristic, device) {
-    return {
+    return [{
       service: Service.Switch,
       characteristics: [Characteristic.On],
       subtype: device.id + '--' + constants.SUBTYPE_SCENE,
-    };
+    }];
   }
 
   // Climate zone (HC3)
   @DeviceType(constants.DEVICE_TYPE_CLIMATE_ZONE)
   private static climateZone(Service, Characteristic, device) {
-    return {
+    return [{
       service: Service.Thermostat,
       characteristics: [
         Characteristic.CurrentTemperature,
@@ -370,13 +414,13 @@ export class DeviceConfigurations {
         Characteristic.TemperatureDisplayUnits,
       ],
       subtype: device.id + '--' + constants.SUBTYPE_CLIMATE_ZONE,
-    };
+    }];
   }
 
   // Heating zone (HC2 and HCL)
   @DeviceType(constants.DEVICE_TYPE_HEATING_ZONE)
   private static heatingZone(Service, Characteristic, device) {
-    return {
+    return [{
       service: Service.Thermostat,
       characteristics: [
         Characteristic.CurrentTemperature,
@@ -386,27 +430,27 @@ export class DeviceConfigurations {
         Characteristic.TemperatureDisplayUnits,
       ],
       subtype: device.id + '--' + constants.SUBTYPE_HEATING_ZONE,
-    };
+    }];
   }
 
   // Global variables
   @DeviceType(constants.DEVICE_TYPE_GLOBAL_VARIABLE)
   private static globalVariable(Service, Characteristic, device) {
-    return {
+    return [{
       service: Service.Switch,
       characteristics: [Characteristic.On],
       subtype: device.type + '-' + device.name + '-',
-    };
+    }];
   }
 
   // Dimmer global variables
   @DeviceType(constants.DEVICE_TYPE_DIMMER_GLOBAL_VARIABLE)
   private static dimmerGlobalVariable(Service, Characteristic, device) {
-    return {
+    return [{
       service: Service.Lightbulb,
       characteristics: [Characteristic.On, Characteristic.Brightness],
       subtype: device.type + '-' + device.name + '-',
-    };
+    }];
   }
 }
 

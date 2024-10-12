@@ -68,6 +68,8 @@ export const SUBTYPE_CLIMATE_ZONE = 'CZ';
 export const SUBTYPE_HEATING_ZONE = 'HZ';
 export const SUBTYPE_OPEN_CLOSE_ONLY = 'OPENCLOSEONLY';
 export const SUBTYPE_PM2_5 = 'PM2_5';
+export const SUBTYPE_REMOTE_CONTROLLER = 'RC';
+export const SUBTYPE_REMOTE_SCENE_CONTROLLER = 'RS';
 
 // Configuration
 export const CONFIG_LOGS_LEVEL_VERBOSE = 2;
@@ -128,6 +130,7 @@ export enum Characteristics {
   Active = 'Active',
   InUse = 'InUse',
   ProgrammableSwitchEvent = 'ProgrammableSwitchEvent',
+  ServiceLabelIndex = 'ServiceLabelIndex',
   AirQuality = 'AirQuality',
   CurrentRelativeHumidity = 'CurrentRelativeHumidity',
   CurrentAmbientLightLevel = 'CurrentAmbientLightLevel',
