@@ -10,6 +10,8 @@ export class Poller {
   constructor(private platform, private pollerPeriod: number) { }
 
   async poll() {
+    const startTime = performance.now();
+
     if (this.pollingUpdateRunning) {
       return;
     }
@@ -17,7 +19,7 @@ export class Poller {
 
     try {
       if (this.platform.config.logsLevel > 1) {
-        this.platform.log.debug('Restarting poller...');
+        this.platform.log.info('Restarting poller...');
       }
 
       const { body: updates } = await this.platform.fibaroClient.refreshStates(this.lastPoll);
@@ -48,7 +50,14 @@ export class Poller {
       this.pollingUpdateRunning = false;
       this.restartPoll(this.pollerPeriod * 1000);
 
+      const endTime = performance.now();
+      const executionTime = endTime - startTime;
+      this.platform.log.info(`Poll execution time: ${executionTime.toFixed(2)} ms`);
+
     } catch (e) {
+      const endTime = performance.now();
+      const executionTime = endTime - startTime;
+      this.platform.log.error(`Poll execution time (error): ${executionTime.toFixed(2)} ms`);
       this.handlePollingError(e);
     }
   }
