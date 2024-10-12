@@ -52,7 +52,6 @@ export class DeviceConfigurations {
 
   // Light RGBW
   @DeviceType(/^com\.fibaro\.FGRGBW/)
-  @DeviceType('com.fibaro.FGRGBW441M')
   @DeviceType('com.fibaro.colorController')
   private static lightWithRGBW(Service, Characteristic, device) {
     return [{
