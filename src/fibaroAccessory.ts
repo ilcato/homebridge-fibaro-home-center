@@ -448,7 +448,7 @@ export class FibaroAccessory {
     } else {
       // If no matching DeviceClass was found, log that the device is not supported
       if (this.platform.config.logsLevel > 0) {
-        this.platform.log.info(`${this.device.name} [id: ${this.device.id}, type: ${type}]: device not supported`);
+        this.platform.log.debug(`${this.device.name} [id: ${this.device.id}, type: ${type}]: device not supported`);
       }
       return;
     }
