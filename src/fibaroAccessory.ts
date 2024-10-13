@@ -152,11 +152,11 @@ export class FibaroAccessory {
       }
 
       // Bind the characteristic to the service
-      this.bindCharacteristic(characteristic, service);
+      this.bindCharacteristic(characteristic, service, IDs);
     }
   }
 
-  bindCharacteristic(characteristic, service) {
+  bindCharacteristic(characteristic, service, IDs) {
     if (!characteristic || !service || !service.subtype) {
       return;
     }
@@ -165,7 +165,6 @@ export class FibaroAccessory {
       this.subscribeUpdate(service, characteristic, this.getPropertyToSubscribe(service, characteristic));
     }
 
-    const IDs = service.subtype.split('-');
     this.bindSetEvent(characteristic, service, IDs);
     this.bindGetEvent(characteristic, service, IDs);
   }
