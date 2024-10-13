@@ -39,6 +39,7 @@ export class FibaroHC implements DynamicPlatformPlugin {
   public getFunctions?: GetFunctions;
   public loginTimeout: NodeJS.Timeout | null = null;
   public rooms: { id: number; name: string }[] = [];
+  public devices;
 
   constructor(
     public readonly log: Logging,
@@ -144,48 +145,76 @@ export class FibaroHC implements DynamicPlatformPlugin {
       if (!this.fibaroClient) {
         return;
       }
-      this.info = (await this.fibaroClient.getInfo()).body;
-      const { body: scenes } = await this.fibaroClient.getScenes();
-      scenes.map((s) => {
-        this.scenes[s.name] = s.id;
-        if (s.name.startsWith('_')) {
-          const device = { name: s.name.substring(1), roomID: 0, id: s.id, type: 'scene' };
-          this.addAccessory(device);
-        }
-      });
-      if (this.isOldApi()) {
-        const { body: heatingZones } = await this.fibaroClient.getHeatingZones();
-        heatingZones.map((s) => {
-          this.climateZones[s.name] = s.id;
-          const device = { name: s.name, roomID: 0, id: s.id, type: 'heatingZone', properties: s.properties };
-          this.addAccessory(device);
-        });
-      } else {
-        const { body: climateZones } = await this.fibaroClient.getClimateZones();
-        climateZones.map((s) => {
-          this.climateZones[s.name] = s.id;
-          const device = { name: s.name, roomID: 0, id: s.id, type: 'climateZone', properties: s.properties };
-          this.addAccessory(device);
-        });
-      }
-      this.setFunctions = new SetFunctions(this);	// There's a dependency in setFunction to Scene Mapping
-      const devices = this.fibaroClient ? (await this.fibaroClient.getDevices()).body : {};
-      this.rooms = (await this.fibaroClient.getRooms()).body;
-      this.LoadAccessories(devices);
+      await this.fetchInfo();
+      await this.processScenes();
+      await this.processZones();
+      this.setFunctions = new SetFunctions(this);
+      await this.fetchDevicesAndRooms();
+      this.processDevices();
       this.log.info('Successfully logged in.');
     } catch (e) {
-      this.log.error('Error getting data from Home Center: ', e);
-      this.log.error('Make sure you provide the correct data: URL or IP, username and password'
-                     + ' and that HC is enabled and available on the same network as Homebridge.'
-                     + ' Using https may be mandatory if you configured HC to use it.');
-      this.log.error('Next try in 5 minutes');
-      if (this.loginTimeout) {
-        clearTimeout(this.loginTimeout);
-      }
-      this.loginTimeout = setTimeout(() => {
-        this.login();
-      }, 300000);
+      this.handleLoginError(e);
     }
+  }
+
+  private async fetchInfo() {
+    this.info = (await this.fibaroClient!.getInfo()).body;
+  }
+
+  private async processScenes() {
+    const { body: scenes } = await this.fibaroClient!.getScenes();
+    scenes.forEach((s) => {
+      this.scenes[s.name] = s.id;
+      if (s.name.startsWith('_')) {
+        const device = { name: s.name.substring(1), roomID: 0, id: s.id, type: 'scene' };
+        this.addAccessory(device);
+      }
+    });
+  }
+
+  private async processZones() {
+    if (this.isOldApi()) {
+      await this.processHeatingZones();
+    } else {
+      await this.processClimateZones();
+    }
+  }
+
+  private async processHeatingZones() {
+    const { body: heatingZones } = await this.fibaroClient!.getHeatingZones();
+    heatingZones.forEach((s) => {
+      this.climateZones[s.name] = s.id;
+      const device = { name: s.name, roomID: 0, id: s.id, type: 'heatingZone', properties: s.properties };
+      this.addAccessory(device);
+    });
+  }
+
+  private async processClimateZones() {
+    const { body: climateZones } = await this.fibaroClient!.getClimateZones();
+    climateZones.forEach((s) => {
+      this.climateZones[s.name] = s.id;
+      const device = { name: s.name, roomID: 0, id: s.id, type: 'climateZone', properties: s.properties };
+      this.addAccessory(device);
+    });
+  }
+
+  private async fetchDevicesAndRooms() {
+    this.devices = (await this.fibaroClient!.getDevices()).body;
+    this.rooms = (await this.fibaroClient!.getRooms()).body;
+  }
+
+  private handleLoginError(e: unknown) {
+    this.log.error('Error getting data from Home Center: ', e);
+    this.log.error('Make sure you provide the correct data: URL or IP, username and password'
+                   + ' and that HC is enabled and available on the same network as Homebridge.'
+                   + ' Using https may be mandatory if you configured HC to use it.');
+    this.log.error('Next try in 5 minutes');
+    if (this.loginTimeout) {
+      clearTimeout(this.loginTimeout);
+    }
+    this.loginTimeout = setTimeout(() => {
+      this.login();
+    }, constants.RETRY_DELAY_LOGIN);
   }
 
   /**
@@ -202,9 +231,9 @@ export class FibaroHC implements DynamicPlatformPlugin {
     this.accessories.push(accessory);
   }
 
-  LoadAccessories(devices) {
-    this.log.debug('Loading accessories');
-    devices.map((s) => {
+  processDevices() {
+    this.log.debug('Processing devices');
+    this.devices.map((s) => {
       if (s.visible === true && !s.name.startsWith('_')) {
         if (this.config.addRoomNameToDeviceName === 'enabled' && this.rooms) {
           // patch device name with the room name
