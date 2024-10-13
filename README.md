@@ -384,7 +384,7 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 
 ### Version 3.1.0
 
-- Added support for remote scene controller (like Aeon Labs Minimote).
+- Initial support for remote controller (tested with Aeon Labs Minimote, Fibaro Button).
 - Dependencies updates.
 
 ### Version 3.0.0

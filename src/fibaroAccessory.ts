@@ -193,8 +193,8 @@ export class FibaroAccessory {
     service.isHeatingZone = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_HEATING_ZONE;
     service.isOpenCloseOnly = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_OPEN_CLOSE_ONLY;
     service.isPM2_5Sensor = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_PM2_5;
-    service.isRemoteController = IDs.length >= 5 && IDs[3] === constants.SUBTYPE_REMOTE_CONTROLLER;
-    service.isRemoteSceneController = IDs.length >= 5 && IDs[3] === constants.SUBTYPE_REMOTE_SCENE_CONTROLLER;
+    service.isRemoteControllerCentralScene = IDs.length >= 5 && IDs[3] === constants.SUBTYPE_REMOTE_CONTROLLER_CENTRAL_SCENE;
+    service.isRemoteControllerSceneActivation = IDs.length >= 5 && IDs[3] === constants.SUBTYPE_REMOTE_CONTROLLER_SCENE_ACTIVATION;
     service.remoteButtonNumber = IDs.length >= 5 ? parseInt(IDs[4]) : -1;
   }
 

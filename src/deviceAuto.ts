@@ -360,21 +360,35 @@ export class DeviceConfigurations {
   // Remote controller and remote scene controller
   @DeviceType('com.fibaro.remoteController')
   @DeviceType('com.fibaro.remoteSceneController')
+  @DeviceType(/^com\.fibaro\.FGPB/)
   private static remoteController(Service, Characteristic, device) {
     const availableScenes = device.properties.availableScenes || [];
-    if (availableScenes.length === 0) { // Aeon Minimote like devices
-      return;
-    }
-    const numberOfButtons = Math.ceil(availableScenes.length / 2); // Assuming each button can trigger 2 scenes
+    const centralSceneSupport = device.properties.centralSceneSupport || [];
+    if (availableScenes.length > 0) { // Aeon Minimote like devices
+      const numberOfButtons = Math.ceil(availableScenes.length / 2); // Assuming each button can trigger 2 scenes
 
-    return Array.from({ length: numberOfButtons }, (_, index) => ({
-      service: Service.StatelessProgrammableSwitch,
-      characteristics: [
-        Characteristic.ProgrammableSwitchEvent,
-        Characteristic.ServiceLabelIndex,
-      ],
-      subtype: `${device.id}---RS-${index + 1}`,
-    }));
+      return Array.from({ length: numberOfButtons }, (_, index) => ({
+        service: Service.StatelessProgrammableSwitch,
+        characteristics: [
+          Characteristic.ProgrammableSwitchEvent,
+          Characteristic.ServiceLabelIndex,
+        ],
+        subtype: `${device.id}---${constants.SUBTYPE_REMOTE_CONTROLLER_SCENE_ACTIVATION}-${index + 1}`,
+      }));
+    } else if (centralSceneSupport.length > 0) { // Fibaro button like devices
+      const parsedCentralSceneSupport = JSON.parse(centralSceneSupport);
+
+      return parsedCentralSceneSupport.map(keys => ({
+        service: Service.StatelessProgrammableSwitch,
+        characteristics: [
+          Characteristic.ProgrammableSwitchEvent,
+          Characteristic.ServiceLabelIndex,
+        ],
+        subtype: `${device.id}---${constants.SUBTYPE_REMOTE_CONTROLLER_CENTRAL_SCENE}-${keys.keyId}`,
+      }));
+    }
+    // No supported configuration is found
+    return;
   }
 
   // Security system

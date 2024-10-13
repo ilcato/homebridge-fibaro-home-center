@@ -67,18 +67,30 @@ export class Poller {
   private handleEvent(event) {
     const { type, data } = event;
     const deviceId = data.deviceId || 'N/A';
-    const sceneId = data.sceneId || 'N/A';
 
-    // Create a change object in order to reuse the manageValue function
-    const change = { id: deviceId, value: sceneId };
     switch (type) {
-      case 'SceneActivationEvent':
+      case 'SceneActivationEvent': {
+        const sceneId = data.sceneId || 'N/A';
+        // Create a change object in order to reuse the manageValue function
+        const change = { id: deviceId, value: sceneId };
         this.manageValue(change);
+        this.platform.log.info(`Processed event scene-${sceneId} of type ${type} from device ${deviceId}`);
         break;
+      }
+      case 'CentralSceneEvent': {
+        // key number pressed, starting from 1
+        const keyId = data.keyId || 'N/A';
+        // key pressed mode: "Pressed" for single press, "Pressed2" for double press, "HeldDown" for long press
+        const keyAttribute = data.keyAttribute || 'N/A';
+        // Create a change object in order to reuse the manageValue function
+        const change = { id: deviceId, value: keyAttribute, button: keyId };
+        this.manageValue(change);
+        this.platform.log.info(`Processed event ${keyAttribute} of type ${type} from device ${deviceId} key ${keyId}`);
+        break;
+      }
       default:
         return;
     }
-    this.platform.log.info(`Processed event ${sceneId} of type ${type} from device ${deviceId}`);
   }
 
   private handleChange(change) {
@@ -138,13 +150,21 @@ export class Poller {
             change.value = (change.value - 32) * 5 / 9;
           }
 
-          if (service.isRemoteSceneController) {
-            const buttonNumber = service.remoteButtonNumber;
-            const eventNumber = change.value;
-            // Each button handles two consecutive events starting from button 1. Skip if not in range.
-            if (!(eventNumber >= (buttonNumber - 1) * 2 + 1 && eventNumber <= buttonNumber * 2) ||
-                characteristic.constructor !== this.platform.Characteristic.ProgrammableSwitchEvent) {
+          if (service.remoteButtonNumber) {
+            if (characteristic.constructor !== this.platform.Characteristic.ProgrammableSwitchEvent) {
               return;
+            }
+            if (service.isRemoteControllerSceneActivation) {
+              const buttonNumber = service.remoteButtonNumber;
+              const eventNumber = change.value;
+              // Each button handles two consecutive events starting from button 1. Skip if not in range.
+              if (!(eventNumber >= (buttonNumber - 1) * 2 + 1 && eventNumber <= buttonNumber * 2)) {
+                return;
+              }
+            } else if (service.isRemoteControllerCentralScene) {
+              if (service.remoteButtonNumber !== change.button) {
+                return;
+              }
             }
           }
 

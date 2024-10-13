@@ -428,15 +428,26 @@ export class GetFunctions {
 
   @characteristicGetter(Characteristics.ProgrammableSwitchEvent)
   getProgrammableSwitchEvent(characteristic, service, _IDs, properties) {
-    if (service.isRemoteSceneController) {
+    if (service.isRemoteControllerSceneActivation) {
       if (properties.value % 2 === 1) { // 1 for single press, 0 for double press
         characteristic.updateValue(this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
       } else {
         characteristic.updateValue(this.platform.Characteristic.ProgrammableSwitchEvent.LONG_PRESS);
       }
-    } else if (service.isRemoteController) {
-      // TODO: Add support for remote controller
-      return;
+    } else if (service.isRemoteControllerCentralScene) {
+      switch (properties.value) {
+        case 'Pressed':
+          characteristic.updateValue(this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
+          break;
+        case 'Pressed2':
+          characteristic.updateValue(this.platform.Characteristic.ProgrammableSwitchEvent.DOUBLE_PRESS);
+          break;
+        case 'HeldDown':
+          characteristic.updateValue(this.platform.Characteristic.ProgrammableSwitchEvent.LONG_PRESS);
+          break;
+        default:
+          return;
+      }
     }
   }
 
