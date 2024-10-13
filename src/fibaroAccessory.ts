@@ -109,7 +109,6 @@ export class FibaroAccessory {
     for (let i = 0; i < characteristics.length; i++) {
       const characteristic = service.getCharacteristic(characteristics[i]);
 
-      // Case 1: Ambient Light Sensor
       // Set the range for light level measurements
       if (characteristic.constructor === this.platform.Characteristic.CurrentAmbientLightLevel) {
         characteristic.props.maxValue = 100000;
@@ -117,40 +116,34 @@ export class FibaroAccessory {
         characteristic.props.minValue = 0;
       }
 
-      // Case 2: Temperature Sensor
       // Set the minimum temperature that can be reported
       if (characteristic.constructor === this.platform.Characteristic.CurrentTemperature) {
         characteristic.props.minValue = -50;
       }
 
-      // Case 3: Thermostat
       // Set the maximum target temperature based on configuration
       if (characteristic.constructor === this.platform.Characteristic.TargetTemperature) {
         characteristic.props.maxValue = this.platform.config.thermostatmaxtemperature;
       }
 
-      // Case 4: Valve
       // Set the default valve type to generic
       if (characteristic.constructor === this.platform.Characteristic.ValveType) {
         characteristic.value = this.platform.Characteristic.ValveType.GENERIC_VALVE;
       }
 
-      // Case 5: Air Quality Sensor
       // Set the initial air quality status to unknown
       if (characteristic.constructor === this.platform.Characteristic.AirQuality) {
         characteristic.value = this.platform.Characteristic.AirQuality.UNKNOWN;
       }
 
-      // Case 6: Remote controller scene activation
-      // Set the remote controller button states
+      // Set the remote controller scene activationbutton options
       if (service.isRemoteControllerSceneActivation &&
         characteristic.constructor === this.platform.Characteristic.ProgrammableSwitchEvent) {
         characteristic.props.validValues = [this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS,
           this.platform.Characteristic.ProgrammableSwitchEvent.LONG_PRESS];
       }
 
-      // Case 7: Remote controller central scene
-      // Set the remote controller button states
+      // Set the remote controller central scene button options
       if (service.isRemoteControllerCentralScene &&
         characteristic.constructor === this.platform.Characteristic.ProgrammableSwitchEvent) {
         characteristic.props.validValues = [this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS,
