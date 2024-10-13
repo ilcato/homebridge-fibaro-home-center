@@ -141,10 +141,20 @@ export class FibaroAccessory {
         characteristic.value = this.platform.Characteristic.AirQuality.UNKNOWN;
       }
 
-      // Case 6: Remote controller and remote scene controller
+      // Case 6: Remote controller scene activation
       // Set the remote controller button states
-      if (service.isRemoteSceneController && characteristic.constructor === this.platform.Characteristic.ProgrammableSwitchEvent) {
+      if (service.isRemoteControllerSceneActivation &&
+        characteristic.constructor === this.platform.Characteristic.ProgrammableSwitchEvent) {
         characteristic.props.validValues = [this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS,
+          this.platform.Characteristic.ProgrammableSwitchEvent.LONG_PRESS];
+      }
+
+      // Case 7: Remote controller central scene
+      // Set the remote controller button states
+      if (service.isRemoteControllerCentralScene &&
+        characteristic.constructor === this.platform.Characteristic.ProgrammableSwitchEvent) {
+        characteristic.props.validValues = [this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS,
+          this.platform.Characteristic.ProgrammableSwitchEvent.DOUBLE_PRESS,
           this.platform.Characteristic.ProgrammableSwitchEvent.LONG_PRESS];
       }
 
@@ -179,8 +189,8 @@ export class FibaroAccessory {
     //   "D"           for dimmer global variables,
     //   "PM2.5"       for PM2.5 sensor
     // IDs[3] is for remote controllers and remote scene controllers and represent the remote controller type:
-    //   "RC"          for remote controller,
-    //   "RS"          for remote scene controller
+    //   "CS"          for remote controller central scene,
+    //   "SA"          for remote controller scene activation
     // IDs[4] is for remote controllers and remote scene controllers and represent the remote controller button number
 
     service.isVirtual = IDs[1] !== '';
