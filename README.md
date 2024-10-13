@@ -384,7 +384,8 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 
 ### Version 3.1.0
 
-- Initial support for remote controller (tested with Aeon Labs Minimote, Fibaro Button).
+- Initial support for remote controller (tested with Aeon Labs Minimote, Fibaro Button, Fibaro Walli Switch).
+- More granular control on poller period parameter: now you can set decimals (e.g. 0.5 s).
 - Dependencies updates.
 
 ### Version 3.0.0
