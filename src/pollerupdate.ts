@@ -1,6 +1,7 @@
 // pollerupdate.ts
 
 import * as constants from './constants';
+import { Utils } from './utils';
 
 export class Poller {
   private pollingUpdateRunning: boolean = false;
@@ -255,7 +256,7 @@ export class Poller {
   manageColor(change) {
     this.platform.updateSubscriptions.forEach(subscription => {
       if (parseInt(subscription.id) === change.id && subscription.property === 'color') {
-        const hsv = this.platform.getFunctions.updateHomeKitColorFromHomeCenter(change.color, subscription.service);
+        const hsv = Utils.updateHomeKitColorFromHomeCenter(change.color);
         const { characteristic } = subscription;
         if (characteristic.constructor === this.platform.Characteristic.On) {
           characteristic.updateValue(hsv.v === 0 ? false : true);

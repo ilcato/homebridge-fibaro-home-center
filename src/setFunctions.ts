@@ -392,19 +392,21 @@ export class SetFunctions {
     const result = await this.platform.fibaroClient.executeDeviceAction(IDs[0], c, value);
 
     if (this.platform.config.logsLevel >= 1) {
-      const nc = c.replace(/turnOn|turnOff|setValue|open|close/g, match => {
+      const nc = c.replace(/turnOn|turnOff|setValue|open|close|setColor/g, match => {
         const replacements = {
           turnOn: 'On',
           turnOff: 'Off',
           setValue: '',
           open: 'Open',
           close: 'Close',
+          setColor: 'Color',
         };
         return replacements[match] || match;
       });
 
       const logMessage = `${service.displayName} [${IDs[0]}]: set ${nc}${
-        value !== null && nc !== 'Open' && nc !== 'Close' ? ` ${value}%` : ''
+        value !== null && nc !== 'Open' && nc !== 'Close' && nc !== 'Color' ? ` ${value}%` :
+          (value !== null && nc === 'Color' ? ` ${value}` : '')
       }`;
 
       this.platform.log(logMessage);
