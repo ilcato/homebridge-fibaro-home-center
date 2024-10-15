@@ -279,40 +279,42 @@ export class FibaroAccessory {
       this.platform.log.error('No Fibaro client available.');
       callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
       return;
+    } else {
+      // communicate to HomeKit the current value of the characteristic.
+      // the logic that follows may update the value or return error in case it is not able to get the updated value
+      callback(undefined, characteristic.value);
     }
+
 
     try {
       if (service.isSecuritySystem) {
-        await this.handleSecuritySystem(characteristic, service, IDs, callback);
+        await this.handleSecuritySystem(characteristic, service, IDs);
       } else if (service.isGlobalVariableSwitch || service.isGlobalVariableDimmer) {
-        await this.handleGlobalVariable(characteristic, service, IDs, callback);
+        await this.handleGlobalVariable(characteristic, service, IDs);
       } else {
-        await this.handleDefaultCase(characteristic, service, IDs, callback);
+        await this.handleDefaultCase(characteristic, service, IDs);
       }
     } catch (e) {
-      callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+      characteristic.updateValue(new Error(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE.toString()));
       this.platform.log.error('G1 - There was a problem getting value from: ', `${IDs[0]} - Err: ${e}`);
     }
   }
 
-  private async handleSecuritySystem(characteristic, service, IDs, callback) {
+  private async handleSecuritySystem(characteristic, service, IDs) {
     const securitySystemStatus = (await this.platform.fibaroClient!.getGlobalVariable(constants.SECURITY_SYSTEM_GLOBAL_VARIABLE)).body;
     this.platform.getFunctions!.getSecuritySystemState(characteristic, service, IDs, securitySystemStatus);
-    callback(undefined, characteristic.value);
   }
 
-  private async handleGlobalVariable(characteristic, service, IDs, callback) {
+  private async handleGlobalVariable(characteristic, service, IDs) {
     const value = (await this.platform.fibaroClient!.getGlobalVariable(IDs[1])).body;
 
     const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(characteristic.constructor);
     if (getFunction) {
       getFunction.call(this.platform.getFunctions, characteristic, service, IDs, value);
     }
-
-    callback(undefined, characteristic.value);
   }
 
-  private async handleDefaultCase(characteristic, service, IDs, callback) {
+  private async handleDefaultCase(characteristic, service, IDs) {
     const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(characteristic.constructor);
     if (getFunction) {
       const properties = await this.getDeviceProperties(service, IDs[0]);
@@ -322,9 +324,9 @@ export class FibaroAccessory {
       }
 
       this.handleDeadDeviceStatus(service, properties, IDs[0]);
-      this.callGetFunctionAndHandleResult(getFunction, characteristic, service, IDs, properties, callback);
+      this.callGetFunctionAndHandleResult(getFunction, characteristic, service, IDs, properties);
     } else {
-      callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+      characteristic.updateValue(new Error(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE.toString()));
       this.platform.log.error('No get function defined for: ', `${characteristic.displayName}`);
     }
   }
@@ -360,22 +362,16 @@ export class FibaroAccessory {
     }
   }
 
-  private callGetFunctionAndHandleResult(getFunction, characteristic, service, IDs, properties, callback) {
+  private callGetFunctionAndHandleResult(getFunction, characteristic, service, IDs, properties) {
     if (properties.dead === true) {
       if (this.platform.config.markDeadDevices) {
         // Report dead status to HomeKit
-        callback(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+        characteristic.updateValue(new Error(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE.toString()));
       } else {
-        // Return the last known value
-        callback(undefined, characteristic.value);
+        // Do nothing, we already set the last known value before
+        return;
       }
     } else {
-      if (characteristic.constructor === this.platform.Characteristic.ServiceLabelIndex) {
-        this.platform.log.info(`${this.device.name} [${IDs[0]}]:`, 'getting', `${characteristic.displayName}`,
-          'value:', service.remoteButtonNumber);
-      }
-      callback(undefined, characteristic.value);
-      // The get function call may update the value with updatValue api
       getFunction.call(this.platform.getFunctions, characteristic, service, IDs, properties);
     }
   }

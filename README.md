@@ -382,24 +382,15 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 
 # Latest release notes
 
+### Version 3.1.1
+
+- Fixed issue #507
+- Dependencies updates.
+
 ### Version 3.1.0
 
 - Initial support for remote controller (tested with Aeon Labs Minimote, Fibaro Button, Fibaro Walli Switch).
 - More granular control on poller period parameter: now you can set decimals (e.g. 0.5 s).
 - Dependencies updates.
-
-### Version 3.0.0
-
-- Main refactoring of code.
-- Significant reduction in device response time (especially for dimmers).
-- Option to mark dead devices as not responding in HomeKit.
-- Log dead devices.
-- Improvements for poller.
-- Ability to add a room name before or after the device name.
-- Display room name in device info.
-- Checking if the roller shutter has reached the required position to prevent endless Opening or Closing status.
-- Add support for Outlet in individual device config.
-- Dependencies updates.
-
 
 #### See all: [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)
