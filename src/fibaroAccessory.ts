@@ -355,7 +355,7 @@ export class FibaroAccessory {
     }
 
     // Log dead status once per service
-    if (properties.dead === true && !service.deadLogged) {
+    if ((properties.dead === true || properties.dead === 'true') && !service.deadLogged) {
       this.platform.log.warn('Device dead: ',
         `${deviceId}  service: ${service.displayName}, reason: ${properties.deadReason}`);
       service.deadLogged = true;
@@ -363,7 +363,7 @@ export class FibaroAccessory {
   }
 
   private callGetFunctionAndHandleResult(getFunction, characteristic, service, IDs, properties) {
-    if (properties.dead === true) {
+    if (properties.dead === true || properties.dead === 'true') {
       if (this.platform.config.markDeadDevices) {
         // Report dead status to HomeKit
         characteristic.updateValue(new Error(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE.toString()));
