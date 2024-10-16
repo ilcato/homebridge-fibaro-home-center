@@ -376,8 +376,14 @@ export class DeviceConfigurations {
         subtype: `${device.id}---${constants.SUBTYPE_REMOTE_CONTROLLER_SCENE_ACTIVATION}-${index + 1}`,
       }));
     } else if (centralSceneSupport.length > 0) { // Fibaro button like devices
-      const parsedCentralSceneSupport = JSON.parse(centralSceneSupport);
-
+      let parsedCentralSceneSupport = centralSceneSupport;
+      if (typeof centralSceneSupport === 'string') {
+        try {
+          parsedCentralSceneSupport = JSON.parse(centralSceneSupport);
+        } catch {
+          return;
+        }
+      }
       return parsedCentralSceneSupport.map(keys => ({
         service: Service.StatelessProgrammableSwitch,
         characteristics: [
