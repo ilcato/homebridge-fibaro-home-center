@@ -71,54 +71,55 @@ export class DeviceConfigurations {
   @DeviceType(/^com\.fibaro\.FGWOEF/)
   private static variousSwitches(Service, Characteristic, device) {
     const { deviceControlType } = device.properties || {};
+    const controlType = typeof deviceControlType === 'string'
+      ? parseInt(deviceControlType, 10)
+      : (deviceControlType || constants.CONTROL_TYPE_OTHER_DEVICE);
 
-    const isLightingDevice =
-      deviceControlType === constants.CONTROL_TYPE_LIGHTING ||
-      deviceControlType === constants.CONTROL_TYPE_BEDSIDE_LAMP ||
-      deviceControlType === constants.CONTROL_TYPE_WALL_LAMP;
+    switch (controlType) {
+      // Lighting devices
+      case constants.CONTROL_TYPE_LIGHTING:
+      case constants.CONTROL_TYPE_BEDSIDE_LAMP:
+      case constants.CONTROL_TYPE_WALL_LAMP:
+        return [{
+          service: Service.Lightbulb,
+          characteristics: [Characteristic.On],
+          subtype: `${device.id}----`,
+        }];
 
-    const isOtherDevice =
-      deviceControlType === constants.CONTROL_TYPE_OTHER_DEVICE ||
-      deviceControlType === constants.CONTROL_TYPE_OTHER_DEVICE_ALT;
+      // Other devices
+      case constants.CONTROL_TYPE_OTHER_DEVICE:
+      case constants.CONTROL_TYPE_OTHER_DEVICE_ALT:
+        return [{
+          service: Service.Switch,
+          characteristics: [Characteristic.On],
+          subtype: `${device.id}----`,
+        }];
 
-    const isLockDevice =
-      deviceControlType === constants.CONTROL_TYPE_VIDEO_INTERCOM ||
-      deviceControlType === constants.CONTROL_TYPE_VIDEO_GATE_OPEN;
+      // Lock devices
+      case constants.CONTROL_TYPE_VIDEO_INTERCOM:
+      case constants.CONTROL_TYPE_VIDEO_GATE_OPEN:
+        return [{
+          service: Service.LockMechanism,
+          characteristics: [Characteristic.LockCurrentState, Characteristic.LockTargetState],
+          subtype: `${device.id}--${constants.SUBTYPE_LOCK}`,
+        }];
 
-    const isValveDevice =
-      deviceControlType === constants.CONTROL_TYPE_SPRINKLER ||
-      deviceControlType === constants.CONTROL_TYPE_VALVE;
+      // Valve devices
+      case constants.CONTROL_TYPE_SPRINKLER:
+      case constants.CONTROL_TYPE_VALVE:
+        return [{
+          service: Service.Valve,
+          characteristics: [Characteristic.Active, Characteristic.InUse, Characteristic.ValveType],
+          subtype: `${device.id}----`,
+        }];
 
-    if (isLightingDevice) {
-      return [{
-        service: Service.Lightbulb,
-        characteristics: [Characteristic.On],
-        subtype: device.id + '----',
-      }];
-    } else if (isOtherDevice) {
-      return [{
-        service: Service.Switch,
-        characteristics: [Characteristic.On],
-        subtype: device.id + '----',
-      }];
-    } else if (isLockDevice) {
-      return [{
-        service: Service.LockMechanism,
-        characteristics: [Characteristic.LockCurrentState, Characteristic.LockTargetState],
-        subtype: `${device.id}--${constants.SUBTYPE_LOCK}`,
-      }];
-    } else if (isValveDevice) {
-      return [{
-        service: Service.Valve,
-        characteristics: [Characteristic.Active, Characteristic.InUse, Characteristic.ValveType],
-        subtype: device.id + '----',
-      }];
-    } else {
-      return [{
-        service: Service.Outlet,
-        characteristics: [Characteristic.On, Characteristic.OutletInUse],
-        subtype: device.id + '----',
-      }];
+      // Default case
+      default:
+        return [{
+          service: Service.Outlet,
+          characteristics: [Characteristic.On, Characteristic.OutletInUse],
+          subtype: `${device.id}----`,
+        }];
     }
   }
 
