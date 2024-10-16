@@ -30,10 +30,13 @@ export class DeviceConfigurations {
   @DeviceType('com.fibaro.FGWD111')
   private static lightWithSwitchOrDimmer(Service, Characteristic, device) {
     const { deviceControlType } = device.properties || {};
+    const controlType = typeof deviceControlType === 'string'
+      ? parseInt(deviceControlType, 10)
+      : deviceControlType;
 
     const isLightingControl =
-      deviceControlType === constants.CONTROL_TYPE_LIGHTING ||
-      deviceControlType === constants.CONTROL_TYPE_LIGHTING_ALT;
+      controlType === constants.CONTROL_TYPE_LIGHTING ||
+      controlType === constants.CONTROL_TYPE_LIGHTING_ALT;
 
     if (isLightingControl) {
       return [{
@@ -73,7 +76,7 @@ export class DeviceConfigurations {
     const { deviceControlType } = device.properties || {};
     const controlType = typeof deviceControlType === 'string'
       ? parseInt(deviceControlType, 10)
-      : (deviceControlType || constants.CONTROL_TYPE_OTHER_DEVICE);
+      : deviceControlType;
 
     switch (controlType) {
       // Lighting devices
@@ -134,15 +137,18 @@ export class DeviceConfigurations {
   private static windowCoveringAndGarageDoor(Service, Characteristic, device) {
     const properties = device.properties || {};
     const { deviceControlType } = properties;
+    const controlType = typeof deviceControlType === 'string'
+      ? parseInt(deviceControlType, 10)
+      : deviceControlType;
 
     const isGarageDoor =
-      deviceControlType === constants.CONTROL_TYPE_GATE_WITH_POSITIONING ||
-      deviceControlType === constants.CONTROL_TYPE_GARAGE_DOOR ||
+      controlType === constants.CONTROL_TYPE_GATE_WITH_POSITIONING ||
+      controlType === constants.CONTROL_TYPE_GARAGE_DOOR ||
       device.type === 'com.fibaro.barrier' ||
       (device.type === 'com.fibaro.baseShutter' && !properties.favoritePositionsNativeSupport);
 
     const isBlindsWithPositioning =
-     deviceControlType === constants.CONTROL_TYPE_BLINDS_WITH_POSITIONING;
+      controlType === constants.CONTROL_TYPE_BLINDS_WITH_POSITIONING;
 
     const isBaseShutter =
       device.type === 'com.fibaro.baseShutter' ||
@@ -223,12 +229,13 @@ export class DeviceConfigurations {
   private static multilevelSensor(Service, Characteristic, device) {
     const properties = device.properties || {};
     const { deviceRole } = properties;
+    const role = typeof deviceRole === 'string' ? parseInt(deviceRole, 10) : deviceRole;
 
-    const isTemperatureSensor = deviceRole === constants.DEVICE_ROLE_TEMPERATURE_SENSOR;
+    const isTemperatureSensor = role === constants.DEVICE_ROLE_TEMPERATURE_SENSOR;
     const isHumiditySensor = deviceRole === constants.DEVICE_ROLE_HUMIDITY_SENSOR;
     const isLightSensor =
-      deviceRole === constants.DEVICE_ROLE_LIGHT_SENSOR ||
-      deviceRole === constants.DEVICE_ROLE_MULTILEVEL_SENSOR;
+      role === constants.DEVICE_ROLE_LIGHT_SENSOR ||
+      role === constants.DEVICE_ROLE_MULTILEVEL_SENSOR;
 
     if (isTemperatureSensor) {
       return [{
@@ -274,9 +281,10 @@ export class DeviceConfigurations {
   private static doorbellContactSensor(Service, Characteristic, device, config) {
     const properties = device.properties || {};
     const { deviceRole } = properties;
+    const role = typeof deviceRole === 'string' ? parseInt(deviceRole, 10) : deviceRole;
 
-    const isMotionSensor = deviceRole === constants.DEVICE_ROLE_MOTION_SENSOR;
-    const isPresenceSensor = deviceRole === constants.DEVICE_ROLE_PRESENCE_SENSOR;
+    const isMotionSensor = role === constants.DEVICE_ROLE_MOTION_SENSOR;
+    const isPresenceSensor = role === constants.DEVICE_ROLE_PRESENCE_SENSOR;
     const isDoorbell = device.id === config.doorbellDeviceId;
 
     if (isMotionSensor) {
