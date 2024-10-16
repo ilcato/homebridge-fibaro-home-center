@@ -432,7 +432,7 @@ export class FibaroAccessory {
     // If a matching deviceConfigFunction was found
     if (deviceConfigFunction) {
       // Set the configuration for this device by calling deviceConfigFunction
-      return deviceConfigFunction.call(null, Service, Characteristic, this.device, this.platform.config);
+      return deviceConfigFunction.call(null, Service, Characteristic, this.device, this.platform.config, this.platform.log);
     } else {
       // If no matching DeviceClass was found, log that the device is not supported
       if (this.platform.config.logsLevel > 0) {

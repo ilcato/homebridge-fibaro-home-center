@@ -3,11 +3,11 @@
 import * as constants from './constants';
 
 // Configuration for automatic device setup
-type DeviceConfigFunction = (Service, Characteristic, device, config?) => {
+type DeviceConfigFunction = (Service, Characteristic, device, config?, log?) => Array<{
   service;
   characteristics;
   subtype?: string;
-};
+}>;
 
 const autoDeviceConfigs = new Map<string | RegExp, DeviceConfigFunction>();
 
@@ -226,7 +226,7 @@ export class DeviceConfigurations {
 
   // Multilevel sensor
   @DeviceType('com.fibaro.multilevelSensor')
-  private static multilevelSensor(Service, Characteristic, device) {
+  private static multilevelSensor(Service, Characteristic, device, config, log) {
     const properties = device.properties || {};
     const { deviceRole } = properties;
     const role = typeof deviceRole === 'string' ? parseInt(deviceRole, 10) : deviceRole;
@@ -256,7 +256,7 @@ export class DeviceConfigurations {
         subtype: device.id + '----',
       }];
     } else {
-      throw new Error(`Unsupported device role for multilevel sensor: ${deviceRole}`);
+      log.debug(`Unsupported device role for ID: ${device.id}, type: ${device.type}, role: ${deviceRole}`);
     }
   }
 
