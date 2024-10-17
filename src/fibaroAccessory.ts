@@ -43,7 +43,7 @@ export class FibaroAccessory {
         this.device.type :
         'HomeCenter Bridged Accessory'}`);
 
-    // Construct the serial number string
+    // Construct the serial number string (max 64 characters)
     let serialNumberValue = `ID:${this.device.id}`;
     let remainingLength = 64 - serialNumberValue.length;
 

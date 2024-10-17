@@ -231,32 +231,32 @@ export class DeviceConfigurations {
     const { deviceRole } = properties;
     const role = typeof deviceRole === 'string' ? parseInt(deviceRole, 10) : deviceRole;
 
-    const isTemperatureSensor = role === constants.DEVICE_ROLE_TEMPERATURE_SENSOR;
-    const isHumiditySensor = deviceRole === constants.DEVICE_ROLE_HUMIDITY_SENSOR;
-    const isLightSensor =
-      role === constants.DEVICE_ROLE_LIGHT_SENSOR ||
-      role === constants.DEVICE_ROLE_MULTILEVEL_SENSOR;
+    switch (role) {
+      case constants.DEVICE_ROLE_TEMPERATURE_SENSOR:
+        return [{
+          service: Service.TemperatureSensor,
+          characteristics: [Characteristic.CurrentTemperature],
+          subtype: device.id + '----',
+        }];
 
-    if (isTemperatureSensor) {
-      return [{
-        service: Service.TemperatureSensor,
-        characteristics: [Characteristic.CurrentTemperature],
-        subtype: device.id + '----',
-      }];
-    } else if (isHumiditySensor) {
-      return [{
-        service: Service.HumiditySensor,
-        characteristics: [Characteristic.CurrentRelativeHumidity],
-        subtype: device.id + '----',
-      }];
-    } else if (isLightSensor) {
-      return [{
-        service: Service.LightSensor,
-        characteristics: [Characteristic.CurrentAmbientLightLevel],
-        subtype: device.id + '----',
-      }];
-    } else {
-      log.debug(`Unsupported device role for ID: ${device.id}, type: ${device.type}, role: ${deviceRole}`);
+      case constants.DEVICE_ROLE_HUMIDITY_SENSOR:
+        return [{
+          service: Service.HumiditySensor,
+          characteristics: [Characteristic.CurrentRelativeHumidity],
+          subtype: device.id + '----',
+        }];
+
+      case constants.DEVICE_ROLE_LIGHT_SENSOR:
+      case constants.DEVICE_ROLE_MULTILEVEL_SENSOR:
+        return [{
+          service: Service.LightSensor,
+          characteristics: [Characteristic.CurrentAmbientLightLevel],
+          subtype: device.id + '----',
+        }];
+
+      default:
+        log.debug(`Unsupported device role for ID: ${device.id}, type: ${device.type}, role: ${deviceRole}`);
+        return;
     }
   }
 
@@ -283,34 +283,34 @@ export class DeviceConfigurations {
     const { deviceRole } = properties;
     const role = typeof deviceRole === 'string' ? parseInt(deviceRole, 10) : deviceRole;
 
-    const isMotionSensor = role === constants.DEVICE_ROLE_MOTION_SENSOR;
-    const isPresenceSensor = role === constants.DEVICE_ROLE_PRESENCE_SENSOR;
-    const isDoorbell = device.id === config.doorbellDeviceId;
+    switch (true) {
+      case role === constants.DEVICE_ROLE_MOTION_SENSOR:
+        return [{
+          service: Service.MotionSensor,
+          characteristics: [Characteristic.MotionDetected],
+          subtype: device.id + '----',
+        }];
 
-    if (isMotionSensor) {
-      return [{
-        service: Service.MotionSensor,
-        characteristics: [Characteristic.MotionDetected],
-        subtype: device.id + '----',
-      }];
-    } else if (isPresenceSensor) {
-      return [{
-        service: Service.OccupancySensor,
-        characteristics: [Characteristic.OccupancyDetected],
-        subtype: device.id + '----',
-      }];
-    } else if (isDoorbell) {
-      return [{
-        service: Service.Doorbell,
-        characteristics: [Characteristic.ProgrammableSwitchEvent],
-        subtype: device.id + '----',
-      }];
-    } else {
-      return [{
-        service: Service.ContactSensor,
-        characteristics: [Characteristic.ContactSensorState],
-        subtype: device.id + '----',
-      }];
+      case role === constants.DEVICE_ROLE_PRESENCE_SENSOR:
+        return [{
+          service: Service.OccupancySensor,
+          characteristics: [Characteristic.OccupancyDetected],
+          subtype: device.id + '----',
+        }];
+
+      case device.id === config.doorbellDeviceId:
+        return [{
+          service: Service.Doorbell,
+          characteristics: [Characteristic.ProgrammableSwitchEvent],
+          subtype: device.id + '----',
+        }];
+
+      default:
+        return [{
+          service: Service.ContactSensor,
+          characteristics: [Characteristic.ContactSensorState],
+          subtype: device.id + '----',
+        }];
     }
   }
 
