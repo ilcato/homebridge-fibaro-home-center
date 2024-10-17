@@ -383,8 +383,7 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 # Latest release notes
 
 ### Version 3.1.1
-- Fixed issue #508
-- Fixed issue #507
+- Fixed issues #507, #508, #509, #510
 - Dependencies updates.
 
 ### Version 3.1.0

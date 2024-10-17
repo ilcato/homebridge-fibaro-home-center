@@ -29,17 +29,40 @@ export class FibaroAccessory {
     const roomName = this.platform.getRoomNameById(this.device.roomID);
 
     // Set accessory information
-    const serialNumber = properties.serialNumber?.startsWith('h\'') ? properties.serialNumber.slice(2) : properties.serialNumber;
-    this.accessory.getService(this.platform.Service.AccessoryInformation)!
+    const serialNumber = properties.serialNumber
+      ? properties.serialNumber.startsWith('h\'')
+        ? properties.serialNumber.slice(2).replace(/^0+/, '')
+        : properties.serialNumber.replace(/^0+/, '')
+      : undefined;
+
+    const accessoryInfo = this.accessory.getService(this.platform.Service.AccessoryInformation)!;
+
+    accessoryInfo
       .setCharacteristic(this.platform.Characteristic.Manufacturer, manufacturer)
       .setCharacteristic(this.platform.Characteristic.Model, `${this.device.type.length > 1 ?
         this.device.type :
-        'HomeCenter Bridged Accessory'}`)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber,
-        `ID: ${this.device.id}` +
-        `${roomName ? `, Room: ${roomName}` : ''}` +
-        `${serialNumber ? `, ${serialNumber}` : ''}`,
-      );
+        'HomeCenter Bridged Accessory'}`);
+
+    // Construct the serial number string
+    let serialNumberValue = `ID:${this.device.id}`;
+    let remainingLength = 64 - serialNumberValue.length;
+
+    if (roomName && remainingLength > 0) {
+      const roomString = `,Room:${roomName}`;
+      if (roomString.length <= remainingLength) {
+        serialNumberValue += roomString;
+        remainingLength -= roomString.length;
+      }
+    }
+
+    if (serialNumber && remainingLength > 0) {
+      const serialString = `,${serialNumber}`;
+      if (serialString.length <= remainingLength) {
+        serialNumberValue += serialString;
+      }
+    }
+
+    accessoryInfo.setCharacteristic(this.platform.Characteristic.SerialNumber, serialNumberValue);
 
     // Check for device-specific configuration
     const devConfig = this.platform.config.devices?.find(item => item.id === this.device.id);
