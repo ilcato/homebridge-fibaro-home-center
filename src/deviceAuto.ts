@@ -408,6 +408,7 @@ export class DeviceConfigurations {
 
   // Radiator thermostatic valve.
   @DeviceType('com.fibaro.thermostatDanfoss')
+  @DeviceType('com.fibaro.FGT001')
   private static radiatorThermostaticValve(Service, Characteristic, device) {
     return [{
       service: Service.Thermostat,

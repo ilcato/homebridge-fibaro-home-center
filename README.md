@@ -382,14 +382,12 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 
 # Latest release notes
 
-### Version 3.1.1
-- Fixed issues #507, #508, #509, #510
+### Version 3.2.0
+- Added support for radiator thermostatic valves ("com.fibaro.thermostatDanfoss", "com.fibaro.FGT001").
 - Dependencies updates.
 
-### Version 3.1.0
-
-- Initial support for remote controller (tested with Aeon Labs Minimote, Fibaro Button, Fibaro Walli Switch).
-- More granular control on poller period parameter: now you can set decimals (e.g. 0.5 s).
+### Version 3.1.1
+- Fixed issues #507, #508, #509, #510
 - Dependencies updates.
 
 #### See all: [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)
