@@ -15,12 +15,13 @@ function characteristicGetter(...characteristics: unknown[]) {
 }
 export class GetFunctions {
   getFunctionsMapping: Map<unknown, (...args: unknown[]) => unknown>;
-
   CurrentSecuritySystemStateMapping;
   TargetSecuritySystemStateMapping;
+  modeMap;
 
   constructor(private platform) {
-    // Initialize security system mappings
+    this.getFunctionsMapping = new Map();
+
     this.CurrentSecuritySystemStateMapping = new Map([
       ['AwayArmed', this.platform.Characteristic.SecuritySystemCurrentState.AWAY_ARM],
       ['Disarmed', this.platform.Characteristic.SecuritySystemCurrentState.DISARMED],
@@ -36,7 +37,14 @@ export class GetFunctions {
       ['StayArmed', this.platform.Characteristic.SecuritySystemTargetState.STAY_ARM],
     ]);
 
-    this.getFunctionsMapping = new Map();
+    const { CurrentHeatingCoolingState } = this.platform.Characteristic;
+    this.modeMap = {
+      'Off': CurrentHeatingCoolingState.OFF,
+      'Heat': CurrentHeatingCoolingState.HEAT,
+      'Cool': CurrentHeatingCoolingState.COOL,
+    };
+
+
     this.initializeFunctionsMapping();
   }
 
@@ -116,10 +124,15 @@ export class GetFunctions {
     try {
       let temperature;
 
-      if (service.isClimateZone || service.isHeatingZone) {
-        temperature = await this.getZoneTemperature(service, IDs[0]);
-      } else {
-        temperature = properties.value;
+      switch (true) {
+        case service.isClimateZone || service.isHeatingZone:
+          temperature = await this.getZoneTemperature(service, IDs[0]);
+          break;
+        case service.isRadiatorThermostaticValve:
+          temperature = properties.heatingThermostatSetpoint;
+          break;
+        default:
+          temperature = properties.value;
       }
 
       characteristic.updateValue(temperature);
@@ -133,10 +146,21 @@ export class GetFunctions {
     try {
       let temperature;
 
-      if (service.isClimateZone || service.isHeatingZone) {
-        temperature = await this.getZoneTemperature(service, IDs[0]);
-      } else {
-        temperature = properties.value;
+      switch (true) {
+        case service.isClimateZone || service.isHeatingZone:
+          temperature = await this.getZoneTemperature(service, IDs[0]);
+          break;
+        case service.isRadiatorThermostaticValve:
+          temperature = properties.heatingThermostatSetpointFuture;
+          if (typeof temperature === 'string') {
+            temperature = parseFloat(temperature);
+          }
+          if (isNaN(temperature)) {
+            throw new Error('No value');
+          }
+          break;
+        default:
+          temperature = properties.value;
       }
 
       characteristic.updateValue(temperature);
@@ -232,27 +256,28 @@ export class GetFunctions {
   }
 
   @characteristicGetter(Characteristics.CurrentHeatingCoolingState)
-  async getCurrentHeatingCoolingState(characteristic, service, IDs) {
+  async getCurrentHeatingCoolingState(characteristic, service, IDs, properties) {
     try {
-      if (service.isClimateZone) {
-        const { body: { properties } } = await this.platform.fibaroClient.getClimateZone(IDs[0]);
-        if (!properties.mode) {
-          throw new Error('No value for heating cooling state.');
+      switch (true) {
+        case service.isClimateZone: {
+          const { body: { properties } } = await this.platform.fibaroClient.getClimateZone(IDs[0]);
+          if (!properties.mode) {
+            throw new Error('No value for heating cooling state.');
+          }
+          const state = this.modeMap[properties.mode];
+          if (state !== undefined) {
+            characteristic.updateValue(state);
+          }
+          break;
         }
-
-        const { CurrentHeatingCoolingState } = this.platform.Characteristic;
-        const modeMap = {
-          'Off': CurrentHeatingCoolingState.OFF,
-          'Heat': CurrentHeatingCoolingState.HEAT,
-          'Cool': CurrentHeatingCoolingState.COOL,
-        };
-
-        const state = modeMap[properties.mode];
-        if (state !== undefined) {
+        case service.isHeatingZone:
+          characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
+          break;
+        case service.isRadiatorThermostaticValve: {
+          const state = this.modeMap[properties.thermostatMode] || this.platform.Characteristic.CurrentHeatingCoolingState.HEAT;
           characteristic.updateValue(state);
+          break;
         }
-      } else if (service.isHeatingZone) {
-        characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
       }
     } catch (e) {
       this.platform.log(`Error getting Current Heating Cooling State: ${service.IDs[0]} - Err: ${e}`);
@@ -260,27 +285,29 @@ export class GetFunctions {
   }
 
   @characteristicGetter(Characteristics.TargetHeatingCoolingState)
-  async getTargetHeatingCoolingState(characteristic, service, IDs) {
+  async getTargetHeatingCoolingState(characteristic, service, IDs, properties) {
     try {
-      if (service.isClimateZone) {
-        const { body: { properties } } = await this.platform.fibaroClient.getClimateZone(IDs[0]);
-        if (!properties.mode) {
-          throw new Error('No value for heating cooling state.');
+      switch (true) {
+        case service.isClimateZone: {
+          const { body: { properties } } = await this.platform.fibaroClient.getClimateZone(IDs[0]);
+          if (!properties.mode) {
+            throw new Error('No value for heating cooling state.');
+          }
+
+          const state = this.modeMap[properties.mode];
+          if (state !== undefined) {
+            characteristic.updateValue(state);
+          }
+          break;
         }
-
-        const { TargetHeatingCoolingState } = this.platform.Characteristic;
-        const modeMap = {
-          'Off': TargetHeatingCoolingState.OFF,
-          'Heat': TargetHeatingCoolingState.HEAT,
-          'Cool': TargetHeatingCoolingState.COOL,
-        };
-
-        const state = modeMap[properties.mode];
-        if (state !== undefined) {
+        case service.isHeatingZone:
+          characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
+          break;
+        case service.isRadiatorThermostaticValve: {
+          const state = this.modeMap[properties.thermostatModeFuture] || this.platform.Characteristic.TargetHeatingCoolingState.HEAT;
           characteristic.updateValue(state);
+          break;
         }
-      } else if (service.isHeatingZone) {
-        characteristic.updateValue(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
       }
     } catch (e) {
       this.platform.log(`Error getting Target Heating Cooling State: ${service.IDs[0]} - Err: ${e}`);

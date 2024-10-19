@@ -141,10 +141,18 @@ function throttle(
 
 export class SetFunctions {
   setFunctionsMapping: Map<unknown, (...args: unknown[]) => unknown>;
-  private lastCommandTime: number = 0;
+  modeMap;
 
   constructor(private platform) {
     this.setFunctionsMapping = new Map();
+    const { TargetHeatingCoolingState } = this.platform.Characteristic;
+    this.modeMap = {
+      [TargetHeatingCoolingState.OFF]: 'Off',
+      [TargetHeatingCoolingState.HEAT]: 'Heat',
+      [TargetHeatingCoolingState.COOL]: 'Cool',
+      [TargetHeatingCoolingState.AUTO]: 'Auto',
+    };
+
     this.initializeFunctionsMapping();
   }
 
@@ -280,54 +288,48 @@ export class SetFunctions {
 
   @characteristicSetter(Characteristics.TargetHeatingCoolingState)
   async setTargetHeatingCoolingState(value, context, characteristic, service, IDs) {
-    if (!service.isClimateZone && !service.isHeatingZone) {
-      return;
+    switch (true) {
+      case service.isRadiatorThermostaticValve:
+      case service.isHeatingZone:
+        return; // Early return as they don't support mode changes
+      case service.isClimateZone: {
+        const mode = this.modeMap[value];
+        if (!mode) {
+          return;
+        }
+        const currentTemperature = service.getCharacteristic(this.platform.Characteristic.CurrentTemperature).value;
+        const timestamp = Math.trunc(Date.now() / 1000) + parseInt(this.platform.config.thermostattimeout);
+
+        await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, currentTemperature, timestamp);
+        break;
+      }
+      default:
+        break;
     }
-
-    if (service.isHeatingZone) {
-      return; // Early return for heating zones as they don't support mode changes
-    }
-
-    const { Characteristic } = this.platform;
-    const modeMap = {
-      [Characteristic.TargetHeatingCoolingState.OFF]: 'Off',
-      [Characteristic.TargetHeatingCoolingState.HEAT]: 'Heat',
-      [Characteristic.TargetHeatingCoolingState.COOL]: 'Cool',
-      [Characteristic.TargetHeatingCoolingState.AUTO]: 'Auto',
-    };
-
-    const mode = modeMap[value];
-    if (!mode) {
-      return;
-    }
-
-    const currentTemperature = service.getCharacteristic(Characteristic.CurrentTemperature).value;
-    const timestamp = Math.trunc(Date.now() / 1000) + parseInt(this.platform.config.thermostattimeout);
-
-    await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, currentTemperature, timestamp);
   }
 
   @characteristicSetter(Characteristics.TargetTemperature)
   async setTargetTemperature(value, context, characteristic, service, IDs) {
     const timestamp = Math.trunc(Date.now() / 1000) + parseInt(this.platform.config.thermostattimeout);
 
-    if (service.isClimateZone) {
-      const { Characteristic } = this.platform;
-      const modeMap = {
-        [Characteristic.CurrentHeatingCoolingState.OFF]: 'Off',
-        [Characteristic.CurrentHeatingCoolingState.HEAT]: 'Heat',
-        [Characteristic.CurrentHeatingCoolingState.COOL]: 'Cool',
-        [Characteristic.CurrentHeatingCoolingState.AUTO]: 'Auto',
-      };
+    switch (true) {
+      case service.isClimateZone: {
+        const currentState = service.getCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState).value;
+        const mode = this.modeMap[currentState];
 
-      const currentState = service.getCharacteristic(Characteristic.CurrentHeatingCoolingState).value;
-      const mode = modeMap[currentState];
-
-      if (mode) {
-        await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, value, timestamp);
+        if (mode) {
+          await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, value, timestamp);
+        }
+        break;
       }
-    } else if (service.isHeatingZone) {
-      await this.platform.fibaroClient.setHeatingZoneHandTemperature(IDs[0], value, timestamp);
+      case service.isHeatingZone:
+        await this.platform.fibaroClient.setHeatingZoneHandTemperature(IDs[0], value, timestamp);
+        break;
+      case service.isRadiatorThermostaticValve:
+        await this.command('setHeatingThermostatSetpoint', [value], service, IDs);
+        break;
+      default:
+        break;
     }
   }
 
@@ -392,7 +394,7 @@ export class SetFunctions {
     const result = await this.platform.fibaroClient.executeDeviceAction(IDs[0], c, value);
 
     if (this.platform.config.logsLevel >= 1) {
-      const nc = c.replace(/turnOn|turnOff|setValue|open|close|setColor/g, match => {
+      const nc = c.replace(/turnOn|turnOff|setValue|open|close|setColor|setHeatingThermostatSetpoint/g, match => {
         const replacements = {
           turnOn: 'On',
           turnOff: 'Off',
@@ -400,13 +402,14 @@ export class SetFunctions {
           open: 'Open',
           close: 'Close',
           setColor: 'Color',
+          setHeatingThermostatSetpoint: 'Setpoint',
         };
         return replacements[match] || match;
       });
 
       const logMessage = `${service.displayName} [${IDs[0]}]: set ${nc}${
-        value !== null && nc !== 'Open' && nc !== 'Close' && nc !== 'Color' ? ` ${value}%` :
-          (value !== null && nc === 'Color' ? ` ${value}` : '')
+        value !== null && nc !== 'Open' && nc !== 'Close' && nc !== 'Color' && nc !== 'Setpoint' ? ` ${value}%` :
+          (value !== null && (nc === 'Color' || nc === 'Setpoint') ? ` ${value}` : '')
       }`;
 
       this.platform.log(logMessage);

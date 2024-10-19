@@ -74,6 +74,7 @@ export const SUBTYPE_LOCK = 'LOCK';
 export const SUBTYPE_SCENE = 'SC';
 export const SUBTYPE_CLIMATE_ZONE = 'CZ';
 export const SUBTYPE_HEATING_ZONE = 'HZ';
+export const SUBTYPE_RADIATOR_THERMOSTATIC_VALVE = 'RV';
 export const SUBTYPE_OPEN_CLOSE_ONLY = 'OPENCLOSEONLY';
 export const SUBTYPE_PM2_5 = 'PM2_5';
 export const SUBTYPE_REMOTE_CONTROLLER_CENTRAL_SCENE = 'CS';

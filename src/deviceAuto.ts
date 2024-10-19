@@ -406,6 +406,23 @@ export class DeviceConfigurations {
     return;
   }
 
+  // Radiator thermostatic valve.
+  @DeviceType('com.fibaro.thermostatDanfoss')
+  @DeviceType('com.fibaro.FGT001')
+  private static radiatorThermostaticValve(Service, Characteristic, device) {
+    return [{
+      service: Service.Thermostat,
+      characteristics: [
+        Characteristic.CurrentTemperature,
+        Characteristic.TargetTemperature,
+        Characteristic.CurrentHeatingCoolingState,
+        Characteristic.TargetHeatingCoolingState,
+        Characteristic.TemperatureDisplayUnits,
+      ],
+      subtype: device.id + '--' + constants.SUBTYPE_RADIATOR_THERMOSTATIC_VALVE,
+    }];
+  }
+
   // Security system
   @DeviceType(constants.DEVICE_TYPE_SECURITY_SYSTEM)
   private static securitySystem(Service, Characteristic) {

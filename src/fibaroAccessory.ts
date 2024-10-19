@@ -216,6 +216,7 @@ export class FibaroAccessory {
     service.isScene = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_SCENE;
     service.isClimateZone = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_CLIMATE_ZONE;
     service.isHeatingZone = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_HEATING_ZONE;
+    service.isRadiatorThermostaticValve = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_RADIATOR_THERMOSTATIC_VALVE;
     service.isOpenCloseOnly = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_OPEN_CLOSE_ONLY;
     service.isPM2_5Sensor = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_PM2_5;
     service.isRemoteControllerCentralScene = IDs.length >= 5 && IDs[3] === constants.SUBTYPE_REMOTE_CONTROLLER_CENTRAL_SCENE;
