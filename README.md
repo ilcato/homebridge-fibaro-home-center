@@ -384,6 +384,7 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 
 ### Version 3.2.0
 - Added support for radiator thermostatic valves ("com.fibaro.thermostatDanfoss", "com.fibaro.FGT001").
+- Fix issue #520
 - Dependencies updates.
 
 ### Version 3.1.1

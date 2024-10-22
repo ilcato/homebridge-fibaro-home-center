@@ -371,11 +371,29 @@ export class DeviceConfigurations {
   @DeviceType('com.fibaro.remoteSceneController')
   @DeviceType(/^com\.fibaro\.FGPB/)
   private static remoteController(Service, Characteristic, device) {
-    const availableScenes = device.properties.availableScenes || [];
-    const centralSceneSupport = device.properties.centralSceneSupport || [];
-    if (availableScenes.length > 0) { // Aeon Minimote like devices
-      const numberOfButtons = Math.ceil(availableScenes.length / 2); // Assuming each button can trigger 2 scenes
+    let availableScenes = device.properties.availableScenes || [];
+    let centralSceneSupport = device.properties.centralSceneSupport || [];
 
+    // Parse availableScenes if it's a string
+    if (typeof availableScenes === 'string') {
+      try {
+        availableScenes = JSON.parse(availableScenes);
+      } catch {
+        availableScenes = [];
+      }
+    }
+    // Parse centralSceneSupport if it's a string
+    if (typeof centralSceneSupport === 'string') {
+      try {
+        centralSceneSupport = JSON.parse(centralSceneSupport);
+      } catch {
+        centralSceneSupport = [];
+      }
+    }
+
+    // Ensure availableScenes is an array and not empty
+    if (Array.isArray(availableScenes) && availableScenes.length > 0) {
+      const numberOfButtons = Math.ceil(availableScenes.length / 2);
       return Array.from({ length: numberOfButtons }, (_, index) => ({
         service: Service.StatelessProgrammableSwitch,
         characteristics: [
@@ -384,16 +402,8 @@ export class DeviceConfigurations {
         ],
         subtype: `${device.id}---${constants.SUBTYPE_REMOTE_CONTROLLER_SCENE_ACTIVATION}-${index + 1}`,
       }));
-    } else if (centralSceneSupport.length > 0) { // Fibaro button like devices
-      let parsedCentralSceneSupport = centralSceneSupport;
-      if (typeof centralSceneSupport === 'string') {
-        try {
-          parsedCentralSceneSupport = JSON.parse(centralSceneSupport);
-        } catch {
-          return;
-        }
-      }
-      return parsedCentralSceneSupport.map(keys => ({
+    } else if (Array.isArray(centralSceneSupport) && centralSceneSupport.length > 0) { // Fibaro button like devices
+      return centralSceneSupport.map(keys => ({
         service: Service.StatelessProgrammableSwitch,
         characteristics: [
           Characteristic.ProgrammableSwitchEvent,
