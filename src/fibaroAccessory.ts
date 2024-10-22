@@ -173,6 +173,16 @@ export class FibaroAccessory {
           this.platform.Characteristic.ProgrammableSwitchEvent.DOUBLE_PRESS,
           this.platform.Characteristic.ProgrammableSwitchEvent.LONG_PRESS];
       }
+      // Set the thermosta radiator options
+      if (service.isRadiatorThermostaticValve &&
+        (characteristic.constructor === this.platform.Characteristic.CurrentHeatingCoolingState ||
+         characteristic.constructor === this.platform.Characteristic.TargetHeatingCoolingState)) {
+        characteristic.props.validValues =[
+          this.platform.Characteristic.CurrentHeatingCoolingState.OFF,
+          this.platform.Characteristic.CurrentHeatingCoolingState.HEAT,
+        ];
+      }
+
 
       // Bind the characteristic to the service
       this.bindCharacteristic(characteristic, service, IDs);
