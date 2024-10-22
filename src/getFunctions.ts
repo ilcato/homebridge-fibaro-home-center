@@ -152,17 +152,22 @@ export class GetFunctions {
           break;
         case service.isRadiatorThermostaticValve:
           temperature = properties.heatingThermostatSetpointFuture;
-          if (typeof temperature === 'string') {
-            temperature = parseFloat(temperature);
-          }
-          if (isNaN(temperature)) {
-            throw new Error('No value');
-          }
           break;
         default:
           temperature = properties.value;
       }
-
+      if (typeof temperature === 'string') {
+        temperature = parseFloat(temperature);
+      }
+      if (isNaN(temperature)) {
+        throw new Error('No value');
+      }
+      if (temperature < characteristic.props.minValue) {
+        temperature = characteristic.props.minValue;
+      }
+      if (temperature > characteristic.props.maxValue) {
+        temperature = characteristic.props.maxValue;
+      }
       characteristic.updateValue(temperature);
     } catch (e) {
       this.platform.log(`Error getting Target Temperature: ${service.IDs[0]} - Err: ${e}`);
