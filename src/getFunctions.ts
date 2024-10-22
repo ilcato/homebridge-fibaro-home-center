@@ -134,6 +134,18 @@ export class GetFunctions {
         default:
           temperature = properties.value;
       }
+      if (typeof temperature === 'string') {
+        temperature = parseFloat(temperature);
+      }
+      if (isNaN(temperature)) {
+        throw new Error('No value');
+      }
+      if (temperature < characteristic.props.minValue) {
+        temperature = characteristic.props.minValue;
+      }
+      if (temperature > characteristic.props.maxValue) {
+        temperature = characteristic.props.maxValue;
+      }
 
       characteristic.updateValue(temperature);
     } catch (e) {
