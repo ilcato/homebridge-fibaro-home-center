@@ -43,25 +43,7 @@ export class FibaroAccessory {
         this.device.type :
         'HomeCenter Bridged Accessory'}`);
 
-    // Construct the serial number string (max 64 characters)
-    let serialNumberValue = `ID:${this.device.id}`;
-    let remainingLength = 64 - serialNumberValue.length;
-
-    if (roomName && remainingLength > 0) {
-      const roomString = `,Room:${roomName}`;
-      if (roomString.length <= remainingLength) {
-        serialNumberValue += roomString;
-        remainingLength -= roomString.length;
-      }
-    }
-
-    if (serialNumber && remainingLength > 0) {
-      const serialString = `,${serialNumber}`;
-      if (serialString.length <= remainingLength) {
-        serialNumberValue += serialString;
-      }
-    }
-
+    const serialNumberValue = this.constructSerialNumber(this.device.id, roomName, serialNumber);
     accessoryInfo.setCharacteristic(this.platform.Characteristic.SerialNumber, serialNumberValue);
 
     // Check for device-specific configuration
@@ -92,9 +74,9 @@ export class FibaroAccessory {
 
     // loop through all services, create it if necessary and bind characteristics
     serviceAndCharacteristics.forEach(({ service, characteristics, subtype }) => {
-      const serviceName = this.buildServiceName(service, subtype);
-      let s = this.accessory.getService(serviceName);
+      let s = this.accessory.getServiceById(service, subtype);
       if (!s) {
+        const serviceName = this.buildServiceName(service, subtype);
         s = this.accessory.addService(service, serviceName, subtype);
       }
       this.bindCharacterstics(s, characteristics);
@@ -474,5 +456,27 @@ export class FibaroAccessory {
       }
       return;
     }
+  }
+
+  private constructSerialNumber(deviceId: string, roomName?: string, serialNumber?: string): string {
+    let serialNumberValue = `ID:${deviceId}`;
+    let remainingLength = 64 - serialNumberValue.length;
+
+    if (roomName && remainingLength > 0) {
+      const roomString = `,Room:${roomName}`;
+      if (roomString.length <= remainingLength) {
+        serialNumberValue += roomString;
+        remainingLength -= roomString.length;
+      }
+    }
+
+    if (serialNumber && remainingLength > 0) {
+      const serialString = `,${serialNumber}`;
+      if (serialString.length <= remainingLength) {
+        serialNumberValue += serialString;
+      }
+    }
+
+    return serialNumberValue;
   }
 }
