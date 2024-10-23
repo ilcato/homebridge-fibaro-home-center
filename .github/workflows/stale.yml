@@ -11,9 +11,10 @@ on:
 jobs:
   stale:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
     - name: Autoclose stale issues.
-      uses: actions/stale@v8
+      uses: actions/stale@v9
       with:
         days-before-close: 5
         days-before-stale: 10
