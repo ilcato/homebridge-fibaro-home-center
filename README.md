@@ -10,6 +10,13 @@
 
 [![Buy me a cofee](https://cdn.buymeacoffee.com/buttons/default-orange.png)](https://www.buymeacoffee.com/ilcato)
 
+### Important Note:
+
+As I no longer actively use the underlying products, I won’t be maintaining this project as frequently.
+
+I remain available to provide best-effort support, but I won’t be able to test any new changes or updates. Community contributions are welcome, and I’ll do my best to respond to issues and review pull requests, though with less regularity and without direct testing capacity.
+
+
 ### Homebridge plugin for Fibaro Home Center (2, 2 Lite, 3, 3 Lite, Yubii Home).
 
 This is an [Homebridge](https://homebridge.io) plugin.
