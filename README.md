@@ -1,3 +1,12 @@
+> [!WARNING]
+>
+> **Please be aware:** I am no longer an active user of the underlying products, so my maintenance of this project will be **limited**.
+>
+> I’m available for **best-effort support**, but **I won’t be able to test new changes** or updates directly. Community contributions are **highly encouraged**! I’ll do my best to respond to issues and review pull requests, but please expect **reduced frequency** and **no direct testing capacity**.
+>
+> If anyone is interested in **taking over as the project maintainer**, please don’t hesitate to reach out!
+
+
 <img src="https://raw.githubusercontent.com/homebridge/verified/latest/icons/homebridge-fibaro-home-center.png" width="100px"></img>
 # homebridge-fibaro-home-center
 
@@ -10,23 +19,9 @@
 
 [![Buy me a cofee](https://cdn.buymeacoffee.com/buttons/default-orange.png)](https://www.buymeacoffee.com/ilcato)
 
----
-
-### ⚠️ Important Note:
-
-**Please be aware:** I am no longer an active user of the underlying products, so my maintenance of this project will be **limited**.
-
-I’m available for **best-effort support**, but **I won’t be able to test new changes** or updates directly. Community contributions are **highly encouraged**! I’ll do my best to respond to issues and review pull requests, but please expect **reduced frequency** and **no direct testing capacity**.
-
-If anyone is interested in **taking over as the project maintainer**, please don’t hesitate to reach out!
-
----
-
 ### Homebridge plugin for Fibaro Home Center (2, 2 Lite, 3, 3 Lite, Yubii Home).
 
-This is an [Homebridge](https://homebridge.io) plugin.
-
-It supports devices (Z-Wave only, Zigbee not supported), scenes, global variables, security systems, climate / heating zones. Exposes them to Homebridge and HomeKit (Apple Home and more).
+This is an [Homebridge](https://homebridge.io) plugin. It supports devices (Z-Wave only, Zigbee not supported), scenes, global variables, security systems, climate / heating zones. Exposes them to Homebridge and HomeKit (Apple Home and more).
 
 # How it works
 
