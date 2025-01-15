@@ -284,7 +284,7 @@ export class DeviceConfigurations {
     const role = typeof deviceRole === 'string' ? parseInt(deviceRole, 10) : deviceRole;
 
     switch (true) {
-      case role === constants.DEVICE_ROLE_MOTION_SENSOR:
+      case role === constants.DEVICE_ROLE_MOTION_SENSOR || properties.deviceRole === 'MotionSensor':
         return [{
           service: Service.MotionSensor,
           characteristics: [Characteristic.MotionDetected],
