@@ -389,10 +389,10 @@ Feel free to create [Issue](https://github.com/ilcato/homebridge-fibaro-home-cen
 
 # Latest release notes
 
+### Version 3.2.3
+- Dependencies updates.
+
 ### Version 3.2.2
 - Dependencies updates.
 
-### Version 3.2.1
-- Fixed issues #307
-- Dependencies updates.
 #### See all: [Releases](https://github.com/ilcato/homebridge-fibaro-home-center/releases)
