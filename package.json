@@ -41,6 +41,9 @@
     "superagent": "^10.1.0",
     "superagent-throttle": "^1.0.1"
   },
+  "overrides": {
+    "axios": "^1.15.0"
+  },
   "devDependencies": {
     "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.12.0",
