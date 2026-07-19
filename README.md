@@ -77,6 +77,11 @@ Configure the plugin through the settings UI or directly in the JSON editor.
           "displayAs": "airQualitySensorVocIndex"
         },
         {
+          "id": 34,
+          "displayAs": "auto",
+          "currentTemperatureFromDeviceId": 33
+        },
+        {
           "id": 58,
           "displayAs": "exclude",
         }
@@ -115,6 +120,9 @@ Configure the plugin through the settings UI or directly in the JSON editor.
   + `airQualitySensorPm25` : Air Quality Sensor reading PM2.5 density (µg/m³).
   + `airQualitySensorVocIndex` : Air Quality Sensor reading Sensirion VOC Index (relative index, not µg/m³ — e.g. IKEA VINDSTYRKA).
   + `auto` : Automatic type-based configuration (to combine with other per-device options).
++ `currentTemperatureFromDeviceId` (integer) : Read CurrentTemperature from another Home Center device, typically a temperature sensor.
+  + Intended for thermostat-type devices without their own temperature reading (`com.fibaro.hvacSystemHeat` / `com.fibaro.hvacSystemCool`).
+  + If not set, the current temperature mirrors the target temperature and a warning is logged.
 
 </details>
 
@@ -206,6 +214,18 @@ Warning: If you exclude the device, adding it again may require reconfiguration 
     
 + Thermostat Controls: once a climate / heating zone is created in the Home Center / Yubii Home, a corresponding Thermostat accessory is generated in HomeKit. The Thermostat accessory provides intuitive controls within the HomeKit ecosystem.
 + Manual Settings and Timeout: the controls available on the Thermostat activate a manual setting for the specified duration. This duration is set by the `thermostattimeout` parameter in the `config.json` file. During this period, the manual settings remain in effect for the zone. After the predefined timeout period expires, the normal schedule of the zone is automatically reactivated. This ensures that the zone reverts to its programmed schedule once the manual setting duration elapses.
+
+</details>
+
+<details>
+<summary><b>HVAC devices (hvacSystemHeat / hvacSystemCool)</b></summary>
+
++ Devices of type `com.fibaro.hvacSystemHeat` or `com.fibaro.hvacSystemCool` are exposed as Thermostat accessories with mode and target temperature control. Tested with QuickApp child devices (floor heating and A/C).
++ These Fibaro types carry no temperature reading of their own, so link a temperature source per device. In the plugin settings UI, open `Individual devices settings`, add an entry for the device, set `Display as` to `Auto (by device type)` and `Current Temperature from Device ID` to the ID of a temperature sensor. Or directly in `config.json`, in the `devices` array of the platform config:
+
+      { "id": 34, "displayAs": "auto", "currentTemperatureFromDeviceId": 33 }
+
++ If no temperature source is set, the current temperature mirrors the target temperature and a warning is logged.
 
 </details>
 

@@ -303,6 +303,14 @@ export class SetFunctions {
         await this.platform.fibaroClient.setClimateZoneHandTemperature(IDs[0], mode, currentTemperature, timestamp);
         break;
       }
+      case service.isHvacHeat || service.isHvacCool: {
+        const mode = this.modeMap[value];
+        if (!mode) {
+          return;
+        }
+        await this.command('setThermostatMode', [mode], service, IDs);
+        break;
+      }
       default:
         break;
     }
@@ -327,6 +335,12 @@ export class SetFunctions {
         break;
       case service.isRadiatorThermostaticValve:
         await this.command('setHeatingThermostatSetpoint', [value], service, IDs);
+        break;
+      case service.isHvacHeat:
+        await this.command('setHeatingThermostatSetpoint', [value], service, IDs);
+        break;
+      case service.isHvacCool:
+        await this.command('setCoolingThermostatSetpoint', [value], service, IDs);
         break;
       default:
         break;
@@ -394,22 +408,22 @@ export class SetFunctions {
     const result = await this.platform.fibaroClient.executeDeviceAction(IDs[0], c, value);
 
     if (this.platform.config.logsLevel >= 1) {
-      const nc = c.replace(/turnOn|turnOff|setValue|open|close|setColor|setHeatingThermostatSetpoint/g, match => {
-        const replacements = {
-          turnOn: 'On',
-          turnOff: 'Off',
-          setValue: '',
-          open: 'Open',
-          close: 'Close',
-          setColor: 'Color',
-          setHeatingThermostatSetpoint: 'Setpoint',
-        };
-        return replacements[match] || match;
-      });
+      const replacements = {
+        turnOn: 'On',
+        turnOff: 'Off',
+        setValue: '',
+        open: 'Open',
+        close: 'Close',
+        setColor: 'Color',
+        setHeatingThermostatSetpoint: 'Setpoint',
+        setCoolingThermostatSetpoint: 'Setpoint',
+        setThermostatMode: 'Mode',
+      };
+      const nc = c.replace(new RegExp(Object.keys(replacements).join('|'), 'g'), match => replacements[match] || match);
 
       const logMessage = `${service.displayName} [${IDs[0]}]: set ${nc}${
-        value !== null && nc !== 'Open' && nc !== 'Close' && nc !== 'Color' && nc !== 'Setpoint' ? ` ${value}%` :
-          (value !== null && (nc === 'Color' || nc === 'Setpoint') ? ` ${value}` : '')
+        value !== null && nc !== 'Open' && nc !== 'Close' && nc !== 'Color' && nc !== 'Setpoint' && nc !== 'Mode' ? ` ${value}%` :
+          (value !== null && (nc === 'Color' || nc === 'Setpoint' || nc === 'Mode') ? ` ${value}` : '')
       }`;
 
       this.platform.log(logMessage);

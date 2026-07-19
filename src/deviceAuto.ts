@@ -486,6 +486,38 @@ export class DeviceConfigurations {
     }];
   }
 
+  // HVAC Heat devices
+  @DeviceType('com.fibaro.hvacSystemHeat')
+  private static hvacSystemHeat(Service, Characteristic, device) {
+    return [{
+      service: Service.Thermostat,
+      characteristics: [
+        Characteristic.CurrentTemperature,
+        Characteristic.TargetTemperature,
+        Characteristic.CurrentHeatingCoolingState,
+        Characteristic.TargetHeatingCoolingState,
+        Characteristic.TemperatureDisplayUnits,
+      ],
+      subtype: device.id + '--' + constants.SUBTYPE_HVAC_HEAT,
+    }];
+  }
+
+  // HVAC Cool devices
+  @DeviceType('com.fibaro.hvacSystemCool')
+  private static hvacSystemCool(Service, Characteristic, device) {
+    return [{
+      service: Service.Thermostat,
+      characteristics: [
+        Characteristic.CurrentTemperature,
+        Characteristic.TargetTemperature,
+        Characteristic.CurrentHeatingCoolingState,
+        Characteristic.TargetHeatingCoolingState,
+        Characteristic.TemperatureDisplayUnits,
+      ],
+      subtype: device.id + '--' + constants.SUBTYPE_HVAC_COOL,
+    }];
+  }
+
   // Global variables
   @DeviceType(constants.DEVICE_TYPE_GLOBAL_VARIABLE)
   private static globalVariable(Service, Characteristic, device) {

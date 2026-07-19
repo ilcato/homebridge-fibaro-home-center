@@ -107,6 +107,8 @@ export class Poller {
       this.manageHeatingThermostatSetpoint(change);
     } else if (change.heatingThermostatSetpointFuture !== undefined) {
       this.manageHeatingThermostatSetpointFuture(change);
+    } else if (change.coolingThermostatSetpoint !== undefined) {
+      this.manageCoolingThermostatSetpoint(change);
     }
   }
 
@@ -275,7 +277,8 @@ export class Poller {
 
   manageOperatingMode(change) {
     this.platform.updateSubscriptions.forEach(subscription => {
-      if (parseInt(subscription.id) === change.id && subscription.property === 'mode') {
+      if (parseInt(subscription.id) === change.id &&
+          (subscription.property === 'mode' || subscription.property === 'thermostatMode')) {
         this.platform.log.info('Updating value for device: ',
           `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.thermostatMode}`);
         const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(subscription.characteristic.constructor);
@@ -288,7 +291,8 @@ export class Poller {
 
   manageHeatingThermostatSetpoint(change) {
     this.platform.updateSubscriptions.forEach(subscription => {
-      if (parseInt(subscription.id) === change.id && subscription.property === 'currenttemperature') {
+      if (parseInt(subscription.id) === change.id &&
+          (subscription.property === 'currenttemperature' || subscription.property === 'heatingThermostatSetpoint')) {
         this.platform.log.info('Updating value for device: ',
           `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.heatingThermostatSetpoint}`);
         const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(subscription.characteristic.constructor);
@@ -304,6 +308,19 @@ export class Poller {
       if (parseInt(subscription.id) === change.id && subscription.property === 'targettemperature') {
         this.platform.log.info('Updating value for device: ',
           `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.heatingThermostatSetpointFuture}`);
+        const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(subscription.characteristic.constructor);
+        if (getFunction) {
+          getFunction.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
+        }
+      }
+    });
+  }
+
+  manageCoolingThermostatSetpoint(change) {
+    this.platform.updateSubscriptions.forEach(subscription => {
+      if (parseInt(subscription.id) === change.id && subscription.property === 'coolingThermostatSetpoint') {
+        this.platform.log.info('Updating value for device: ',
+          `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.coolingThermostatSetpoint}`);
         const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(subscription.characteristic.constructor);
         if (getFunction) {
           getFunction.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);

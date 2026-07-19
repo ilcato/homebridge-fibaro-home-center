@@ -131,6 +131,11 @@ export class GetFunctions {
         case service.isRadiatorThermostaticValve:
           temperature = properties.heatingThermostatSetpoint;
           break;
+        case (service.isHvacHeat || service.isHvacCool) && !service.currentTemperatureFromDeviceId:
+          temperature = service.isHvacHeat
+            ? properties.heatingThermostatSetpoint
+            : properties.coolingThermostatSetpoint;
+          break;
         default:
           temperature = properties.value;
       }
@@ -149,7 +154,7 @@ export class GetFunctions {
 
       characteristic.updateValue(temperature);
     } catch (e) {
-      this.platform.log(`Error getting Current Temperature: ${service.IDs[0]} - Err: ${e}`);
+      this.platform.log(`Error getting Current Temperature: ${IDs} - Err: ${e}`);
     }
   }
 
@@ -164,6 +169,12 @@ export class GetFunctions {
           break;
         case service.isRadiatorThermostaticValve:
           temperature = properties.heatingThermostatSetpointFuture;
+          break;
+        case service.isHvacHeat:
+          temperature = properties.heatingThermostatSetpoint;
+          break;
+        case service.isHvacCool:
+          temperature = properties.coolingThermostatSetpoint;
           break;
         default:
           temperature = properties.value;
@@ -295,6 +306,16 @@ export class GetFunctions {
           characteristic.updateValue(state);
           break;
         }
+        case service.isHvacHeat: {
+          const state = this.modeMap[properties.thermostatMode];
+          characteristic.updateValue(state);
+          break;
+        }
+        case service.isHvacCool: {
+          const state = this.modeMap[properties.thermostatMode];
+          characteristic.updateValue(state);
+          break;
+        }
       }
     } catch (e) {
       this.platform.log(`Error getting Current Heating Cooling State: ${service.IDs[0]} - Err: ${e}`);
@@ -322,6 +343,16 @@ export class GetFunctions {
           break;
         case service.isRadiatorThermostaticValve: {
           const state = this.modeMap[properties.thermostatModeFuture] || this.platform.Characteristic.TargetHeatingCoolingState.HEAT;
+          characteristic.updateValue(state);
+          break;
+        }
+        case service.isHvacHeat: {
+          const state = this.modeMap[properties.thermostatMode];
+          characteristic.updateValue(state);
+          break;
+        }
+        case service.isHvacCool: {
+          const state = this.modeMap[properties.thermostatMode];
           characteristic.updateValue(state);
           break;
         }
