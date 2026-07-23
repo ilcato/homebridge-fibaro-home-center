@@ -1,7 +1,7 @@
 // manualDeviceConfigurations.ts
 
 // Configuration for manual device setup
-import { MANUAL_DEVICE_TYPES } from './constants';
+import { MANUAL_DEVICE_TYPES, SUBTYPE_PM2_5 } from './constants';
 
 type ManualConfigFunction = (Service, Characteristic, device) => {
   service;
@@ -131,6 +131,15 @@ export class ManualDeviceConfigurations {
       service: Service.SmokeSensor,
       characteristics: [Characteristic.SmokeDetected],
       subtype: device.id + '----',
+    }];
+  }
+
+  @ManualType(MANUAL_DEVICE_TYPES.AIR_QUALITY_SENSOR_PM2_5)
+  static configureAirQualitySensorPm25(Service, Characteristic, device) {
+    return [{
+      service: Service.AirQualitySensor,
+      characteristics: [Characteristic.AirQuality, Characteristic.PM2_5Density],
+      subtype: device.id + '--' + SUBTYPE_PM2_5,
     }];
   }
 

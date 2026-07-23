@@ -98,6 +98,7 @@ export const MANUAL_DEVICE_TYPES = {
   MOTION: 'motion',
   LEAK: 'leak',
   SMOKE: 'smoke',
+  AIR_QUALITY_SENSOR_PM2_5: 'airQualitySensorPm25',
   OUTLET: 'outlet',
 } as const;
 
