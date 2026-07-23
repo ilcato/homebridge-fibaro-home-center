@@ -229,9 +229,8 @@ export class DeviceConfigurations {
   private static multilevelSensor(Service, Characteristic, device, config, log) {
     const properties = device.properties || {};
     const { deviceRole } = properties;
-    const role = typeof deviceRole === 'string' ? parseInt(deviceRole, 10) : deviceRole;
 
-    switch (role) {
+    switch (deviceRole) {
       case constants.DEVICE_ROLE_TEMPERATURE_SENSOR:
         return [{
           service: Service.TemperatureSensor,
