@@ -77,6 +77,7 @@ export const SUBTYPE_HEATING_ZONE = 'HZ';
 export const SUBTYPE_RADIATOR_THERMOSTATIC_VALVE = 'RV';
 export const SUBTYPE_OPEN_CLOSE_ONLY = 'OPENCLOSEONLY';
 export const SUBTYPE_PM2_5 = 'PM2_5';
+export const SUBTYPE_VOC_INDEX = 'VOC_INDEX';
 export const SUBTYPE_REMOTE_CONTROLLER_CENTRAL_SCENE = 'CS';
 export const SUBTYPE_REMOTE_CONTROLLER_SCENE_ACTIVATION = 'SA';
 
@@ -99,6 +100,7 @@ export const MANUAL_DEVICE_TYPES = {
   LEAK: 'leak',
   SMOKE: 'smoke',
   AIR_QUALITY_SENSOR_PM2_5: 'airQualitySensorPm25',
+  AIR_QUALITY_SENSOR_VOC_INDEX: 'airQualitySensorVocIndex',
   OUTLET: 'outlet',
 } as const;
 
@@ -145,5 +147,6 @@ export enum Characteristics {
   CurrentRelativeHumidity = 'CurrentRelativeHumidity',
   CurrentAmbientLightLevel = 'CurrentAmbientLightLevel',
   PM2_5Density = 'PM2_5Density',
+  VOCDensity = 'VOCDensity',
   HoldPosition = 'HoldPosition'
 }

@@ -211,6 +211,7 @@ export class FibaroAccessory {
     service.isRadiatorThermostaticValve = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_RADIATOR_THERMOSTATIC_VALVE;
     service.isOpenCloseOnly = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_OPEN_CLOSE_ONLY;
     service.isPM2_5Sensor = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_PM2_5;
+    service.isVOCIndexSensor = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_VOC_INDEX;
     service.isRemoteControllerCentralScene = IDs.length >= 5 && IDs[3] === constants.SUBTYPE_REMOTE_CONTROLLER_CENTRAL_SCENE;
     service.isRemoteControllerSceneActivation = IDs.length >= 5 && IDs[3] === constants.SUBTYPE_REMOTE_CONTROLLER_SCENE_ACTIVATION;
     service.remoteButtonNumber = IDs.length >= 5 ? parseInt(IDs[4]) : -1;
