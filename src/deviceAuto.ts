@@ -229,9 +229,8 @@ export class DeviceConfigurations {
   private static multilevelSensor(Service, Characteristic, device, config, log) {
     const properties = device.properties || {};
     const { deviceRole } = properties;
-    const role = typeof deviceRole === 'string' ? parseInt(deviceRole, 10) : deviceRole;
 
-    switch (role) {
+    switch (deviceRole) {
       case constants.DEVICE_ROLE_TEMPERATURE_SENSOR:
         return [{
           service: Service.TemperatureSensor,
@@ -281,17 +280,16 @@ export class DeviceConfigurations {
   private static doorbellContactSensor(Service, Characteristic, device, config) {
     const properties = device.properties || {};
     const { deviceRole } = properties;
-    const role = typeof deviceRole === 'string' ? parseInt(deviceRole, 10) : deviceRole;
 
     switch (true) {
-      case role === constants.DEVICE_ROLE_MOTION_SENSOR || properties.deviceRole === 'MotionSensor':
+      case deviceRole === constants.DEVICE_ROLE_MOTION_SENSOR:
         return [{
           service: Service.MotionSensor,
           characteristics: [Characteristic.MotionDetected],
           subtype: device.id + '----',
         }];
 
-      case role === constants.DEVICE_ROLE_PRESENCE_SENSOR:
+      case deviceRole === constants.DEVICE_ROLE_PRESENCE_SENSOR:
         return [{
           service: Service.OccupancySensor,
           characteristics: [Characteristic.OccupancyDetected],
