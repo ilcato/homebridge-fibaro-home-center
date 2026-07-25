@@ -419,6 +419,11 @@ export class FibaroAccessory {
       return;
     }
 
+    // Auto: use type-based configuration, keeping per-device options applicable
+    if (devConfig.displayAs === 'auto') {
+      return this.configureAccessoryFromType();
+    }
+
     // Find a matching function based on the name
     const manualConfigFunc = manualDeviceConfigs.get(devConfig.displayAs);
 

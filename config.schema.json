@@ -286,6 +286,12 @@
                   "enum": [
                     "exclude"
                   ]
+                },
+                {
+                  "title": "Auto (by device type)",
+                  "enum": [
+                    "auto"
+                  ]
                 }
               ],
               "required": true

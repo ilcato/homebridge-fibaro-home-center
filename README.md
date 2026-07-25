@@ -114,6 +114,7 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 + `displayAS` : Display as: switch, dimmer, air quality sensor, etc. or exclude device.
   + `airQualitySensorPm25` : Air Quality Sensor reading PM2.5 density (µg/m³).
   + `airQualitySensorVocIndex` : Air Quality Sensor reading Sensirion VOC Index (relative index, not µg/m³ — e.g. IKEA VINDSTYRKA).
+  + `auto` : Automatic type-based configuration (to combine with other per-device options).
 
 </details>
 
