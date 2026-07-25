@@ -153,7 +153,7 @@ export class Poller {
             change.value = (change.value - 32) * 5 / 9;
           }
 
-          if (service.remoteButtonNumber) {
+          if (service.remoteButtonNumber > 0) {
             if (characteristic.constructor !== this.platform.Characteristic.ProgrammableSwitchEvent) {
               return;
             }
