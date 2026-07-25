@@ -1,7 +1,7 @@
 // manualDeviceConfigurations.ts
 
 // Configuration for manual device setup
-import { MANUAL_DEVICE_TYPES, SUBTYPE_PM2_5 } from './constants';
+import { MANUAL_DEVICE_TYPES, SUBTYPE_PM2_5, SUBTYPE_VOC_INDEX } from './constants';
 
 type ManualConfigFunction = (Service, Characteristic, device) => {
   service;
@@ -140,6 +140,15 @@ export class ManualDeviceConfigurations {
       service: Service.AirQualitySensor,
       characteristics: [Characteristic.AirQuality, Characteristic.PM2_5Density],
       subtype: device.id + '--' + SUBTYPE_PM2_5,
+    }];
+  }
+
+  @ManualType(MANUAL_DEVICE_TYPES.AIR_QUALITY_SENSOR_VOC_INDEX)
+  static configureAirQualitySensorVocIndex(Service, Characteristic, device) {
+    return [{
+      service: Service.AirQualitySensor,
+      characteristics: [Characteristic.AirQuality, Characteristic.VOCDensity],
+      subtype: device.id + '--' + SUBTYPE_VOC_INDEX,
     }];
   }
 

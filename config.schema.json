@@ -270,6 +270,12 @@
                   ]
                 },
                 {
+                  "title": "Air Quality Sensor - VOC (Sensirion VOC Index)",
+                  "enum": [
+                    "airQualitySensorVocIndex"
+                  ]
+                },
+                {
                   "title": "Outlet",
                   "enum": [
                     "outlet"

@@ -517,13 +517,32 @@ export class GetFunctions {
       } else {
         characteristic.updateValue(this.platform.Characteristic.AirQuality.POOR);
       }
+    } else if (_service.isVOCIndexSensor) {
+      // Sensirion VOC Index: relative to the sensor's own 24 h baseline (100),
+      // on a logarithmic scale from 1 to 500. Not a health standard: bands are a
+      // pragmatic mapping anchored on Sensirion's documented values - baseline 100,
+      // air purifier trigger example 150, and algorithm gating threshold 230.
+      // EXCELLENT is intentionally not used, as a relative index cannot certify
+      // absolute air quality.
+      // https://sensirion.com/media/documents/02232963/6294E043/Info_Note_VOC_Index.pdf
+      if (v <= 150) {
+        characteristic.updateValue(this.platform.Characteristic.AirQuality.GOOD);
+      } else if (v <= 230) {
+        characteristic.updateValue(this.platform.Characteristic.AirQuality.FAIR);
+      } else if (v <= 350) {
+        characteristic.updateValue(this.platform.Characteristic.AirQuality.INFERIOR);
+      } else {
+        characteristic.updateValue(this.platform.Characteristic.AirQuality.POOR);
+      }
     }
   }
 
   @characteristicGetter(
     Characteristics.CurrentRelativeHumidity,
     Characteristics.CurrentAmbientLightLevel,
-    Characteristics.PM2_5Density)
+    Characteristics.PM2_5Density,
+    Characteristics.VOCDensity,
+  )
   getFloat(characteristic, _service, _IDs, properties) {
     const value = properties.value;
     if (value !== undefined && !isNaN(value)) {

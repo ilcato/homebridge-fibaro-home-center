@@ -73,6 +73,10 @@ Configure the plugin through the settings UI or directly in the JSON editor.
           "displayAs": "switch",
         },
         {
+          "id": 69,
+          "displayAs": "airQualitySensorVocIndex"
+        },
+        {
           "id": 58,
           "displayAs": "exclude",
         }
@@ -107,7 +111,9 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 
 #### Individual for each device
 + `id` : Device ID (like: 42).
-+ `displayAS` : Display as: switch, dimmer, etc. or exclude device.
++ `displayAS` : Display as: switch, dimmer, air quality sensor, etc. or exclude device.
+  + `airQualitySensorPm25` : Air Quality Sensor reading PM2.5 density (µg/m³).
+  + `airQualitySensorVocIndex` : Air Quality Sensor reading Sensirion VOC Index (relative index, not µg/m³ — e.g. IKEA VINDSTYRKA).
 
 </details>
 
