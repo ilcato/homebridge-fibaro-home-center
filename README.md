@@ -230,6 +230,20 @@ Warning: If you exclude the device, adding it again may require reconfiguration 
 </details>
 
 <details>
+<summary><b>Air quality sensors (PM2.5 / VOC index)</b></summary>
+
++ Any device that reports PM2.5 density or Sensirion VOC Index as its value (a multilevel sensor) can be exposed as an Air Quality Sensor accessory. Tested with an IKEA VINDSTYRKA connected through a Zigbee2MQTT QuickApp.
++ In the plugin settings UI, open `Individual devices settings`, add an entry for the device and set `Display as` to `Air Quality Sensor - PM2.5` or `Air Quality Sensor - VOC (Sensirion VOC Index)`. Or directly in `config.json`, in the `devices` array of the platform config:
+
+      { "id": 69, "displayAs": "airQualitySensorVocIndex" }
+
++ The Air Quality level shown in the Home app is derived from the measured value:
+  + PM2.5: mapped to the 2024 US EPA AQI breakpoints.
+  + VOC Index: a relative, dimensionless value (100 = the sensor's own 24 h baseline), not a µg/m³ concentration — around baseline reads GOOD, and increasingly elevated values read FAIR / INFERIOR / POOR. Read the number in the Home app as a trend indicator; exact thresholds are documented in the source next to the mapping.
+
+</details>
+
+<details>
 <summary><b>Child bridge mode</b></summary>
 
 It is recomended to run this plugin as child bridge, there are several reasons and benefits of doing this:
