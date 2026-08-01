@@ -80,6 +80,17 @@ export class FibaroAccessory {
         const serviceName = this.buildServiceName(service, subtype);
         s = this.accessory.addService(service, serviceName, subtype);
       }
+      // The Home app labels services from ConfiguredName, not Name. Only seed
+      // it when empty so a rename done in the Home app is preserved.
+      const configuredName = this.buildConfiguredName(service, subtype);
+      if (configuredName) {
+        s.addOptionalCharacteristic(this.platform.Characteristic.ConfiguredName);
+        const characteristic = s.getCharacteristic(this.platform.Characteristic.ConfiguredName);
+        if (!characteristic.value) {
+          characteristic.updateValue(configuredName);
+        }
+      }
+
       this.bindCharacterstics(s, characteristics);
     });
 
@@ -100,9 +111,26 @@ export class FibaroAccessory {
       return this.device.name + ' Battery';
     } else if (service === this.platform.Service.StatelessProgrammableSwitch) {
       return this.device.name + ' Button ' + subtype.split('-')[4];
+    } else if (subtype.split('-')[2] === constants.SUBTYPE_HVAC_FAN_SPEED) {
+      return this.device.name + ' Fan speed';
+    } else if (constants.HVAC_MODE_SWITCHES[subtype.split('-')[2]]) {
+      return this.device.name + ' ' + constants.HVAC_MODE_SWITCHES[subtype.split('-')[2]].label;
     } else {
       return this.device.name;
     }
+  }
+
+  // Value for the ConfiguredName characteristic: the short label the Home app
+  // shows for a service. Null for the service that just carries the device name.
+  buildConfiguredName(service, subtype) {
+    if (service === this.platform.Service.Battery) {
+      return 'Battery';
+    } else if (service === this.platform.Service.StatelessProgrammableSwitch) {
+      return 'Button ' + subtype.split('-')[4];
+    } else if (subtype.split('-')[2] === constants.SUBTYPE_HVAC_FAN_SPEED) {
+      return 'Fan speed';
+    }
+    return constants.HVAC_MODE_SWITCHES[subtype.split('-')[2]]?.label ?? null;
   }
 
   bindCharacterstics(service, characteristics) {
