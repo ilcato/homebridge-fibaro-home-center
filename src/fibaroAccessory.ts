@@ -127,18 +127,39 @@ export class FibaroAccessory {
         characteristic.props.minValue = -50;
       }
 
-      // Set the maximum target temperature based on configuration
+      // Set the target temperature range based on what the device reports
+      // (setpointCapabilitiesMin/Max and setpointStep); fall back to a sane
+      // heating range when not reported. The generic case keeps the
+      // configurable maximum for backwards compatibility.
       if (characteristic.constructor === this.platform.Characteristic.TargetTemperature) {
+        const props = this.device.properties;
+        let hvacMinValue = 0;
         if (service.isHvacHeat) {
-          characteristic.props.minValue = parseFloat(this.device.properties.heatingThermostatSetpointCapabilitiesMin);
-          characteristic.props.maxValue = parseFloat(this.device.properties.heatingThermostatSetpointCapabilitiesMax);
-          characteristic.props.minStep = parseFloat(this.device.properties.heatingThermostatSetpointStep[this.device.properties.unit]);
+          const min = parseFloat(props?.heatingThermostatSetpointCapabilitiesMin);
+          const max = parseFloat(props?.heatingThermostatSetpointCapabilitiesMax);
+          const step = parseFloat(props?.heatingThermostatSetpointStep?.[props?.unit]);
+          hvacMinValue = isNaN(min) ? 10 : min;
+          characteristic.props.minValue = hvacMinValue;
+          characteristic.props.maxValue = isNaN(max) ? 35 : max;
+          characteristic.props.minStep = isNaN(step) ? 1 : step;
         } else if (service.isHvacCool) {
-          characteristic.props.minValue = parseFloat(this.device.properties.coolingThermostatSetpointCapabilitiesMin);
-          characteristic.props.maxValue = parseFloat(this.device.properties.coolingThermostatSetpointCapabilitiesMax);
-          characteristic.props.minStep = parseFloat(this.device.properties.coolingThermostatSetpointStep[this.device.properties.unit]);
+          const min = parseFloat(props?.coolingThermostatSetpointCapabilitiesMin);
+          const max = parseFloat(props?.coolingThermostatSetpointCapabilitiesMax);
+          const step = parseFloat(props?.coolingThermostatSetpointStep?.[props?.unit]);
+          hvacMinValue = isNaN(min) ? 16 : min;
+          characteristic.props.minValue = hvacMinValue;
+          characteristic.props.maxValue = isNaN(max) ? 30 : max;
+          characteristic.props.minStep = isNaN(step) ? 1 : step;
         } else {
           characteristic.props.maxValue = this.platform.config.thermostatmaxtemperature;
+        }
+        if (service.isHvacHeat || service.isHvacCool) {
+          // Seed the initial value from the device so it starts inside the
+          // tightened range (the HAP default of 10 °C may lie below it).
+          const setpoint = parseFloat(service.isHvacHeat
+            ? props?.heatingThermostatSetpoint
+            : props?.coolingThermostatSetpoint);
+          characteristic.value = isNaN(setpoint) ? hvacMinValue : setpoint;
         }
       }
 
