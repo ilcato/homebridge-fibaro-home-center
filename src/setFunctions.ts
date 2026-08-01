@@ -175,6 +175,15 @@ export class SetFunctions {
       }, delay);
     };
 
+    // hvac mode switch: on selects the mode, off returns to plain cooling
+    if (service.hvacModeSwitch) {
+      if (!value && characteristic.value !== true) {
+        return;   // already off - don't power a stopped device into cooling
+      }
+      await this.command('setThermostatMode', [value ? service.hvacModeSwitch : 'Cool'], service, IDs);
+      return;
+    }
+
     if (service.isVirtual && !service.isGlobalVariableSwitch && !service.isGlobalVariableDimmer) {
       // It's a virtual device so the command is pressButton and not turnOn or Off
       await this.command('pressButton', [IDs[1]], service, IDs);
@@ -383,8 +392,35 @@ export class SetFunctions {
 
   @characteristicSetter(Characteristics.Active)
   async setActive(value, context, characteristic, service, IDs) {
+    // Fan service of an hvac device: power maps to thermostat mode Off/Cool
+    if (service.isHvacFanSpeed) {
+      const mode = value === this.platform.Characteristic.Active.ACTIVE ? 'Cool' : 'Off';
+      await this.command('setThermostatMode', [mode], service, IDs);
+      return;
+    }
+
     const action = (value === this.platform.Characteristic.Active.ACTIVE) ? 'turnOn' : 'turnOff';
     await this.command(action, null, service, IDs);
+  }
+
+  @characteristicSetter(Characteristics.RotationSpeed)
+  async setRotationSpeed(value, _context, _characteristic, service, IDs) {
+    if (value === 0) {
+      return;   // 0 arrives when HomeKit powers the device off; fan-off doesn't exist here
+    }
+    const speeds = ['Low', 'Medium', 'High'];
+    const index = Math.min(3, Math.max(1, Math.round(value / 33.33)));
+    const fanMode = speeds[index - 1];
+    // Dragging the slider produces a burst of writes; only send the last one,
+    // since devices behind a serial bridge mishandle overlapping commands.
+    if (service.fanSpeedTimer) {
+      clearTimeout(service.fanSpeedTimer);
+    }
+    service.fanSpeedTimer = setTimeout(() => {
+      service.fanSpeedTimer = null;
+      this.command('setThermostatFanMode', [fanMode], service, IDs)
+        .catch((e) => this.platform.log.error('Deferred fan speed command failed:', e));
+    }, 500);
   }
 
   async updateHomeCenterColorFromHomeKit(h, s, service, IDs) {
@@ -418,12 +454,14 @@ export class SetFunctions {
         setHeatingThermostatSetpoint: 'Setpoint',
         setCoolingThermostatSetpoint: 'Setpoint',
         setThermostatMode: 'Mode',
+        setThermostatFanMode: 'Fan mode',
       };
       const nc = c.replace(new RegExp(Object.keys(replacements).join('|'), 'g'), match => replacements[match] || match);
 
       const logMessage = `${service.displayName} [${IDs[0]}]: set ${nc}${
-        value !== null && nc !== 'Open' && nc !== 'Close' && nc !== 'Color' && nc !== 'Setpoint' && nc !== 'Mode' ? ` ${value}%` :
-          (value !== null && (nc === 'Color' || nc === 'Setpoint' || nc === 'Mode') ? ` ${value}` : '')
+        value !== null && nc !== 'Open' && nc !== 'Close' && nc !== 'Color' && nc !== 'Setpoint' && nc !== 'Mode' && nc !== 'Fan mode'
+          ? ` ${value}%` :
+          (value !== null && (nc === 'Color' || nc === 'Setpoint' || nc === 'Mode' || nc === 'Fan mode') ? ` ${value}` : '')
       }`;
 
       this.platform.log(logMessage);

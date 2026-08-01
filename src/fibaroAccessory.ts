@@ -260,6 +260,16 @@ export class FibaroAccessory {
         }
       }
 
+      // Snap the fan speed slider to the three discrete fan speeds of the hvac
+      // device (33/67/100 = Low/Medium/High). The step must divide into the
+      // maximum, otherwise the top speed cannot be reached from the Home app.
+      if (service.isHvacFanSpeed &&
+        characteristic.UUID === this.platform.Characteristic.RotationSpeed.UUID) {
+        characteristic.props.minValue = 0;
+        characteristic.props.maxValue = 100;
+        characteristic.props.minStep = 33.33;
+      }
+
       // Bind the characteristic to the service
       this.bindCharacteristic(characteristic, service, IDs);
     }
@@ -308,6 +318,8 @@ export class FibaroAccessory {
     service.isHeatingZone = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_HEATING_ZONE;
     service.isHvacHeat = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_HVAC_HEAT;
     service.isHvacCool = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_HVAC_COOL;
+    service.isHvacFanSpeed = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_HVAC_FAN_SPEED;
+    service.hvacModeSwitch = IDs.length >= 3 ? constants.HVAC_MODE_SWITCHES[IDs[2]]?.mode : undefined;
     service.isRadiatorThermostaticValve = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_RADIATOR_THERMOSTATIC_VALVE;
     service.isOpenCloseOnly = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_OPEN_CLOSE_ONLY;
     service.isPM2_5Sensor = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_PM2_5;
@@ -338,7 +350,15 @@ export class FibaroAccessory {
     }
     if (characteristic.constructor === this.platform.Characteristic.CurrentHeatingCoolingState ||
       characteristic.constructor === this.platform.Characteristic.TargetHeatingCoolingState) {
-      return (service.isHvacHeat || service.isHvacCool) ? 'thermostatMode' : 'mode';
+      if (service.isHvacHeat || service.isHvacCool) {
+        // The current state follows the operating state when the device reports one
+        if (characteristic.constructor === this.platform.Characteristic.CurrentHeatingCoolingState &&
+          this.device.properties?.thermostatOperatingState !== undefined) {
+          return 'thermostatOperatingState';
+        }
+        return 'thermostatMode';
+      }
+      return 'mode';
     }
     if (characteristic.UUID === this.platform.Characteristic.CurrentTemperature.UUID) {
       if (service.currentTemperatureFromDeviceId) {
@@ -358,6 +378,21 @@ export class FibaroAccessory {
         return 'coolingThermostatSetpoint';
       } else {
         return 'targettemperature';
+      }
+    }
+    if (characteristic.constructor === this.platform.Characteristic.Active) {
+      if (service.isHvacFanSpeed) {
+        return 'thermostatMode';
+      }
+    }
+    if (characteristic.constructor === this.platform.Characteristic.On) {
+      if (service.hvacModeSwitch) {
+        return 'thermostatMode';
+      }
+    }
+    if (characteristic.constructor === this.platform.Characteristic.RotationSpeed) {
+      if (service.isHvacFanSpeed) {
+        return 'thermostatFanMode';
       }
     }
     if (service.UUID === this.platform.Service.WindowCovering.UUID

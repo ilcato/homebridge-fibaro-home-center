@@ -220,12 +220,17 @@ Warning: If you exclude the device, adding it again may require reconfiguration 
 <details>
 <summary><b>HVAC devices (hvacSystemHeat / hvacSystemCool)</b></summary>
 
-+ Devices of type `com.fibaro.hvacSystemHeat` or `com.fibaro.hvacSystemCool` are exposed as Thermostat accessories with mode and target temperature control. Tested with QuickApp child devices (floor heating and A/C).
++ Heating devices (`com.fibaro.hvacSystemHeat`) are exposed as Thermostat accessories with mode and target temperature control. Tested with QuickApp child devices (floor heating).
++ Cooling devices (`com.fibaro.hvacSystemCool`) are exposed as a Thermostat accessory as well, with a fan service and, where the device supports them, extra switches for modes HomeKit has no vocabulary for. Tested with QuickApp child devices (A/C).
 + These Fibaro types carry no temperature reading of their own, so link a temperature source per device. In the plugin settings UI, open `Individual devices settings`, add an entry for the device, set `Display as` to `Auto (by device type)` and `Current Temperature from Device ID` to the ID of a temperature sensor. Or directly in `config.json`, in the `devices` array of the platform config:
 
       { "id": 34, "displayAs": "auto", "currentTemperatureFromDeviceId": 33 }
 
 + If no temperature source is set, the current temperature mirrors the target temperature and a warning is logged.
++ Fan speed (cooling devices): the three speeds reported in `supportedThermostatFanModes` (`Low` / `Medium` / `High`) are exposed as a separate fan accessory with a speed slider at 33 / 67 / 100 %. Automatic fan speeds (`AutoLow` / `AutoMedium` / `AutoHigh`) are shown as their underlying speed; turning the fan to automatic is only possible from the Home Center.
++ Mode switches (cooling devices): one switch is added for each of `Dry`, `Fan` and `FullPower` that the device lists in `supportedThermostatModes`, because HomeKit's thermostat has no equivalent. Turning a switch on selects that mode, turning it off returns the device to plain cooling. While one of these modes is active, the thermostat itself reads as cooling.
++ Current state: if the device reports `thermostatOperatingState`, the thermostat shows what the device is actually doing, so it reads as idle once the compressor stops rather than staying on cooling. Devices that do not report it fall back to deriving the state from the selected mode.
++ The switches and the fan appear as separate tiles of the same accessory; rename them in the Home app if you want shorter or localised names, and the plugin will keep your names.
 
 </details>
 

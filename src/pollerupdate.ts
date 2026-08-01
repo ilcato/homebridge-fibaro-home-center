@@ -101,14 +101,26 @@ export class Poller {
       this.manageValue({ ...change, value: change['ui.startStopActivitySwitch.value'] });
     } else if (change.color !== undefined) {
       this.manageColor(change);
-    } else if (change.thermostatMode !== undefined) {
-      this.manageOperatingMode(change);
-    } else if (change.heatingThermostatSetpoint !== undefined) {
-      this.manageHeatingThermostatSetpoint(change);
-    } else if (change.heatingThermostatSetpointFuture !== undefined) {
-      this.manageHeatingThermostatSetpointFuture(change);
-    } else if (change.coolingThermostatSetpoint !== undefined) {
-      this.manageCoolingThermostatSetpoint(change);
+    } else {
+      // hvac properties can arrive together in a single change
+      if (change.thermostatMode !== undefined) {
+        this.manageOperatingMode(change);
+      }
+      if (change.thermostatOperatingState !== undefined) {
+        this.manageThermostatOperatingState(change);
+      }
+      if (change.thermostatFanMode !== undefined) {
+        this.manageThermostatFanMode(change);
+      }
+      if (change.heatingThermostatSetpoint !== undefined) {
+        this.manageHeatingThermostatSetpoint(change);
+      }
+      if (change.heatingThermostatSetpointFuture !== undefined) {
+        this.manageHeatingThermostatSetpointFuture(change);
+      }
+      if (change.coolingThermostatSetpoint !== undefined) {
+        this.manageCoolingThermostatSetpoint(change);
+      }
     }
   }
 
@@ -281,6 +293,32 @@ export class Poller {
           (subscription.property === 'mode' || subscription.property === 'thermostatMode')) {
         this.platform.log.info('Updating value for device: ',
           `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.thermostatMode}`);
+        const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(subscription.characteristic.constructor);
+        if (getFunction) {
+          getFunction.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
+        }
+      }
+    });
+  }
+
+  manageThermostatOperatingState(change) {
+    this.platform.updateSubscriptions.forEach(subscription => {
+      if (parseInt(subscription.id) === change.id && subscription.property === 'thermostatOperatingState') {
+        this.platform.log.info('Updating value for device: ',
+          `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.thermostatOperatingState}`);
+        const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(subscription.characteristic.constructor);
+        if (getFunction) {
+          getFunction.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);
+        }
+      }
+    });
+  }
+
+  manageThermostatFanMode(change) {
+    this.platform.updateSubscriptions.forEach(subscription => {
+      if (parseInt(subscription.id) === change.id && subscription.property === 'thermostatFanMode') {
+        this.platform.log.info('Updating value for device: ',
+          `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.thermostatFanMode}`);
         const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(subscription.characteristic.constructor);
         if (getFunction) {
           getFunction.call(this.platform.getFunctions, subscription.characteristic, subscription.service, null, change);

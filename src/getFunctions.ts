@@ -18,6 +18,9 @@ export class GetFunctions {
   CurrentSecuritySystemStateMapping;
   TargetSecuritySystemStateMapping;
   modeMap;
+  TargetHeatingCoolingStateMapping;
+  ThermostatOperatingStateMapping;
+  FanModeToRotationSpeedMapping;
 
   constructor(private platform) {
     this.getFunctionsMapping = new Map();
@@ -43,7 +46,36 @@ export class GetFunctions {
       'Heat': CurrentHeatingCoolingState.HEAT,
       'Cool': CurrentHeatingCoolingState.COOL,
     };
+    // The target state also supports AUTO; the current state characteristic does not.
+    const { TargetHeatingCoolingState } = this.platform.Characteristic;
+    this.TargetHeatingCoolingStateMapping = new Map([
+      ['Off', TargetHeatingCoolingState.OFF],
+      ['Heat', TargetHeatingCoolingState.HEAT],
+      ['Cool', TargetHeatingCoolingState.COOL],
+      ['Auto', TargetHeatingCoolingState.AUTO],
+      // Modes HomeKit cannot express are shown as cooling; the dedicated
+      // switches expose which one is actually running.
+      ['Dry', TargetHeatingCoolingState.COOL],
+      ['Fan', TargetHeatingCoolingState.COOL],
+      ['FullPower', TargetHeatingCoolingState.COOL],
+    ]);
 
+    // What the device reports it is actually doing right now
+    this.ThermostatOperatingStateMapping = new Map([
+      ['Idle', CurrentHeatingCoolingState.OFF],
+      ['Heating', CurrentHeatingCoolingState.HEAT],
+      ['Cooling', CurrentHeatingCoolingState.COOL],
+      ['FanOnly', CurrentHeatingCoolingState.OFF],
+      ['PendingHeat', CurrentHeatingCoolingState.OFF],
+      ['PendingCool', CurrentHeatingCoolingState.OFF],
+    ]);
+
+    // Fan speeds map to fixed slider positions; Auto* variants mirror the
+    // underlying speed (automatic fan speed stays a Home Center feature).
+    this.FanModeToRotationSpeedMapping = new Map([
+      ['Low', 33.33], ['Medium', 66.66], ['High', 99.99],
+      ['AutoLow', 33.33], ['AutoMedium', 66.66], ['AutoHigh', 99.99],
+    ]);
 
     this.initializeFunctionsMapping();
   }
@@ -61,6 +93,11 @@ export class GetFunctions {
 
   @characteristicGetter(Characteristics.On, Characteristics.MotionDetected, Characteristics.OccupancyDetected)
   getBool(characteristic, service, IDs, properties) {
+    // hvac mode switch reflects the thermostat mode it represents
+    if (service.hvacModeSwitch) {
+      characteristic.updateValue(properties.thermostatMode === service.hvacModeSwitch);
+      return;
+    }
     const v = properties.value ?? properties['ui.startStopActivitySwitch.value'] ?? false;
     characteristic.updateValue(Utils.getBoolean(v));
   }
@@ -306,13 +343,30 @@ export class GetFunctions {
           characteristic.updateValue(state);
           break;
         }
-        case service.isHvacHeat: {
-          const state = this.modeMap[properties.thermostatMode];
-          characteristic.updateValue(state);
-          break;
-        }
+        case service.isHvacHeat:
         case service.isHvacCool: {
-          const state = this.modeMap[properties.thermostatMode];
+          // Prefer what the device reports it is doing, so the accessory shows
+          // idle once the setpoint is reached instead of the selected mode.
+          const operatingState = properties.thermostatOperatingState;
+          if (operatingState) {
+            const state = this.ThermostatOperatingStateMapping.get(operatingState);
+            if (state === undefined) {
+              this.platform.log.debug(`Unknown thermostatOperatingState: ${operatingState}`);
+              break;
+            }
+            characteristic.updateValue(state);
+            break;
+          }
+          // The current state has no AUTO and no dry/fan-only equivalent, so
+          // report the direction the device works in (or off, for fan only).
+          const direction = service.isHvacHeat ? 'Heat' : 'Cool';
+          const approximated = { 'Auto': direction, 'Dry': direction, 'FullPower': direction, 'Fan': 'Off' };
+          const mode = approximated[properties.thermostatMode] ?? properties.thermostatMode;
+          const state = this.modeMap[mode];
+          if (state === undefined) {
+            this.platform.log.debug(`Unknown thermostatMode: ${properties.thermostatMode}`);
+            break;
+          }
           characteristic.updateValue(state);
           break;
         }
@@ -346,13 +400,13 @@ export class GetFunctions {
           characteristic.updateValue(state);
           break;
         }
-        case service.isHvacHeat: {
-          const state = this.modeMap[properties.thermostatMode];
-          characteristic.updateValue(state);
-          break;
-        }
+        case service.isHvacHeat:
         case service.isHvacCool: {
-          const state = this.modeMap[properties.thermostatMode];
+          const state = this.TargetHeatingCoolingStateMapping.get(properties.thermostatMode);
+          if (state === undefined) {
+            this.platform.log.debug(`Unknown thermostatMode: ${properties.thermostatMode}`);
+            break;
+          }
           characteristic.updateValue(state);
           break;
         }
@@ -486,11 +540,32 @@ export class GetFunctions {
   }
 
   @characteristicGetter(Characteristics.Active)
-  getActive(characteristic, _service, _IDs, properties) {
+  getActive(characteristic, service, _IDs, properties) {
+    // Fan service of an hvac device: power state comes from thermostatMode
+    if (service.isHvacFanSpeed) {
+      const mode = properties.thermostatMode;
+      if (mode === undefined) {
+        return;
+      }
+      characteristic.updateValue(mode === 'Off'
+        ? this.platform.Characteristic.Active.INACTIVE
+        : this.platform.Characteristic.Active.ACTIVE);
+      return;
+    }
     const v = Utils.getBoolean(properties.value);
     characteristic.updateValue(v === false ?
       this.platform.Characteristic.Active.INACTIVE :
       this.platform.Characteristic.Active.ACTIVE);
+  }
+
+  @characteristicGetter(Characteristics.RotationSpeed)
+  getRotationSpeed(characteristic, _service, _IDs, properties) {
+    const speed = this.FanModeToRotationSpeedMapping.get(properties.thermostatFanMode);
+    if (speed === undefined) {
+      this.platform.log.debug(`Unknown thermostatFanMode: ${properties.thermostatFanMode}`);
+      return;
+    }
+    characteristic.updateValue(speed);
   }
 
   @characteristicGetter(Characteristics.InUse)
