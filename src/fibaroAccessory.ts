@@ -230,61 +230,34 @@ export class FibaroAccessory {
           characteristic.UUID === this.platform.Characteristic.TargetHeatingCoolingState.UUID)) {
 
         const modes = this.device.properties.supportedThermostatModes;
-        let maxValue = 0;
-        let validValues;
         if (modes) {
-          if (characteristic.UUID === this.platform.Characteristic.CurrentHeatingCoolingState.UUID) {
-            validValues = modes.map((mode) => {
-              let value = 0;
-              switch (mode) {
-                case 'Off':
-                  value = this.platform.Characteristic.CurrentHeatingCoolingState.OFF;
-                  break;
-                case 'Heat':
-                  value = this.platform.Characteristic.CurrentHeatingCoolingState.HEAT;
-                  break;
-                case 'Cool':
-                  value = this.platform.Characteristic.CurrentHeatingCoolingState.COOL;
-                  break;
-                default:
-                  break;
+          const { CurrentHeatingCoolingState, TargetHeatingCoolingState } = this.platform.Characteristic;
+          // Only the modes HomeKit can actually be set to. This deliberately
+          // differs from the getter mappings, which additionally approximate
+          // Dry/Fan/FullPower as cooling for display: those must not become
+          // selectable values here.
+          const modeMap: { [mode: string]: number } =
+            characteristic.UUID === CurrentHeatingCoolingState.UUID
+              ? {
+                'Off': CurrentHeatingCoolingState.OFF,
+                'Heat': CurrentHeatingCoolingState.HEAT,
+                'Cool': CurrentHeatingCoolingState.COOL,
               }
-              if (value > maxValue) {
-                maxValue = value;
-              }
-              return value;
-            });
-          } else {
-            validValues = modes.map((mode) => {
-              let value = 0;
-              switch (mode) {
-                case 'Off':
-                  value = this.platform.Characteristic.TargetHeatingCoolingState.OFF;
-                  break;
-                case 'Heat':
-                  value = this.platform.Characteristic.TargetHeatingCoolingState.HEAT;
-                  break;
-                case 'Cool':
-                  value = this.platform.Characteristic.TargetHeatingCoolingState.COOL;
-                  break;
-                case 'Auto':
-                  value = this.platform.Characteristic.TargetHeatingCoolingState.AUTO;
-                  break;
-                default:
-                  break;
-              }
-              if (value > maxValue) {
-                maxValue = value;
-              }
-              return value;
+              : {
+                'Off': TargetHeatingCoolingState.OFF,
+                'Heat': TargetHeatingCoolingState.HEAT,
+                'Cool': TargetHeatingCoolingState.COOL,
+                'Auto': TargetHeatingCoolingState.AUTO,
+              };
+          const validValues = [...new Set<number>(
+            modes.map((mode: string) => modeMap[mode]).filter((value: number | undefined) => value !== undefined),
+          )];
+          if (validValues.length > 0) {
+            characteristic.setProps({
+              maxValue: Math.max(...validValues),
+              validValues: validValues,
             });
           }
-
-          validValues.filter((v, i) => validValues.indexOf(v) === i);
-          characteristic.setProps({
-            maxValue: maxValue,
-            validValues: validValues,
-          });
         }
       }
 

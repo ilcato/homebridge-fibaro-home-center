@@ -230,7 +230,7 @@ export class GetFunctions {
       }
       characteristic.updateValue(temperature);
     } catch (e) {
-      this.platform.log(`Error getting Target Temperature: ${service.IDs[0]} - Err: ${e}`);
+      this.platform.log(`Error getting Target Temperature: ${IDs} - Err: ${e}`);
     }
   }
 
@@ -372,7 +372,7 @@ export class GetFunctions {
         }
       }
     } catch (e) {
-      this.platform.log(`Error getting Current Heating Cooling State: ${service.IDs[0]} - Err: ${e}`);
+      this.platform.log(`Error getting Current Heating Cooling State: ${IDs} - Err: ${e}`);
     }
   }
 
@@ -412,7 +412,7 @@ export class GetFunctions {
         }
       }
     } catch (e) {
-      this.platform.log(`Error getting Target Heating Cooling State: ${service.IDs[0]} - Err: ${e}`);
+      this.platform.log(`Error getting Target Heating Cooling State: ${IDs} - Err: ${e}`);
     }
   }
 
