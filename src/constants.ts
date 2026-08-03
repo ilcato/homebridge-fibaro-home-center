@@ -74,6 +74,19 @@ export const SUBTYPE_LOCK = 'LOCK';
 export const SUBTYPE_SCENE = 'SC';
 export const SUBTYPE_CLIMATE_ZONE = 'CZ';
 export const SUBTYPE_HEATING_ZONE = 'HZ';
+export const SUBTYPE_HVAC_HEAT = 'HVAC_HEAT';
+export const SUBTYPE_HVAC_COOL = 'HVAC_COOL';
+export const SUBTYPE_HVAC_FAN_SPEED = 'HVAC_FAN_SPEED';
+export const SUBTYPE_HVAC_DRY = 'HVAC_DRY';
+export const SUBTYPE_HVAC_FAN = 'HVAC_FAN';
+export const SUBTYPE_HVAC_MAX = 'HVAC_MAX';
+// Switches for hvac modes HomeKit cannot express: subtype -> HC thermostat mode
+// and the label shown in the Home app.
+export const HVAC_MODE_SWITCHES: { [subtype: string]: { mode: string; label: string } } = {
+  [SUBTYPE_HVAC_DRY]: { mode: 'Dry', label: 'Dry' },
+  [SUBTYPE_HVAC_FAN]: { mode: 'Fan', label: 'Fan' },
+  [SUBTYPE_HVAC_MAX]: { mode: 'FullPower', label: 'Max' },
+};
 export const SUBTYPE_RADIATOR_THERMOSTATIC_VALVE = 'RV';
 export const SUBTYPE_OPEN_CLOSE_ONLY = 'OPENCLOSEONLY';
 export const SUBTYPE_PM2_5 = 'PM2_5';
@@ -140,6 +153,7 @@ export enum Characteristics {
   SecuritySystemCurrentState = 'SecuritySystemCurrentState',
   SecuritySystemTargetState = 'SecuritySystemTargetState',
   Active = 'Active',
+  RotationSpeed = 'RotationSpeed',
   InUse = 'InUse',
   ProgrammableSwitchEvent = 'ProgrammableSwitchEvent',
   ServiceLabelIndex = 'ServiceLabelIndex',

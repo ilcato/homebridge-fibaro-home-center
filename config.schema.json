@@ -286,9 +286,21 @@
                   "enum": [
                     "exclude"
                   ]
+                },
+                {
+                  "title": "Auto (by device type)",
+                  "enum": [
+                    "auto"
+                  ]
                 }
               ],
               "required": true
+            },
+            "currentTemperatureFromDeviceId": {
+              "title": "Current Temperature from Device ID",
+              "description": "Read CurrentTemperature from this HC3 device (typically a temperature sensor). Applies to any accessory exposing CurrentTemperature; primarily intended for thermostat-type devices without their own temperature reading (e.g. com.fibaro.hvacSystemHeat/Cool).",
+              "type": "integer",
+              "required": false
             }
           }
         }
@@ -406,7 +418,8 @@
       "expanded": false,
       "items": [
         "devices[].id",
-        "devices[].displayAs"
+        "devices[].displayAs",
+        "devices[].currentTemperatureFromDeviceId"
       ]
     }
   ],

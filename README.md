@@ -77,6 +77,11 @@ Configure the plugin through the settings UI or directly in the JSON editor.
           "displayAs": "airQualitySensorVocIndex"
         },
         {
+          "id": 34,
+          "displayAs": "auto",
+          "currentTemperatureFromDeviceId": 33
+        },
+        {
           "id": 58,
           "displayAs": "exclude",
         }
@@ -114,6 +119,10 @@ Configure the plugin through the settings UI or directly in the JSON editor.
 + `displayAS` : Display as: switch, dimmer, air quality sensor, etc. or exclude device.
   + `airQualitySensorPm25` : Air Quality Sensor reading PM2.5 density (µg/m³).
   + `airQualitySensorVocIndex` : Air Quality Sensor reading Sensirion VOC Index (relative index, not µg/m³ — e.g. IKEA VINDSTYRKA).
+  + `auto` : Automatic type-based configuration (to combine with other per-device options).
++ `currentTemperatureFromDeviceId` (integer) : Read CurrentTemperature from another Home Center device, typically a temperature sensor.
+  + Intended for thermostat-type devices without their own temperature reading (`com.fibaro.hvacSystemHeat` / `com.fibaro.hvacSystemCool`).
+  + If not set, the current temperature mirrors the target temperature and a warning is logged.
 
 </details>
 
@@ -205,6 +214,38 @@ Warning: If you exclude the device, adding it again may require reconfiguration 
     
 + Thermostat Controls: once a climate / heating zone is created in the Home Center / Yubii Home, a corresponding Thermostat accessory is generated in HomeKit. The Thermostat accessory provides intuitive controls within the HomeKit ecosystem.
 + Manual Settings and Timeout: the controls available on the Thermostat activate a manual setting for the specified duration. This duration is set by the `thermostattimeout` parameter in the `config.json` file. During this period, the manual settings remain in effect for the zone. After the predefined timeout period expires, the normal schedule of the zone is automatically reactivated. This ensures that the zone reverts to its programmed schedule once the manual setting duration elapses.
+
+</details>
+
+<details>
+<summary><b>HVAC devices (hvacSystemHeat / hvacSystemCool)</b></summary>
+
++ Heating devices (`com.fibaro.hvacSystemHeat`) are exposed as Thermostat accessories with mode and target temperature control. Tested with QuickApp child devices (floor heating).
++ Cooling devices (`com.fibaro.hvacSystemCool`) are exposed as a Thermostat accessory as well, with a fan service and, where the device supports them, extra switches for modes HomeKit has no vocabulary for. Tested with QuickApp child devices (A/C).
++ These Fibaro types carry no temperature reading of their own, so link a temperature source per device. In the plugin settings UI, open `Individual devices settings`, add an entry for the device, set `Display as` to `Auto (by device type)` and `Current Temperature from Device ID` to the ID of a temperature sensor. Or directly in `config.json`, in the `devices` array of the platform config:
+
+      { "id": 34, "displayAs": "auto", "currentTemperatureFromDeviceId": 33 }
+
++ If no temperature source is set, the current temperature mirrors the target temperature and a warning is logged.
++ With `markDeadDevices` enabled, the accessory follows the dead status of the linked temperature source as well, since that is where its current temperature comes from.
++ Fan speed: devices reporting `supportedThermostatFanModes` get a separate fan accessory whose slider snaps to the three speeds the device supports (`Low` / `Medium` / `High`, at roughly a third, two thirds and full speed). Automatic fan speeds (`AutoLow` / `AutoMedium` / `AutoHigh`) are shown as their underlying speed; turning the fan to automatic is only possible from the Home Center.
++ Mode switches (cooling devices): one switch is added for each of `Dry`, `Fan` and `FullPower` that the device lists in `supportedThermostatModes`, because HomeKit's thermostat has no equivalent. Turning a switch on selects that mode, turning it off returns the device to plain cooling. While one of these modes is active, the thermostat itself reads as cooling.
++ Current state: if the device reports `thermostatOperatingState`, the thermostat shows what the device is actually doing, so it reads as idle once the compressor stops rather than staying on cooling. Devices that do not report it fall back to deriving the state from the selected mode.
++ The switches and the fan appear as separate tiles of the same accessory; rename them in the Home app if you want shorter or localised names, and the plugin will keep your names.
+
+</details>
+
+<details>
+<summary><b>Air quality sensors (PM2.5 / VOC index)</b></summary>
+
++ Any device that reports PM2.5 density or Sensirion VOC Index as its value (a multilevel sensor) can be exposed as an Air Quality Sensor accessory. Tested with an IKEA VINDSTYRKA connected through a Zigbee2MQTT QuickApp.
++ In the plugin settings UI, open `Individual devices settings`, add an entry for the device and set `Display as` to `Air Quality Sensor - PM2.5` or `Air Quality Sensor - VOC (Sensirion VOC Index)`. Or directly in `config.json`, in the `devices` array of the platform config:
+
+      { "id": 69, "displayAs": "airQualitySensorVocIndex" }
+
++ The Air Quality level shown in the Home app is derived from the measured value:
+  + PM2.5: mapped to the 2024 US EPA AQI breakpoints.
+  + VOC Index: a relative, dimensionless value (100 = the sensor's own 24 h baseline), not a µg/m³ concentration — around baseline reads GOOD, and increasingly elevated values read FAIR / INFERIOR / POOR. Read the number in the Home app as a trend indicator; exact thresholds are documented in the source next to the mapping.
 
 </details>
 

@@ -486,7 +486,52 @@ export class DeviceConfigurations {
     }];
   }
 
-  // Global variables
+  @DeviceType('com.fibaro.hvacSystemHeat')
+  private static hvacSystemHeat(Service, Characteristic, device) {
+    return DeviceConfigurations.hvacSystem(Service, Characteristic, device, constants.SUBTYPE_HVAC_HEAT);
+  }
+
+  // HVAC Cool devices
+  @DeviceType('com.fibaro.hvacSystemCool')
+  private static hvacSystemCool(Service, Characteristic, device) {
+    return DeviceConfigurations.hvacSystem(Service, Characteristic, device, constants.SUBTYPE_HVAC_COOL);
+  }
+
+  private static hvacSystem(Service, Characteristic, device, subtype) {
+    const services = [{
+      service: Service.Thermostat,
+      characteristics: [
+        Characteristic.CurrentTemperature,
+        Characteristic.TargetTemperature,
+        Characteristic.CurrentHeatingCoolingState,
+        Characteristic.TargetHeatingCoolingState,
+        Characteristic.TemperatureDisplayUnits,
+      ],
+      subtype: device.id + '--' + subtype,
+    }];
+    // Devices that report fan speeds get a fan accessory alongside the thermostat
+    if ((device.properties?.supportedThermostatFanModes ?? []).length > 0) {
+      services.push({
+        service: Service.Fanv2,
+        characteristics: [Characteristic.Active, Characteristic.RotationSpeed],
+        subtype: device.id + '--' + constants.SUBTYPE_HVAC_FAN_SPEED,
+      });
+    }
+    // One switch per mode the device reports and HomeKit cannot express
+    const supportedModes = device.properties?.supportedThermostatModes ?? [];
+    for (const [subtypeKey, { mode }] of Object.entries(constants.HVAC_MODE_SWITCHES)) {
+      if (!supportedModes.includes(mode)) {
+        continue;
+      }
+      services.push({
+        service: Service.Switch,
+        characteristics: [Characteristic.On],
+        subtype: device.id + '--' + subtypeKey,
+      });
+    }
+    return services;
+  }
+
   @DeviceType(constants.DEVICE_TYPE_GLOBAL_VARIABLE)
   private static globalVariable(Service, Characteristic, device) {
     return [{
