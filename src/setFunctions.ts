@@ -175,12 +175,13 @@ export class SetFunctions {
       }, delay);
     };
 
-    // hvac mode switch: on selects the mode, off returns to plain cooling
+    // hvac mode switch: on selects the mode, off returns to normal operation
     if (service.hvacModeSwitch) {
       if (!value && characteristic.value !== true) {
-        return;   // already off - don't power a stopped device into cooling
+        return;   // already off - don't power a stopped device back on
       }
-      await this.command('setThermostatMode', [value ? service.hvacModeSwitch : 'Cool'], service, IDs);
+      await this.command('setThermostatMode',
+        [value ? service.hvacModeSwitch : service.hvacDefaultMode], service, IDs);
       return;
     }
 
@@ -392,9 +393,15 @@ export class SetFunctions {
 
   @characteristicSetter(Characteristics.Active)
   async setActive(value, context, characteristic, service, IDs) {
-    // Fan service of an hvac device: power maps to thermostat mode Off/Cool
+    // Fan service of an hvac device: power maps to the parent's operating mode
     if (service.isHvacFanSpeed) {
-      const mode = value === this.platform.Characteristic.Active.ACTIVE ? 'Cool' : 'Off';
+      const active = value === this.platform.Characteristic.Active.ACTIVE;
+      if (!active && service.fanSpeedTimer) {
+        // Powering off supersedes a fan speed that is still waiting to be sent
+        clearTimeout(service.fanSpeedTimer);
+        service.fanSpeedTimer = null;
+      }
+      const mode = active ? service.hvacDefaultMode : 'Off';
       await this.command('setThermostatMode', [mode], service, IDs);
       return;
     }
@@ -405,6 +412,9 @@ export class SetFunctions {
 
   @characteristicSetter(Characteristics.RotationSpeed)
   async setRotationSpeed(value, _context, _characteristic, service, IDs) {
+    if (!service.isHvacFanSpeed) {
+      return;
+    }
     if (value === 0) {
       return;   // 0 arrives when HomeKit powers the device off; fan-off doesn't exist here
     }

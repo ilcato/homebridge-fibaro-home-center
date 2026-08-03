@@ -321,6 +321,10 @@ export class FibaroAccessory {
     service.isHvacCool = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_HVAC_COOL;
     service.isHvacFanSpeed = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_HVAC_FAN_SPEED;
     service.hvacModeSwitch = IDs.length >= 3 ? constants.HVAC_MODE_SWITCHES[IDs[2]]?.mode : undefined;
+    // The fan and mode switches carry their own subtype, so the mode the
+    // parent device runs in normally has to be recorded here for the setters.
+    service.hvacDefaultMode = this.device.type === 'com.fibaro.hvacSystemHeat' ? 'Heat'
+      : this.device.type === 'com.fibaro.hvacSystemCool' ? 'Cool' : undefined;
     service.isRadiatorThermostaticValve = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_RADIATOR_THERMOSTATIC_VALVE;
     service.isOpenCloseOnly = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_OPEN_CLOSE_ONLY;
     service.isPM2_5Sensor = IDs.length >= 3 && IDs[2] === constants.SUBTYPE_PM2_5;
@@ -585,8 +589,9 @@ export class FibaroAccessory {
       return;
     }
 
-    // Auto: use type-based configuration, keeping per-device options applicable
-    if (devConfig.displayAs === 'auto') {
+    // Auto, or an entry that only carries per-device options such as
+    // currentTemperatureFromDeviceId: use type-based configuration
+    if (!devConfig.displayAs || devConfig.displayAs === 'auto') {
       return this.configureAccessoryFromType();
     }
 

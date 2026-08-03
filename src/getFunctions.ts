@@ -559,7 +559,10 @@ export class GetFunctions {
   }
 
   @characteristicGetter(Characteristics.RotationSpeed)
-  getRotationSpeed(characteristic, _service, _IDs, properties) {
+  getRotationSpeed(characteristic, service, _IDs, properties) {
+    if (!service.isHvacFanSpeed) {
+      return;
+    }
     const speed = this.FanModeToRotationSpeedMapping.get(properties.thermostatFanMode);
     if (speed === undefined) {
       this.platform.log.debug(`Unknown thermostatFanMode: ${properties.thermostatFanMode}`);

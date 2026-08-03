@@ -102,7 +102,8 @@ export class Poller {
     } else if (change.color !== undefined) {
       this.manageColor(change);
     } else {
-      // hvac properties can arrive together in a single change
+      // Several hvac properties can arrive in the same change, so they are
+      // dispatched independently rather than as an either/or chain
       if (change.thermostatMode !== undefined) {
         this.manageOperatingMode(change);
       }
