@@ -114,7 +114,7 @@ export class FibaroAccessory {
     } else if (subtype.split('-')[2] === constants.SUBTYPE_HVAC_FAN_SPEED) {
       return this.device.name + ' Fan speed';
     } else if (constants.HVAC_MODE_SWITCHES[subtype.split('-')[2]]) {
-      return this.device.name + ' ' + constants.HVAC_MODE_SWITCHES[subtype.split('-')[2]].label;
+      return this.device.name + ' Mode ' + constants.HVAC_MODE_SWITCHES[subtype.split('-')[2]].label;
     } else {
       return this.device.name;
     }
@@ -130,7 +130,9 @@ export class FibaroAccessory {
     } else if (subtype.split('-')[2] === constants.SUBTYPE_HVAC_FAN_SPEED) {
       return 'Fan speed';
     }
-    return constants.HVAC_MODE_SWITCHES[subtype.split('-')[2]]?.label ?? null;
+    return constants.HVAC_MODE_SWITCHES[subtype.split('-')[2]]
+      ? 'Mode ' + constants.HVAC_MODE_SWITCHES[subtype.split('-')[2]].label
+      : null;
   }
 
   bindCharacterstics(service, characteristics) {
