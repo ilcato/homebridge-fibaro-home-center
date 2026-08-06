@@ -36,7 +36,6 @@
     "Siri"
   ],
   "dependencies": {
-    "homebridge-config-ui-x": "^5.2.0",
     "reflect-metadata": "^0.2.2",
     "superagent": "^10.1.0",
     "superagent-throttle": "^1.0.1"
