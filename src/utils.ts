@@ -25,7 +25,7 @@ export class Utils {
           return false;
         }
         // If it's a number string, convert to integer and check if it's non-zero
-        const numValue = parseInt(value, 10);
+        const numValue = Number(value);
         return !isNaN(numValue) && numValue !== 0;
       }
 
@@ -41,6 +41,7 @@ export class Utils {
 
   static RGBtoHSV(r, g, b, w) {
     if (arguments.length === 1) {
+      w = r.w ?? 0;
       g = r.g;
       b = r.b;
       r = r.r;
