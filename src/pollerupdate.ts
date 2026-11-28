@@ -11,6 +11,10 @@ export class Poller {
 
   constructor(private platform, private pollerPeriod: number) { }
 
+  private matchesDeviceId(subscriptionId, changeId): boolean {
+    return parseInt(subscriptionId, 10) === parseInt(changeId, 10);
+  }
+
   async poll() {
     if (this.timeout) {
       clearTimeout(this.timeout);
@@ -160,7 +164,7 @@ export class Poller {
     this.platform.updateSubscriptions.forEach(subscription => {
       if (!(subscription.service instanceof this.platform.Service.Battery) && subscription.characteristic.displayName !== 'Name') {
         const { property, id, characteristic, service } = subscription;
-        if (parseInt(id) === change.id &&
+        if (this.matchesDeviceId(id, change.id) &&
             ((property === 'value' && change.value !== undefined) || (property === 'value2' && change.value2 !== undefined))) {
 
           if (this.platform.config.FibaroTemperatureUnit === constants.CONFIG_FIBARO_TEMPERATURE_UNIT_FAHRENHEIT &&
@@ -272,7 +276,7 @@ export class Poller {
 
   manageColor(change) {
     this.platform.updateSubscriptions.forEach(subscription => {
-      if (parseInt(subscription.id) === change.id && subscription.property === 'color') {
+      if (this.matchesDeviceId(subscription.id, change.id) && subscription.property === 'color') {
         const hsv = Utils.updateHomeKitColorFromHomeCenter(change.color);
         const { characteristic } = subscription;
         if (characteristic.constructor === this.platform.Characteristic.On) {
@@ -290,7 +294,7 @@ export class Poller {
 
   manageOperatingMode(change) {
     this.platform.updateSubscriptions.forEach(subscription => {
-      if (parseInt(subscription.id) === change.id &&
+      if (this.matchesDeviceId(subscription.id, change.id) &&
           (subscription.property === 'mode' || subscription.property === 'thermostatMode')) {
         this.platform.log.info('Updating value for device: ',
           `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.thermostatMode}`);
@@ -304,7 +308,7 @@ export class Poller {
 
   manageThermostatOperatingState(change) {
     this.platform.updateSubscriptions.forEach(subscription => {
-      if (parseInt(subscription.id) === change.id && subscription.property === 'thermostatOperatingState') {
+      if (this.matchesDeviceId(subscription.id, change.id) && subscription.property === 'thermostatOperatingState') {
         this.platform.log.info('Updating value for device: ',
           `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.thermostatOperatingState}`);
         const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(subscription.characteristic.constructor);
@@ -317,7 +321,7 @@ export class Poller {
 
   manageThermostatFanMode(change) {
     this.platform.updateSubscriptions.forEach(subscription => {
-      if (parseInt(subscription.id) === change.id && subscription.property === 'thermostatFanMode') {
+      if (this.matchesDeviceId(subscription.id, change.id) && subscription.property === 'thermostatFanMode') {
         this.platform.log.info('Updating value for device: ',
           `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.thermostatFanMode}`);
         const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(subscription.characteristic.constructor);
@@ -330,7 +334,7 @@ export class Poller {
 
   manageHeatingThermostatSetpoint(change) {
     this.platform.updateSubscriptions.forEach(subscription => {
-      if (parseInt(subscription.id) === change.id &&
+      if (this.matchesDeviceId(subscription.id, change.id) &&
           (subscription.property === 'currenttemperature' || subscription.property === 'heatingThermostatSetpoint')) {
         this.platform.log.info('Updating value for device: ',
           `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.heatingThermostatSetpoint}`);
@@ -344,7 +348,7 @@ export class Poller {
 
   manageHeatingThermostatSetpointFuture(change) {
     this.platform.updateSubscriptions.forEach(subscription => {
-      if (parseInt(subscription.id) === change.id && subscription.property === 'targettemperature') {
+      if (this.matchesDeviceId(subscription.id, change.id) && subscription.property === 'targettemperature') {
         this.platform.log.info('Updating value for device: ',
           `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.heatingThermostatSetpointFuture}`);
         const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(subscription.characteristic.constructor);
@@ -357,7 +361,7 @@ export class Poller {
 
   manageCoolingThermostatSetpoint(change) {
     this.platform.updateSubscriptions.forEach(subscription => {
-      if (parseInt(subscription.id) === change.id && subscription.property === 'coolingThermostatSetpoint') {
+      if (this.matchesDeviceId(subscription.id, change.id) && subscription.property === 'coolingThermostatSetpoint') {
         this.platform.log.info('Updating value for device: ',
           `${subscription.id}  parameter: ${subscription.characteristic.displayName}, value: ${change.coolingThermostatSetpoint}`);
         const getFunction = this.platform.getFunctions!.getFunctionsMapping.get(subscription.characteristic.constructor);

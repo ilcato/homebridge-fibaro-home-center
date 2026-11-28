@@ -24,6 +24,7 @@
     "lint": "eslint src/**.ts --max-warnings=30",
     "watch": "npm run build && npm link && nodemon",
     "build": "rimraf ./dist && tsc",
+    "test": "npm run build && node --test --experimental-test-coverage test/*.test.js",
     "prepublishOnly": "npm run lint && npm run build"
   },
   "keywords": [

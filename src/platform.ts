@@ -98,6 +98,8 @@ export class FibaroHC implements DynamicPlatformPlugin {
       constants.DEFAULT_THERMOSTAT_MAX_TEMP;
     if (isNaN(thermostatMaxTemp) || thermostatMaxTemp < 0 || thermostatMaxTemp > constants.DEFAULT_THERMOSTAT_MAX_TEMP) {
       this.config.thermostatmaxtemperature = constants.DEFAULT_THERMOSTAT_MAX_TEMP;
+    } else {
+      this.config.thermostatmaxtemperature = thermostatMaxTemp;
     }
   }
 
